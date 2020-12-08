@@ -1,0 +1,77 @@
+definitions:
+  cpts.Person:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      score:
+        type: number
+    type: object
+  cpts.QueryRequest:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+    type: object
+host: 10.78.74.37:8150
+info:
+  contact: {}
+  description: This is a console server celler server.
+  license: {}
+  title: console Swagger API
+  version: "1.0"
+paths:
+  /test/all: {}
+  /test/person:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 上传人物信息
+      parameters:
+      - description: 任务信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/cpts.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cpts.Person'
+        "400": {}
+        "500": {}
+      summary: 上传人物信息
+      tags:
+      - CPTS
+  /test/query:
+    get:
+      consumes:
+      - application/json
+      description: 请求参数编码
+      parameters:
+      - description: 名字
+        in: query
+        name: name
+        type: string
+      - description: 年龄
+        in: query
+        name: age
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cpts.QueryRequest'
+        "400": {}
+        "500": {}
+      summary: 请求参数处理
+      tags:
+      - CPTS
+swagger: "2.0"

@@ -1,0 +1,116 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a console server celler server.",
+        "title": "console Swagger API",
+        "contact": {},
+        "license": {},
+        "version": "1.0"
+    },
+    "host": "10.78.74.37:8150",
+    "paths": {
+        "/test/all": {},
+        "/test/person": {
+            "post": {
+                "description": "上传人物信息",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CPTS"
+                ],
+                "summary": "上传人物信息",
+                "parameters": [
+                    {
+                        "description": "任务信息",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cpts.Person"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cpts.Person"
+                        }
+                    },
+                    "400": {},
+                    "500": {}
+                }
+            }
+        },
+        "/test/query": {
+            "get": {
+                "description": "请求参数编码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CPTS"
+                ],
+                "summary": "请求参数处理",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "名字",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "年龄",
+                        "name": "age",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cpts.QueryRequest"
+                        }
+                    },
+                    "400": {},
+                    "500": {}
+                }
+            }
+        }
+    },
+    "definitions": {
+        "cpts.Person": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                }
+            }
+        },
+        "cpts.QueryRequest": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
