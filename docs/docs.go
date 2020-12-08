@@ -25,7 +25,37 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/test/all": {},
+        "/test/all": {
+            "post": {
+                "description": "返回请求数据",
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "CPTS"
+                ],
+                "summary": "返回请求数据",
+                "parameters": [
+                    {
+                        "description": "数据流",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {},
+                    "400": {},
+                    "500": {}
+                }
+            }
+        },
         "/test/person": {
             "post": {
                 "description": "上传人物信息",

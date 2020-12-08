@@ -23,7 +23,27 @@ info:
   title: console Swagger API
   version: "1.0"
 paths:
-  /test/all: {}
+  /test/all:
+    post:
+      consumes:
+      - application/octet-stream
+      description: 返回请求数据
+      parameters:
+      - description: 数据流
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200": {}
+        "400": {}
+        "500": {}
+      summary: 返回请求数据
+      tags:
+      - CPTS
   /test/person:
     post:
       consumes:

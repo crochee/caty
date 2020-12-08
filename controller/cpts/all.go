@@ -24,7 +24,7 @@ import (
 // @Success 200
 // @Failure 400
 // @Failure 500
-// @Router /test/all [any]
+// @Router /test/all [post]
 func PayAll(ctx *gin.Context) {
 	n, err := io.Copy(ctx.Writer, ctx.Request.Body)
 	if err != nil {
