@@ -22,7 +22,7 @@ import (
 
 func GinRun() *gin.Engine {
 	router := gin.New()
-	router.Use(middleware.Limit, middleware.CrossDomain, middleware.Recovery)
+	router.Use(middleware.Limit, middleware.Log, middleware.CrossDomain, middleware.Recovery)
 
 	url := ginSwagger.URL("/swagger/doc.json")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
