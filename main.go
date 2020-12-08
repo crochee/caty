@@ -6,13 +6,16 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
+
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"obs/config"
 	"obs/logger"
 	"obs/router"
 )
@@ -21,10 +24,12 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	config.InitConfig()
 	logger.InitLogger()
 
 	srv := &http.Server{
-		Addr:    ":8150",
+		Addr: fmt.Sprintf("%v:%d", config.Cfg.IP.String(),
+			config.Cfg.ServiceInfo.Port),
 		Handler: router.GinRun(),
 	}
 	srv.RegisterOnShutdown(logger.Exit)

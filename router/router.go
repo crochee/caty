@@ -6,9 +6,10 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"obs/config"
 	"obs/controller/cpts"
 	_ "obs/docs"
 	"obs/middleware"
@@ -24,8 +25,10 @@ func GinRun() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.Limit, middleware.Log, middleware.CrossDomain, middleware.Recovery)
 
-	url := ginSwagger.URL("/swagger/doc.json")
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	if config.Cfg.ServiceInfo.Mode != gin.TestMode {
+		url := ginSwagger.URL("/swagger/doc.json")
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	}
 
 	testRouter := router.Group("/test")
 	{

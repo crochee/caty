@@ -7,6 +7,7 @@
 package logger
 
 import (
+	"github.com/gin-gonic/gin"
 	"io"
 	"strings"
 
@@ -57,9 +58,9 @@ func newEncoderConfig() zapcore.EncoderConfig {
 func newLevel(level string) zapcore.Level {
 	var l zapcore.Level
 	switch strings.ToUpper(level) {
-	case DebugLevel:
+	case DebugLevel, gin.DebugMode, gin.TestMode:
 		l = zap.DebugLevel
-	case InfoLevel:
+	case InfoLevel, gin.ReleaseMode:
 		l = zap.InfoLevel
 	case WarnLevel:
 		l = zap.WarnLevel
