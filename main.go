@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,10 +22,7 @@ import (
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
 	config.InitConfig()
-	logger.InitLogger()
-
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Cfg.ServiceInfo.Port),
 		Handler: router.GinRun(),

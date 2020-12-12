@@ -9,7 +9,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"obs/config"
 	"obs/controller/cpts"
 	_ "obs/docs"
 	"obs/middleware"
@@ -25,7 +24,7 @@ func GinRun() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.Limit, middleware.Log, middleware.CrossDomain, middleware.Recovery)
 
-	if config.Cfg.ServiceInfo.Mode != gin.TestMode {
+	if gin.Mode() != gin.ReleaseMode {
 		url := ginSwagger.URL("/swagger/doc.json")
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	}

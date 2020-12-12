@@ -7,12 +7,10 @@
 package logger
 
 import (
-	"io"
-	"obs/config"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"io"
 )
 
 var (
@@ -38,9 +36,11 @@ func SetLoggerWriter(path string) io.Writer {
 }
 
 // InitLogger 初始化日志组件
-func InitLogger() {
-	logger = NewZap(config.Cfg.ServiceInfo.Mode,
-		zapcore.NewJSONEncoder, SetLoggerWriter(config.Cfg.ServiceInfo.Log))
+func InitLogger(path, level string) {
+	if path == "" {
+		path = "./log/obs.log"
+	}
+	logger = NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path))
 	loggerSugar = logger.Sugar()
 }
 
@@ -89,6 +89,18 @@ func Errorf(format string, v ...interface{}) {
 func Error(message string) {
 	if logger != nil {
 		logger.Error(message)
+	}
+}
+
+func Fatalf(format string, v ...interface{}) {
+	if loggerSugar != nil {
+		loggerSugar.Fatalf(format, v...)
+	}
+}
+
+func Fatal(message string) {
+	if logger != nil {
+		logger.Fatal(message)
 	}
 }
 

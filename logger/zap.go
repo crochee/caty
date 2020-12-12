@@ -10,7 +10,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -58,9 +57,9 @@ func newEncoderConfig() zapcore.EncoderConfig {
 func newLevel(level string) zapcore.Level {
 	var l zapcore.Level
 	switch strings.ToUpper(level) {
-	case DebugLevel, gin.DebugMode, gin.TestMode:
+	case DebugLevel:
 		l = zap.DebugLevel
-	case InfoLevel, gin.ReleaseMode:
+	case InfoLevel:
 		l = zap.InfoLevel
 	case WarnLevel:
 		l = zap.WarnLevel
@@ -73,9 +72,6 @@ func newLevel(level string) zapcore.Level {
 	case FatalLevel:
 		l = zap.FatalLevel
 	default:
-		l = zap.InfoLevel
-	}
-	if gin.Mode() == gin.ReleaseMode && l < zap.InfoLevel {
 		l = zap.InfoLevel
 	}
 	return l
