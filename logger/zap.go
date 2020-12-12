@@ -7,10 +7,10 @@
 package logger
 
 import (
-	"github.com/gin-gonic/gin"
 	"io"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -73,6 +73,9 @@ func newLevel(level string) zapcore.Level {
 	case FatalLevel:
 		l = zap.FatalLevel
 	default:
+		l = zap.InfoLevel
+	}
+	if gin.Mode() == gin.ReleaseMode && l < zap.InfoLevel {
 		l = zap.InfoLevel
 	}
 	return l

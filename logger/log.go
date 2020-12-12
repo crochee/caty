@@ -15,7 +15,10 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var logger *zap.Logger
+var (
+	logger      *zap.Logger
+	loggerSugar *zap.SugaredLogger
+)
 
 const (
 	DefaultLogSizeM int = 20
@@ -38,6 +41,7 @@ func SetLoggerWriter(path string) io.Writer {
 func InitLogger() {
 	logger = NewZap(config.Cfg.ServiceInfo.Mode,
 		zapcore.NewJSONEncoder, SetLoggerWriter(config.Cfg.ServiceInfo.Log))
+	loggerSugar = logger.Sugar()
 }
 
 // Infof 打印Info信息
@@ -45,8 +49,8 @@ func InitLogger() {
 // @param: format 格式信息
 // @param: v 参数信息
 func Infof(format string, v ...interface{}) {
-	if logger != nil {
-		logger.Sugar().Infof(format, v...)
+	if loggerSugar != nil {
+		loggerSugar.Infof(format, v...)
 	}
 }
 
@@ -61,8 +65,8 @@ func Info(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func Debugf(format string, v ...interface{}) {
-	if logger != nil {
-		logger.Sugar().Debugf(format, v...)
+	if loggerSugar != nil {
+		loggerSugar.Debugf(format, v...)
 	}
 }
 
@@ -77,8 +81,8 @@ func Debug(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func Errorf(format string, v ...interface{}) {
-	if logger != nil {
-		logger.Sugar().Errorf(format, v...)
+	if loggerSugar != nil {
+		loggerSugar.Errorf(format, v...)
 	}
 }
 
