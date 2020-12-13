@@ -1,0 +1,49 @@
+// Copyright 2020, The Go Authors. All rights reserved.
+// Author: OnlyOneFace
+// Date: 2020/12/13
+
+package response
+
+import (
+	"strconv"
+	"sync"
+)
+
+type ErrorResponse struct {
+	Code    int64  `json:"code"`
+	Message string `json:"message"`
+}
+
+func Error(code int, message string) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    int64(code),
+		Message: message,
+	}
+}
+
+func (e *ErrorResponse) Error() string {
+	buf := acquireBuf()
+	defer releaseBuf(buf)
+	strconv.AppendInt(buf, e.Code, 64)
+	buf = append(buf, '.')
+	buf = append(buf, '#')
+	buf = append(buf, e.Message...)
+	return string(buf)
+}
+
+var bufPool sync.Pool
+
+const _size = 1024 // by default, create 1 KiB buffers
+
+func acquireBuf() []byte {
+	v := bufPool.Get()
+	if v == nil {
+		return make([]byte, 0, _size)
+	}
+	return v.([]byte)
+}
+
+func releaseBuf(buf []byte) {
+	buf = buf[:0]
+	bufPool.Put(buf)
+}
