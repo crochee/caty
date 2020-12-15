@@ -24,7 +24,7 @@ func main() {
 	defer cancel()
 	config.InitConfig()
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", config.Cfg.ServiceInfo.Port),
+		Addr:    fmt.Sprintf(":%d", config.Cfg.YamlConfig.ServiceInformation.Port),
 		Handler: router.GinRun(),
 	}
 	srv.RegisterOnShutdown(logger.Exit)
