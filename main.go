@@ -28,8 +28,7 @@ func main() {
 	logger.InitLogger()
 
 	srv := &http.Server{
-		Addr: fmt.Sprintf("%v:%d", config.Cfg.IP.String(),
-			config.Cfg.ServiceInfo.Port),
+		Addr:    fmt.Sprintf(":%d", config.Cfg.ServiceInfo.Port),
 		Handler: router.GinRun(),
 	}
 	srv.RegisterOnShutdown(logger.Exit)
