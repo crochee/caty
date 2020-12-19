@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CrossDomain skip the cross-domain phase
 func CrossDomain(ctx *gin.Context) {
 	ctx.Header("Access-Control-Allow-Headers", "Content-Type,X-Auth-Token")
 	ctx.Header("Access-Control-Allow-Origin", ctx.GetHeader("Origin"))

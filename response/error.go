@@ -14,6 +14,7 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+// Error according to the given message structure returns an error
 func Error(code int, message string) *ErrorResponse {
 	return &ErrorResponse{
 		Code:    int64(code),
@@ -21,6 +22,7 @@ func Error(code int, message string) *ErrorResponse {
 	}
 }
 
+// Errors according to the given message and error structure returns an error
 func Errors(code int, err error, message string) *ErrorResponse {
 	return &ErrorResponse{
 		Code:    int64(code),

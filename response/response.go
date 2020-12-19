@@ -5,10 +5,12 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
+// ErrorWith gin response with format err
 func ErrorWith(ctx *gin.Context, err error) {
 	switch value := err.(type) {
 	case *ErrorResponse:

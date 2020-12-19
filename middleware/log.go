@@ -15,6 +15,7 @@ import (
 	"obs/logger"
 )
 
+// Log request log
 func Log(ctx *gin.Context) {
 	// Start timer
 	start := time.Now()
@@ -58,7 +59,7 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 		// Truncate in a golang < 1.8 safe way
 		param.Latency = param.Latency - param.Latency%time.Second
 	}
-	return fmt.Sprintf("[INFO] %v |%s %3d %s| %13v | %15s |%s %-7s %s |%8d| %#v\n%s",
+	return fmt.Sprintf("[OBS] %v |%s %3d %s| %13v | %15s |%s %-7s %s |%8d| %#v\n%s",
 		param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		statusColor, param.StatusCode, resetColor,
 		param.Latency,

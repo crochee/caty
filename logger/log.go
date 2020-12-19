@@ -25,6 +25,7 @@ const (
 	MaxLogDays      int = 30
 )
 
+// SetLoggerWriter
 func SetLoggerWriter(path string) io.Writer {
 	return &lumberjack.Logger{
 		Filename:   path,
