@@ -15,7 +15,7 @@ type UUID [22]byte
 
 var (
 	version   byte = 0x01 // set version to 1
-	pid            = Pid()
+	pid            = getPid()
 	clockSeq       = randUint64()
 	machineID      = readMachineID()
 )

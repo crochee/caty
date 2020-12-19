@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func Pid() int {
+func getPid() int {
 	pid := os.Getpid()
 	b, err := ioutil.ReadFile("/proc/self/cpuset")
 	if err == nil && len(b) > 1 {
