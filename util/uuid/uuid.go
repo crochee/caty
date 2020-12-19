@@ -21,12 +21,12 @@ var (
 )
 
 func New() UUID {
-	return FromTime(time.Now())
+	return fromTime(time.Now())
 }
 
 // 8 bytes of time (ns) + 1 bytes of version +
 // first 3 bytes of md5(Machine hostname) + 2 byes of pid + 8 random bytes
-func FromTime(aTime time.Time) UUID {
+func fromTime(aTime time.Time) UUID {
 	var id UUID
 
 	utcTime := aTime.In(time.UTC)

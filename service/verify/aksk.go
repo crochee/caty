@@ -4,7 +4,11 @@
 
 package verify
 
-import "github.com/dgrijalva/jwt-go"
+import (
+	"github.com/dgrijalva/jwt-go"
+
+	"obs/util/uuid"
+)
 
 type AkSk interface {
 	Create() (string, string, error)
@@ -17,7 +21,7 @@ type Token struct {
 }
 
 func (t Token) Create() (string, string, error) {
-	var akSecret string
+	akSecret := uuid.New().String()
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, t)
 	skToken, err := tokenImpl.SignedString(akSecret)
 	if err != nil {
