@@ -21,6 +21,13 @@ func Error(code int, message string) *ErrorResponse {
 	}
 }
 
+func Errors(code int, err error, message string) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    int64(code),
+		Message: err.Error() + "#" + message,
+	}
+}
+
 func (e *ErrorResponse) Error() string {
 	buf := acquireBuf()
 	defer releaseBuf(buf)
