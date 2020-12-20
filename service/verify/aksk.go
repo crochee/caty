@@ -5,9 +5,8 @@
 package verify
 
 import (
+	"github.com/crochee/uid"
 	"github.com/dgrijalva/jwt-go"
-
-	"obs/util/uuid"
 )
 
 type AkSk interface {
@@ -21,7 +20,7 @@ type Token struct {
 }
 
 func (t Token) Create() (string, string, error) {
-	akSecret := uuid.New().String()
+	akSecret := uid.New().String()
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, t)
 	skToken, err := tokenImpl.SignedString(akSecret)
 	if err != nil {
