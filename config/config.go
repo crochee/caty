@@ -37,7 +37,7 @@ func InitConfig() {
 func loadYaml() (*YamlConfig, error) {
 	configPath, ok := os.LookupEnv("config_path")
 	if !ok {
-		configPath = "conf/config.yml"
+		configPath = "D:/project/obs/conf/config.yml"
 	}
 	file, err := os.Open(configPath)
 	if err != nil {

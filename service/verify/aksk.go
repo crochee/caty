@@ -5,30 +5,82 @@
 package verify
 
 import (
+	"errors"
+	"fmt"
+	"obs/util"
+
 	"github.com/crochee/uid"
 	"github.com/dgrijalva/jwt-go"
 )
 
 type AkSk interface {
 	Create() (string, string, error)
-	Verify() error
+	Verify(string) error
 }
+
+// Bucket permissions
+type BucketAction uint8
+
+const (
+	Read   BucketAction = 0
+	Write  BucketAction = 1
+	Delete BucketAction = 2
+	Admin  BucketAction = 3
+)
 
 type Token struct {
-	Bucket string `json:"bucket"`
-	jwt.StandardClaims
+	AkSecret []byte                    `json:"secret"`
+	Bucket   string                    `json:"bucket"`
+	Action   map[BucketAction]struct{} `json:"action"`
 }
 
-func (t Token) Create() (string, string, error) {
-	akSecret := uid.New().String()
+func NewToken(bucket string) *Token {
+	return &Token{
+		Bucket: bucket,
+		Action: make(map[BucketAction]struct{}),
+	}
+}
+
+func (t *Token) Valid() error {
+	return nil
+}
+
+func (t *Token) AddAction(action BucketAction) {
+	t.Action[action] = struct{}{}
+}
+
+func (t *Token) Create() (string, string, error) {
+	secret := uid.New().String()
+	t.AkSecret = util.Slice(secret)
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, t)
-	skToken, err := tokenImpl.SignedString(akSecret)
+	skToken, err := tokenImpl.SignedString(t.AkSecret)
 	if err != nil {
 		return "", "", err
 	}
-	return akSecret, skToken, nil
+	return secret, skToken, nil
 }
 
-func (t Token) Verify() error {
-	panic("implement me")
+func (t *Token) Verify(skToken string) error {
+	tokenImpl, err := jwt.ParseWithClaims(skToken, t, func(token *jwt.Token) (interface{}, error) {
+		return t.AkSecret, nil
+	})
+	if err != nil {
+		return err
+	}
+	if !tokenImpl.Valid {
+		return errors.New("token is invalid")
+	}
+	thisToken, ok := tokenImpl.Claims.(*Token)
+	if !ok {
+		return errors.New("claim is not Token")
+	}
+	if thisToken.Bucket != t.Bucket {
+		return errors.New("bucket is not right")
+	}
+	for key := range t.Action {
+		if _, ok = thisToken.Action[key]; !ok {
+			return fmt.Errorf("bucket %s haven't %v", t.Bucket, key)
+		}
+	}
+	return nil
 }

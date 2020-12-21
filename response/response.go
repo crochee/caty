@@ -20,3 +20,7 @@ func ErrorWith(ctx *gin.Context, err error) {
 			Error(http.StatusInternalServerError, value.Error()))
 	}
 }
+
+func ErrorWithMessage(ctx *gin.Context, message string) {
+	ctx.JSON(http.StatusInternalServerError, Error(http.StatusInternalServerError, message))
+}

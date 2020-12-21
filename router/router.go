@@ -9,6 +9,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"obs/controller/bucket"
 	"obs/controller/cpts"
 	_ "obs/docs"
 	"obs/middleware"
@@ -34,6 +35,11 @@ func GinRun() *gin.Engine {
 		testRouter.GET("/query", cpts.QueryEncode)
 		testRouter.POST("/person", cpts.FindPerson)
 		testRouter.POST("/all", cpts.PayAll)
+	}
+
+	v1Router := router.Group("/v1")
+	{
+		v1Router.POST("/bucket", bucket.CreateBucket)
 	}
 	return router
 }
