@@ -21,6 +21,7 @@ func ErrorWith(ctx *gin.Context, err error) {
 	}
 }
 
+// ErrorWithMessage gin response with message
 func ErrorWithMessage(ctx *gin.Context, message string) {
 	ctx.JSON(http.StatusInternalServerError, Error(http.StatusInternalServerError, message))
 }

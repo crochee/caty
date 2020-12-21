@@ -15,12 +15,11 @@ import (
 	"obs/middleware"
 )
 
-// @title console Swagger API
+// @title obs Swagger API
 // @version 1.0
-// @description This is a console server celler server.
+// @description This is a obs server.
 
-// @host 10.78.74.37:8150
-
+// GinRun gin router
 func GinRun() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.Limit, middleware.Log, middleware.CrossDomain, middleware.Recovery)

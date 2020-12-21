@@ -130,9 +130,80 @@ var doc = `{
                     "500": {}
                 }
             }
+        },
+        "/v1/bucket": {
+            "post": {
+                "description": "create bucket",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bucket"
+                ],
+                "summary": "CreateBucket",
+                "parameters": [
+                    {
+                        "description": "bucket",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/bucket.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/bucket.BucketAkSk"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "bucket.BucketAkSk": {
+            "type": "object",
+            "properties": {
+                "ak": {
+                    "type": "string"
+                },
+                "sk": {
+                    "type": "string"
+                }
+            }
+        },
+        "bucket.CreateRequest": {
+            "type": "object",
+            "required": [
+                "bucket_name"
+            ],
+            "properties": {
+                "action": {
+                    "type": "integer"
+                },
+                "bucket_name": {
+                    "type": "string"
+                }
+            }
+        },
         "cpts.Person": {
             "type": "object",
             "properties": {
@@ -157,6 +228,17 @@ var doc = `{
                     "type": "string"
                 }
             }
+        },
+        "response.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
@@ -173,11 +255,11 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "10.78.74.37:8150",
+	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
-	Title:       "console Swagger API",
-	Description: "This is a console server celler server.",
+	Title:       "obs Swagger API",
+	Description: "This is a obs server.",
 }
 
 type s struct{}

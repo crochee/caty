@@ -1,4 +1,20 @@
 definitions:
+  bucket.BucketAkSk:
+    properties:
+      ak:
+        type: string
+      sk:
+        type: string
+    type: object
+  bucket.CreateRequest:
+    properties:
+      action:
+        type: integer
+      bucket_name:
+        type: string
+    required:
+    - bucket_name
+    type: object
   cpts.Person:
     properties:
       age:
@@ -15,12 +31,18 @@ definitions:
       name:
         type: string
     type: object
-host: 10.78.74.37:8150
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
 info:
   contact: {}
-  description: This is a console server celler server.
+  description: This is a obs server.
   license: {}
-  title: console Swagger API
+  title: obs Swagger API
   version: "1.0"
 paths:
   /test/all:
@@ -94,4 +116,34 @@ paths:
       summary: 请求参数处理
       tags:
       - CPTS
+  /v1/bucket:
+    post:
+      consumes:
+      - application/json
+      description: create bucket
+      parameters:
+      - description: bucket
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/bucket.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/bucket.BucketAkSk'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: CreateBucket
+      tags:
+      - bucket
 swagger: "2.0"
