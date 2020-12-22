@@ -6,7 +6,6 @@ package verify
 
 import (
 	"errors"
-	"fmt"
 	"obs/util"
 
 	"github.com/crochee/uid"
@@ -77,10 +76,6 @@ func (t *Token) Verify(skToken string) error {
 	if thisToken.Bucket != t.Bucket {
 		return errors.New("bucket is not right")
 	}
-	for key := range t.Action {
-		if _, ok = thisToken.Action[key]; !ok {
-			return fmt.Errorf("bucket %s haven't %v", t.Bucket, key)
-		}
-	}
+	t.Action = thisToken.Action
 	return nil
 }

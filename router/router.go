@@ -39,6 +39,8 @@ func GinRun() *gin.Engine {
 	v1Router := router.Group("/v1")
 	{
 		v1Router.POST("/bucket", bucket.CreateBucket)
+		v1Router.HEAD("/bucket", bucket.HeadBucket)
+		v1Router.DELETE("/bucket", bucket.DeleteBucket)
 	}
 	return router
 }

@@ -23,10 +23,17 @@ func Error(code int, message string) *ErrorResponse {
 }
 
 // Errors according to the given message and error structure returns an error
-func Errors(code int, err error, message string) *ErrorResponse {
+func ErrorAll(code int, err error, message string) *ErrorResponse {
 	return &ErrorResponse{
 		Code:    int64(code),
 		Message: err.Error() + "#" + message,
+	}
+}
+
+func Errors(code int, err error) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    int64(code),
+		Message: err.Error(),
 	}
 }
 
