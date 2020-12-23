@@ -1,20 +1,4 @@
 definitions:
-  bucket.BucketAkSk:
-    properties:
-      ak:
-        type: string
-      sk:
-        type: string
-    type: object
-  bucket.CreateRequest:
-    properties:
-      action:
-        type: integer
-      bucket_name:
-        type: string
-    required:
-    - bucket_name
-    type: object
   cpts.Person:
     properties:
       age:
@@ -30,6 +14,45 @@ definitions:
         type: integer
       name:
         type: string
+    type: object
+  model.AkSk:
+    properties:
+      ak:
+        type: string
+      sk:
+        type: string
+    required:
+    - ak
+    - sk
+    type: object
+  model.BucketName:
+    properties:
+      bucket_name:
+        type: string
+    required:
+    - bucket_name
+    type: object
+  model.CreateBucket:
+    properties:
+      action:
+        type: integer
+      bucket_name:
+        type: string
+    required:
+    - bucket_name
+    type: object
+  model.SimpleBucket:
+    properties:
+      ak:
+        type: string
+      bucket_name:
+        type: string
+      sk:
+        type: string
+    required:
+    - ak
+    - bucket_name
+    - sk
     type: object
   response.ErrorResponse:
     properties:
@@ -117,6 +140,68 @@ paths:
       tags:
       - CPTS
   /v1/bucket:
+    delete:
+      consumes:
+      - application/json
+      description: delete bucket
+      parameters:
+      - description: bucket
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.SimpleBucket'
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DeleteBucket
+      tags:
+      - bucket
+    head:
+      consumes:
+      - application/json
+      description: head bucket
+      parameters:
+      - description: bucket
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.BucketName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          headers:
+            Last-Modified:
+              description: last modify
+              type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: HeadBucket
+      tags:
+      - bucket
     post:
       consumes:
       - application/json
@@ -127,14 +212,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/bucket.CreateRequest'
+          $ref: '#/definitions/model.CreateBucket'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/bucket.BucketAkSk'
+            $ref: '#/definitions/model.AkSk'
         "400":
           description: Bad Request
           schema:

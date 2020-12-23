@@ -151,7 +151,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/bucket.CreateRequest"
+                            "$ref": "#/definitions/model.CreateBucket"
                         }
                     }
                 ],
@@ -159,7 +159,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/bucket.BucketAkSk"
+                            "$ref": "#/definitions/model.AkSk"
                         }
                     },
                     "400": {
@@ -175,35 +175,103 @@ var doc = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "delete bucket",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bucket"
+                ],
+                "summary": "DeleteBucket",
+                "parameters": [
+                    {
+                        "description": "bucket",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SimpleBucket"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {},
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {},
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "head": {
+                "description": "head bucket",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bucket"
+                ],
+                "summary": "HeadBucket",
+                "parameters": [
+                    {
+                        "description": "bucket",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.BucketName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "headers": {
+                            "Last-Modified": {
+                                "type": "string",
+                                "description": "last modify"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {},
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
-        "bucket.BucketAkSk": {
-            "type": "object",
-            "properties": {
-                "ak": {
-                    "type": "string"
-                },
-                "sk": {
-                    "type": "string"
-                }
-            }
-        },
-        "bucket.CreateRequest": {
-            "type": "object",
-            "required": [
-                "bucket_name"
-            ],
-            "properties": {
-                "action": {
-                    "type": "integer"
-                },
-                "bucket_name": {
-                    "type": "string"
-                }
-            }
-        },
         "cpts.Person": {
             "type": "object",
             "properties": {
@@ -225,6 +293,65 @@ var doc = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AkSk": {
+            "type": "object",
+            "required": [
+                "ak",
+                "sk"
+            ],
+            "properties": {
+                "ak": {
+                    "type": "string"
+                },
+                "sk": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BucketName": {
+            "type": "object",
+            "required": [
+                "bucket_name"
+            ],
+            "properties": {
+                "bucket_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.CreateBucket": {
+            "type": "object",
+            "required": [
+                "bucket_name"
+            ],
+            "properties": {
+                "action": {
+                    "type": "integer"
+                },
+                "bucket_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SimpleBucket": {
+            "type": "object",
+            "required": [
+                "ak",
+                "bucket_name",
+                "sk"
+            ],
+            "properties": {
+                "ak": {
+                    "type": "string"
+                },
+                "bucket_name": {
+                    "type": "string"
+                },
+                "sk": {
                     "type": "string"
                 }
             }
