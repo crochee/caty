@@ -36,9 +36,9 @@ func CreateBucket(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
 		return
 	}
-	token := verify.NewToken(createBucket.BucketName.BucketName)
-	token.AddAction(createBucket.Action)
-	ak, sk, err := token.Create()
+	newToken := verify.NewToken(createBucket.BucketName.BucketName)
+	newToken.AddAction(createBucket.Action)
+	ak, sk, err := newToken.Create()
 	if err != nil {
 		logger.Errorf("create token failed.Error:%v", err)
 		response.ErrorWithMessage(ctx, "create bucket failed")
@@ -84,8 +84,8 @@ func HeadBucket(ctx *gin.Context) {
 			ctx.Status(http.StatusNotFound)
 			return
 		}
-		logger.Errorf("get %s stat failed.Error:%v", path, err)
-		response.ErrorWithMessage(ctx, "find bucket failed")
+		logger.Errorf("find path(%s) failed.Error:%v", path, err)
+		response.ErrorWithMessage(ctx, "get bucket info failed")
 		return
 	}
 	if !fileInfo.IsDir() {
@@ -106,6 +106,7 @@ func HeadBucket(ctx *gin.Context) {
 // @Param request body model.SimpleBucket true "bucket"
 // @Success 200
 // @Failure 404
+// @Failure 403 {object} response.ErrorResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /v1/bucket [delete]
@@ -116,7 +117,7 @@ func DeleteBucket(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
 		return
 	}
-	t := verify.Token{
+	t := &verify.Token{
 		AkSecret: util.Slice(simpleBucket.Ak),
 		Bucket:   simpleBucket.BucketName.BucketName,
 	}

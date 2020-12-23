@@ -3,7 +3,7 @@ service_information:
   mode: release
   version: v1.0.0
   log_path: log/obs.log
-  log_level: error
+  log_level: info
   save_root_path: /obs/file/
 connection_list:
   log_config:

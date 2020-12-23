@@ -8,15 +8,15 @@ package util
 
 import (
 	"io"
+	"net/http"
 	"net/http/httptest"
-
-	"github.com/gin-gonic/gin"
 )
 
-func PerformRequest(f gin.HandlerFunc, method, path string, body io.Reader) *httptest.ResponseRecorder {
+func PerformRequest(r http.Handler, method, path string, body io.Reader,
+	headers http.Header) *httptest.ResponseRecorder {
+	req := httptest.NewRequest(method, path, body)
+	req.Header = headers
 	w := httptest.NewRecorder()
-	ctx, _ := gin.CreateTestContext(w)
-	ctx.Request = httptest.NewRequest(method, path, body)
-	f(ctx)
+	r.ServeHTTP(w, req)
 	return w
 }
