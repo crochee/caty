@@ -269,6 +269,48 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/v1/file": {
+            "post": {
+                "description": "upload file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "file"
+                ],
+                "summary": "UploadFile",
+                "parameters": [
+                    {
+                        "description": "file",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.FileInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {},
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {},
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -333,6 +375,33 @@ var doc = `{
                     "type": "integer"
                 },
                 "bucket_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.FileInfo": {
+            "type": "object",
+            "required": [
+                "ak",
+                "bucket_name",
+                "file",
+                "sk",
+                "target"
+            ],
+            "properties": {
+                "ak": {
+                    "type": "string"
+                },
+                "bucket_name": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "sk": {
+                    "type": "string"
+                },
+                "target": {
                     "type": "string"
                 }
             }

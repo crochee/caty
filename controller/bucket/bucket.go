@@ -126,17 +126,15 @@ func DeleteBucket(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "check your ak sk"))
 		return
 	}
-	for action := range t.Action {
-		if action >= verify.Delete {
-			path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + simpleBucket.BucketName.BucketName
-			if err := os.RemoveAll(path); err != nil {
-				logger.Errorf("delete path(%s) failed.Error:%v", path, err)
-				response.ErrorWithMessage(ctx, "delete bucket failed")
-				return
-			}
-			ctx.Status(http.StatusOK)
-			return
-		}
+	if !verify.VerifyAuthentication(t, verify.Delete) {
+		ctx.Status(http.StatusForbidden)
+		return
 	}
-	ctx.Status(http.StatusNotFound)
+	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + simpleBucket.BucketName.BucketName
+	if err := os.RemoveAll(path); err != nil {
+		logger.Errorf("delete path(%s) failed.Error:%v", path, err)
+		response.ErrorWithMessage(ctx, "delete bucket failed")
+		return
+	}
+	ctx.Status(http.StatusOK)
 }

@@ -79,3 +79,12 @@ func (t *Token) Verify(skToken string) error {
 	t.Action = thisToken.Action
 	return nil
 }
+
+func VerifyAuthentication(token *Token, action BucketAction) bool {
+	for action := range token.Action {
+		if action >= action {
+			return true
+		}
+	}
+	return false
+}

@@ -41,6 +41,25 @@ definitions:
     required:
     - bucket_name
     type: object
+  model.FileInfo:
+    properties:
+      ak:
+        type: string
+      bucket_name:
+        type: string
+      file:
+        type: string
+      sk:
+        type: string
+      target:
+        type: string
+    required:
+    - ak
+    - bucket_name
+    - file
+    - sk
+    - target
+    type: object
   model.SimpleBucket:
     properties:
       ak:
@@ -231,4 +250,32 @@ paths:
       summary: CreateBucket
       tags:
       - bucket
+  /v1/file:
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload file
+      parameters:
+      - description: file
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.FileInfo'
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: UploadFile
+      tags:
+      - file
 swagger: "2.0"

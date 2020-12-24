@@ -12,8 +12,8 @@ type CreateBucket struct {
 }
 
 type AkSk struct {
-	Ak string `json:"ak" binding:"required"`
-	Sk string `json:"sk" binding:"required"`
+	Ak string `json:"ak" form:"ak" binding:"required"`
+	Sk string `json:"sk" form:"sk" binding:"required"`
 }
 
 type SimpleBucket struct {
@@ -22,5 +22,5 @@ type SimpleBucket struct {
 }
 
 type BucketName struct {
-	BucketName string `json:"bucket_name" binding:"required"`
+	BucketName string `json:"bucket_name" form:"bucket_name" binding:"required"`
 }
