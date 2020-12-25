@@ -6,12 +6,10 @@
 // Package verify
 package verify
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNewToken(t *testing.T) {
-	tmp := NewToken("cpts")
+	tmp := &Token{}
 	tmp.AddAction(Admin)
 	ak, sk, err := tmp.Create()
 	if err != nil {

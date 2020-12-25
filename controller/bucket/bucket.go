@@ -15,7 +15,6 @@ import (
 	"obs/model"
 	"obs/response"
 	"obs/service/verify"
-	"obs/util"
 )
 
 // CreateBucket godoc
@@ -24,27 +23,34 @@ import (
 // @Tags bucket
 // @Accept application/json
 // @Produce  application/json
-// @Param request body model.CreateBucket true "bucket"
+// @Param bucket_name path string true "bucket name"
+// @Param request body model.BucketAction true "bucket action"
 // @Success 200 {object} model.AkSk
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket [post]
+// @Router /v1/bucket/{bucket_name} [post]
 func CreateBucket(ctx *gin.Context) {
-	var createBucket model.CreateBucket
-	if err := ctx.ShouldBindJSON(&createBucket); err != nil {
-		logger.Errorf("bind request failed.Error:%v", err)
+	var bucket model.BucketName
+	if err := ctx.ShouldBindUri(&bucket); err != nil {
+		logger.Errorf("bind url failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
+		return
+	}
+	var bucketAction model.BucketAction
+	if err := ctx.ShouldBindJSON(&bucketAction); err != nil {
+		logger.Errorf("bind body failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
 		return
 	}
-	newToken := verify.NewToken(createBucket.BucketName.BucketName)
-	newToken.AddAction(createBucket.Action)
+	newToken := &verify.Token{}
+	newToken.AddAction(bucketAction.Action)
 	ak, sk, err := newToken.Create()
 	if err != nil {
 		logger.Errorf("create token failed.Error:%v", err)
 		response.ErrorWithMessage(ctx, "create bucket failed")
 		return
 	}
-	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + createBucket.BucketName.BucketName
+	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + bucket.BucketName
 	if err = os.MkdirAll(path, os.ModePerm); err != nil {
 		logger.Errorf("mkdir %s failed.Error:%v", path, err)
 		response.ErrorWithMessage(ctx, "create bucket failed")
@@ -63,17 +69,17 @@ func CreateBucket(ctx *gin.Context) {
 // @Tags bucket
 // @Accept application/json
 // @Produce  application/json
-// @Param request body model.BucketName true "bucket"
+// @Param bucket_name path string true "bucket name"
 // @Success 200
 // @Header 200 {string} Last-Modified "last modify"
 // @Failure 404
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket [head]
+// @Router /v1/bucket/{bucket_name} [head]
 func HeadBucket(ctx *gin.Context) {
 	var bucket model.BucketName
-	if err := ctx.ShouldBindJSON(&bucket); err != nil {
-		logger.Errorf("bind request failed.Error:%v", err)
+	if err := ctx.ShouldBindUri(&bucket); err != nil {
+		logger.Errorf("bind uri failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
@@ -103,34 +109,19 @@ func HeadBucket(ctx *gin.Context) {
 // @Tags bucket
 // @Accept application/json
 // @Produce  application/json
-// @Param request body model.SimpleBucket true "bucket"
+// @Param bucket_name path string true "bucket name"
 // @Success 200
-// @Failure 404
 // @Failure 403 {object} response.ErrorResponse
-// @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket [delete]
+// @Router /v1/bucket/{bucket_name} [delete]
 func DeleteBucket(ctx *gin.Context) {
-	var simpleBucket model.SimpleBucket
-	if err := ctx.ShouldBindJSON(&simpleBucket); err != nil {
-		logger.Errorf("bind request failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
+	var bucket model.BucketName
+	if err := ctx.ShouldBindUri(&bucket); err != nil {
+		logger.Errorf("bind uri  failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
-	t := &verify.Token{
-		AkSecret: util.Slice(simpleBucket.Ak),
-		Bucket:   simpleBucket.BucketName.BucketName,
-	}
-	if err := t.Verify(simpleBucket.Sk); err != nil {
-		logger.Errorf("verify sk failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "check your ak sk"))
-		return
-	}
-	if !verify.VerifyAuthentication(t, verify.Delete) {
-		ctx.Status(http.StatusForbidden)
-		return
-	}
-	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + simpleBucket.BucketName.BucketName
+	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + bucket.BucketName
 	if err := os.RemoveAll(path); err != nil {
 		logger.Errorf("delete path(%s) failed.Error:%v", path, err)
 		response.ErrorWithMessage(ctx, "delete bucket failed")

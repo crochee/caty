@@ -6,21 +6,10 @@ package model
 
 import "obs/service/verify"
 
-type CreateBucket struct {
-	BucketName
+type BucketAction struct {
 	Action verify.BucketAction `json:"action"`
 }
 
-type AkSk struct {
-	Ak string `json:"ak" form:"ak" binding:"required"`
-	Sk string `json:"sk" form:"sk" binding:"required"`
-}
-
-type SimpleBucket struct {
-	BucketName
-	AkSk
-}
-
 type BucketName struct {
-	BucketName string `json:"bucket_name" form:"bucket_name" binding:"required"`
+	BucketName string `json:"bucket_name" uri:"bucket_name" form:"bucket_name" binding:"required"`
 }

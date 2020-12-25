@@ -7,7 +7,10 @@ package model
 import "mime/multipart"
 
 type FileInfo struct {
-	SimpleBucket
-	Target string                `json:"target" form:"target" binding:"required"`
-	File   *multipart.FileHeader `json:"file" form:"file" binding:"required"`
+	FileTarget
+	File *multipart.FileHeader `json:"file" form:"file" binding:"required"`
+}
+
+type FileTarget struct {
+	Path string `json:"path" uri:"path" form:"path" binding:"required"`
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"obs/controller/file"
 
 	"obs/controller/bucket"
 	"obs/controller/cpts"
@@ -22,7 +23,8 @@ import (
 // GinRun gin router
 func GinRun() *gin.Engine {
 	router := gin.New()
-	router.Use(middleware.Limit, middleware.Log, middleware.CrossDomain, middleware.Recovery)
+	router.Use(middleware.Limit, middleware.Log, middleware.CrossDomain,
+		middleware.Recovery, middleware.Verify)
 
 	if gin.Mode() != gin.ReleaseMode {
 		url := ginSwagger.URL("/swagger/doc.json")
@@ -37,12 +39,18 @@ func GinRun() *gin.Engine {
 	}
 
 	v1Router := router.Group("/v1")
-	{
-		v1Router.POST("/bucket", bucket.CreateBucket)
-		v1Router.HEAD("/bucket", bucket.HeadBucket)
-		v1Router.DELETE("/bucket", bucket.DeleteBucket)
 
-		v1Router.POST("/file", bucket.UploadFile)
+	bucketRouter := v1Router.Group("/bucket")
+	{
+		bucketRouter.POST("/:bucket_name", bucket.CreateBucket)
+		bucketRouter.HEAD("/:bucket_name", bucket.HeadBucket)
+		bucketRouter.DELETE("/:bucket_name", bucket.DeleteBucket)
+	}
+
+	fileRouter := v1Router.Group("/file")
+	{
+		fileRouter.POST("/bucket/:bucket_name", file.UploadFile)
+		fileRouter.DELETE("/bucket/:bucket_name", file.DeleteFile)
 	}
 	return router
 }
