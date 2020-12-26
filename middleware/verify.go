@@ -19,6 +19,7 @@ import (
 // Verify 鉴权 (每一个请求还需要横向鉴权)
 func Verify(ctx *gin.Context) {
 	if SkipAuth(ctx) {
+		ctx.Next()
 		return
 	}
 	var akSk model.AkSk
