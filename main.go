@@ -8,14 +8,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"syscall"
 	"time"
 
-	"obs/logger"
-	"os"
-	"os/signal"
-
 	"obs/config"
+	"obs/logger"
 	"obs/router"
 )
 
