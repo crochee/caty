@@ -5,6 +5,7 @@
 package middleware
 
 import (
+	"github.com/gin-contrib/pprof"
 	"net/http"
 	"strings"
 
@@ -57,7 +58,7 @@ func MethodAction(method string) verify.BucketAction {
 }
 
 // 为所有不想加token到header的提供一个将token放入param key的途径
-var notNeedVerifyApi = map[string]map[string]struct{}{
+var skipVerifyApi = map[string]map[string]struct{}{
 	"/v1/bucket/:bucket_name": {
 		http.MethodPost: {},
 	},
@@ -66,14 +67,22 @@ var notNeedVerifyApi = map[string]map[string]struct{}{
 	},
 }
 
+var skipPrefixList = []string{
+	pprof.DefaultPrefix,
+	"/test",
+	"/swagger",
+}
+
 func SkipAuth(ctx *gin.Context) bool {
-	if temp, ok := notNeedVerifyApi[ctx.FullPath()]; ok {
+	if temp, ok := skipVerifyApi[ctx.FullPath()]; ok {
 		if _, ok = temp[ctx.Request.Method]; ok {
 			return true
 		}
 	}
-	if strings.HasPrefix(ctx.FullPath(), "/test") {
-		return true
+	for _, prefix := range skipPrefixList {
+		if strings.HasPrefix(ctx.FullPath(), prefix) {
+			return true
+		}
 	}
 	return false
 }
