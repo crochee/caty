@@ -79,8 +79,8 @@ func SkipAuth(ctx *gin.Context) bool {
 }
 
 func ShouldBind(ctx *gin.Context, obj interface{}) error {
-	if err := ctx.ShouldBindQuery(obj); err == nil {
+	if err := ctx.ShouldBindHeader(obj); err == nil {
 		return nil
 	}
-	return ctx.ShouldBindHeader(obj)
+	return ctx.ShouldBindQuery(obj)
 }

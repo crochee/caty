@@ -25,53 +25,17 @@ definitions:
     - ak
     - sk
     type: object
-  model.BucketName:
-    properties:
-      bucket_name:
-        type: string
-    required:
-    - bucket_name
-    type: object
-  model.CreateBucket:
+  model.BucketAction:
     properties:
       action:
         type: integer
-      bucket_name:
-        type: string
-    required:
-    - bucket_name
     type: object
-  model.FileInfo:
+  model.FileTarget:
     properties:
-      ak:
-        type: string
-      bucket_name:
-        type: string
-      file:
-        type: string
-      sk:
-        type: string
-      target:
+      path:
         type: string
     required:
-    - ak
-    - bucket_name
-    - file
-    - sk
-    - target
-    type: object
-  model.SimpleBucket:
-    properties:
-      ak:
-        type: string
-      bucket_name:
-        type: string
-      sk:
-        type: string
-    required:
-    - ak
-    - bucket_name
-    - sk
+    - path
     type: object
   response.ErrorResponse:
     properties:
@@ -158,31 +122,25 @@ paths:
       summary: 请求参数处理
       tags:
       - CPTS
-  /v1/bucket:
+  /v1/bucket/{bucket_name}:
     delete:
       consumes:
       - application/json
       description: delete bucket
       parameters:
-      - description: bucket
-        in: body
-        name: request
+      - description: bucket name
+        in: path
+        name: bucket_name
         required: true
-        schema:
-          $ref: '#/definitions/model.SimpleBucket'
+        type: string
       produces:
       - application/json
       responses:
         "200": {}
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
         "403":
           description: Forbidden
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-        "404": {}
         "500":
           description: Internal Server Error
           schema:
@@ -195,12 +153,11 @@ paths:
       - application/json
       description: head bucket
       parameters:
-      - description: bucket
-        in: body
-        name: request
+      - description: bucket name
+        in: path
+        name: bucket_name
         required: true
-        schema:
-          $ref: '#/definitions/model.BucketName'
+        type: string
       produces:
       - application/json
       responses:
@@ -226,12 +183,17 @@ paths:
       - application/json
       description: create bucket
       parameters:
-      - description: bucket
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: bucket action
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/model.CreateBucket'
+          $ref: '#/definitions/model.BucketAction'
       produces:
       - application/json
       responses:
@@ -250,18 +212,22 @@ paths:
       summary: CreateBucket
       tags:
       - bucket
-  /v1/file:
-    post:
+  /v1/file/{bucket_name}:
+    delete:
       consumes:
-      - multipart/form-data
-      description: upload file
+      - application/json
+      description: delete file
       parameters:
-      - description: file
-        in: body
-        name: request
+      - description: bucket name
+        in: path
+        name: bucket_name
         required: true
-        schema:
-          $ref: '#/definitions/model.FileInfo'
+        type: string
+      - description: target path
+        in: query
+        name: path
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -270,7 +236,107 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-        "403": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DeleteFile
+      tags:
+      - file
+    get:
+      consumes:
+      - application/json
+      description: download File
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: target path
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DownloadFile
+      tags:
+      - file
+    head:
+      consumes:
+      - application/json
+      description: head file sign info
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: target path
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FileTarget'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: SignFile
+      tags:
+      - file
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload file
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: file
+        in: formData
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FileTarget'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:

@@ -32,11 +32,12 @@ import (
 // @Accept multipart/form-data
 // @Produce  application/json
 // @Param bucket_name path string true "bucket name"
-// @Param request formData model.FileInfo true "file"
-// @Success 200
+// @Param file formData file true "file"
+// @Param path formData string true "file"
+// @Success 200 {object} model.FileTarget
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/bucket/{bucket_name} [post]
+// @Router /v1/file/{bucket_name} [post]
 func UploadFile(ctx *gin.Context) {
 	var bucketName model.BucketName
 	if err := ctx.ShouldBindUri(&bucketName); err != nil {
@@ -85,7 +86,23 @@ func UploadFile(ctx *gin.Context) {
 		response.ErrorWithMessage(ctx, "write size wrong")
 		return
 	}
-	ctx.Status(http.StatusOK)
+	newToken := &verify.Token{ExpiresAt: time.Now().Add(30 * time.Minute)}
+	newToken.AddAction(verify.Read)
+	ak, sk, err := newToken.Create()
+	if err != nil {
+		logger.Errorf("create token failed.Error:%v", err)
+		response.ErrorWithMessage(ctx, "create sign failed")
+		return
+	}
+	v := url.Values{}
+	v.Set("path", fmt.Sprintf("%s/%s", fileInfo.Path, fileInfo.File.Filename))
+	v.Add("ak", ak)
+	v.Add("sk", sk)
+	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
+		fmt.Sprintf("%s:%d", config.Cfg.IP.String(), config.Cfg.YamlConfig.ServiceInformation.Port),
+		bucketName.BucketName,
+		v.Encode(),
+	)})
 }
 
 // DeleteFile godoc
@@ -99,7 +116,7 @@ func UploadFile(ctx *gin.Context) {
 // @Success 200
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/bucket/{bucket_name} [delete]
+// @Router /v1/file/{bucket_name} [delete]
 func DeleteFile(ctx *gin.Context) {
 	var bucketName model.BucketName
 	if err := ctx.ShouldBindUri(&bucketName); err != nil {
@@ -131,10 +148,10 @@ func DeleteFile(ctx *gin.Context) {
 // @Produce  application/json
 // @Param bucket_name path string true "bucket name"
 // @Param path query string true "target path"
-// @Success 200 {string}
+// @Success 200 {object} model.FileTarget
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/bucket/{bucket_name} [head]
+// @Router /v1/file/{bucket_name} [head]
 func SignFile(ctx *gin.Context) {
 	var bucketName model.BucketName
 	if err := ctx.ShouldBindUri(&bucketName); err != nil {
@@ -160,11 +177,11 @@ func SignFile(ctx *gin.Context) {
 	v.Set("path", fileTarget.Path)
 	v.Add("ak", ak)
 	v.Add("sk", sk)
-	ctx.String(http.StatusOK, "%s/v1/file/bucket/%s?%s",
-		config.Cfg.IP.String(),
+	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
+		fmt.Sprintf("%s:%d", config.Cfg.IP.String(), config.Cfg.YamlConfig.ServiceInformation.Port),
 		bucketName.BucketName,
 		v.Encode(),
-	)
+	)})
 }
 
 // DownloadFile godoc
@@ -172,13 +189,13 @@ func SignFile(ctx *gin.Context) {
 // @Description download File
 // @Tags file
 // @Accept application/json
-// @Produce  application/json
+// @Produce application/octet-stream
 // @Param bucket_name path string true "bucket name"
 // @Param path query string true "target path"
 // @Success 200
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/bucket/{bucket_name} [get]
+// @Router /v1/file/{bucket_name} [get]
 func DownloadFile(ctx *gin.Context) {
 	var bucketName model.BucketName
 	if err := ctx.ShouldBindUri(&bucketName); err != nil {

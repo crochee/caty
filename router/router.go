@@ -49,10 +49,10 @@ func GinRun() *gin.Engine {
 
 	fileRouter := v1Router.Group("/file")
 	{
-		fileRouter.POST("/bucket/:bucket_name", file.UploadFile)
-		fileRouter.DELETE("/bucket/:bucket_name", file.DeleteFile)
-		fileRouter.DELETE("/bucket/:bucket_name", file.SignFile)
-		fileRouter.GET("/bucket/:bucket_name", file.DownloadFile)
+		fileRouter.POST("/:bucket_name", file.UploadFile)
+		fileRouter.DELETE("/:bucket_name", file.DeleteFile)
+		fileRouter.DELETE("/:bucket_name", file.SignFile)
+		fileRouter.GET("/:bucket_name", file.DownloadFile)
 	}
 	return router
 }
