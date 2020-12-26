@@ -6,6 +6,7 @@ package verify
 
 import (
 	"errors"
+	"time"
 
 	"github.com/crochee/uid"
 	"github.com/dgrijalva/jwt-go"
@@ -29,8 +30,9 @@ const (
 )
 
 type Token struct {
-	AkSecret []byte                    `json:"secret"`
-	Action   map[BucketAction]struct{} `json:"action"`
+	ExpiresAt time.Time                 `json:"expires_at,omitempty"`
+	AkSecret  []byte                    `json:"secret"`
+	Action    map[BucketAction]struct{} `json:"action"`
 }
 
 func (t *Token) Valid() error {
@@ -68,6 +70,9 @@ func (t *Token) Verify(skToken string) error {
 	thisToken, ok := tokenImpl.Claims.(*Token)
 	if !ok {
 		return errors.New("claim is not Token")
+	}
+	if !thisToken.ExpiresAt.IsZero() && time.Now().After(thisToken.ExpiresAt) {
+		return errors.New("time out")
 	}
 	t.Action = thisToken.Action
 	return nil

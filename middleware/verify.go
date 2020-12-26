@@ -21,7 +21,7 @@ func Verify(ctx *gin.Context) {
 		return
 	}
 	var akSk model.AkSk
-	if err := ctx.ShouldBindHeader(&akSk); err != nil {
+	if err := ShouldBind(ctx, &akSk); err != nil {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -61,6 +61,9 @@ var notNeedVerifyApi = map[string]map[string]struct{}{
 	"/v1/bucket/:bucket_name": {
 		http.MethodPost: {},
 	},
+	"/v1/file/bucket/:bucket_name": {
+		http.MethodHead: {},
+	},
 }
 
 func SkipAuth(ctx *gin.Context) bool {
@@ -73,4 +76,11 @@ func SkipAuth(ctx *gin.Context) bool {
 		return true
 	}
 	return false
+}
+
+func ShouldBind(ctx *gin.Context, obj interface{}) error {
+	if err := ctx.ShouldBindQuery(obj); err == nil {
+		return nil
+	}
+	return ctx.ShouldBindHeader(obj)
 }

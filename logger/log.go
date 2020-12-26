@@ -106,9 +106,9 @@ func Fatal(message string) {
 	}
 }
 
-func Exit(format string, v ...interface{}) {
+func Exit(message string) {
 	if logger != nil {
-		loggerSugar.Infof(format, v...)
+		logger.Info(message)
 		_ = logger.Sync()
 		_ = loggerSugar.Sync()
 	}
