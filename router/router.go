@@ -5,6 +5,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -27,8 +28,12 @@ func GinRun() *gin.Engine {
 		middleware.Recovery, middleware.Verify)
 
 	if gin.Mode() != gin.ReleaseMode {
+		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
+		// 增加性能测试
+		pprof.Register(router)
 	}
 
 	testRouter := router.Group("/test")
@@ -51,7 +56,7 @@ func GinRun() *gin.Engine {
 	{
 		fileRouter.POST("/:bucket_name", file.UploadFile)
 		fileRouter.DELETE("/:bucket_name", file.DeleteFile)
-		fileRouter.DELETE("/:bucket_name", file.SignFile)
+		fileRouter.HEAD("/:bucket_name", file.SignFile)
 		fileRouter.GET("/:bucket_name", file.DownloadFile)
 	}
 	return router
