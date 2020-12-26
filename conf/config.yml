@@ -1,6 +1,6 @@
 service_information:
   port: 8150
-  mode: release
+  mode: debug
   version: v1.0.0
   log_path: log/obs.log
   log_level: info

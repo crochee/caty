@@ -7,10 +7,11 @@
 package logger
 
 import (
+	"io"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"io"
 )
 
 var (
@@ -105,9 +106,10 @@ func Fatal(message string) {
 	}
 }
 
-func Exit() {
+func Exit(format string, v ...interface{}) {
 	if logger != nil {
-		logger.Info("Server exiting...")
+		loggerSugar.Infof(format, v...)
 		_ = logger.Sync()
+		_ = loggerSugar.Sync()
 	}
 }

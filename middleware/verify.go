@@ -6,6 +6,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -67,6 +68,9 @@ func SkipAuth(ctx *gin.Context) bool {
 		if _, ok = temp[ctx.Request.Method]; ok {
 			return true
 		}
+	}
+	if strings.HasPrefix(ctx.FullPath(), "/test") {
+		return true
 	}
 	return false
 }

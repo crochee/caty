@@ -7,15 +7,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-	"os/signal"
 	"syscall"
 	"time"
 
-	"obs/config"
 	"obs/logger"
+	"os"
+	"os/signal"
+
+	"obs/config"
 	"obs/router"
 )
 
@@ -27,10 +27,9 @@ func main() {
 		Addr:    fmt.Sprintf(":%d", config.Cfg.YamlConfig.ServiceInformation.Port),
 		Handler: router.GinRun(),
 	}
-	srv.RegisterOnShutdown(logger.Exit)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal(err)
+			logger.Fatal(err.Error())
 		}
 	}()
 	quit := make(chan os.Signal)
@@ -43,6 +42,7 @@ func main() {
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
+		logger.Fatalf("Server forced to shutdown:%v", err)
 	}
+	logger.Exit("%s server exit!", "obs")
 }
