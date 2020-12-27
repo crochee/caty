@@ -25,6 +25,7 @@ func main() {
 		Handler: router.GinRun(),
 	}
 	go func() {
+		logger.Exit("obs running...")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal(err.Error())
 		}
