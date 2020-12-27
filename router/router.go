@@ -21,6 +21,14 @@ import (
 // @version 1.0
 // @description This is a obs server.
 
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name ak
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name sk
+
 // GinRun gin router
 func GinRun() *gin.Engine {
 	router := gin.New()

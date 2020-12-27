@@ -13,12 +13,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"obs/response"
 )
 
 // Limit 限流器
 func Limit(ctx *gin.Context) {
 	if !Limiter().IsAvailable() {
-		ctx.AbortWithStatus(http.StatusTooManyRequests)
+		ctx.AbortWithStatusJSON(http.StatusTooManyRequests,
+			response.Error(http.StatusTooManyRequests, "limit request"))
 		return
 	}
 	Limiter().Increase()

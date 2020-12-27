@@ -344,4 +344,9 @@ paths:
       summary: UploadFile
       tags:
       - file
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: sk
+    type: apiKey
 swagger: "2.0"

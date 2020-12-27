@@ -533,6 +533,13 @@ var doc = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "sk",
+            "in": "header"
+        }
     }
 }`
 

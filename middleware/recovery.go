@@ -7,15 +7,18 @@
 package middleware
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"obs/logger"
 	"os"
 	"runtime/debug"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
+	"obs/logger"
+	"obs/response"
 )
 
 // Recovery panic log
@@ -34,10 +37,13 @@ func Recovery(ctx *gin.Context) {
 			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
 			logger.Errorf("[Recovery] %v\n%v\n%v", string(httpRequest), err, string(debug.Stack()))
 			if brokenPipe {
-				ctx.AbortWithStatusJSON(http.StatusInternalServerError, err)
+				ctx.AbortWithStatusJSON(http.StatusInternalServerError,
+					response.Error(http.StatusInternalServerError,
+						fmt.Sprintf("broken pipe or connection reset by peer;%v", err)))
 				return
 			}
-			ctx.AbortWithStatus(http.StatusInternalServerError)
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError,
+				response.Error(http.StatusInternalServerError, fmt.Sprint(err)))
 		}
 	}()
 	ctx.Next()
