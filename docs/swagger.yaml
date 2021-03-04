@@ -1,0 +1,352 @@
+definitions:
+  cpts.Person:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      score:
+        type: number
+    type: object
+  cpts.QueryRequest:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+    type: object
+  model.AkSk:
+    properties:
+      ak:
+        type: string
+      sk:
+        type: string
+    required:
+    - ak
+    - sk
+    type: object
+  model.BucketAction:
+    properties:
+      action:
+        type: integer
+    type: object
+  model.FileTarget:
+    properties:
+      path:
+        type: string
+    required:
+    - path
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a obs server.
+  license: {}
+  title: obs Swagger API
+  version: "1.0"
+paths:
+  /test/all:
+    post:
+      consumes:
+      - application/octet-stream
+      description: 返回请求数据
+      parameters:
+      - description: 数据流
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200": {}
+        "400": {}
+        "500": {}
+      summary: 返回请求数据
+      tags:
+      - CPTS
+  /test/person:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: 上传人物信息
+      parameters:
+      - description: 任务信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/cpts.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cpts.Person'
+        "400": {}
+        "500": {}
+      summary: 上传人物信息
+      tags:
+      - CPTS
+  /test/query:
+    get:
+      consumes:
+      - application/json
+      description: 请求参数编码
+      parameters:
+      - description: 名字
+        in: query
+        name: name
+        type: string
+      - description: 年龄
+        in: query
+        name: age
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cpts.QueryRequest'
+        "400": {}
+        "500": {}
+      summary: 请求参数处理
+      tags:
+      - CPTS
+  /v1/bucket/{bucket_name}:
+    delete:
+      consumes:
+      - application/json
+      description: delete bucket
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DeleteBucket
+      tags:
+      - bucket
+    head:
+      consumes:
+      - application/json
+      description: head bucket
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          headers:
+            Last-Modified:
+              description: last modify
+              type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: HeadBucket
+      tags:
+      - bucket
+    post:
+      consumes:
+      - application/json
+      description: create bucket
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: bucket action
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.BucketAction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AkSk'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: CreateBucket
+      tags:
+      - bucket
+  /v1/file/{bucket_name}:
+    delete:
+      consumes:
+      - application/json
+      description: delete file
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: target path
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DeleteFile
+      tags:
+      - file
+    get:
+      consumes:
+      - application/json
+      description: download File
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: target path
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200": {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DownloadFile
+      tags:
+      - file
+    head:
+      consumes:
+      - application/json
+      description: head file sign info
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: target path
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FileTarget'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: SignFile
+      tags:
+      - file
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload file
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: file
+        in: formData
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FileTarget'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: UploadFile
+      tags:
+      - file
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: sk
+    type: apiKey
+swagger: "2.0"
