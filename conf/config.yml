@@ -18,3 +18,18 @@ list:
         host: 192.168.31.62
         port: 27017
         database: log
+=======
+service_information:
+  port: 8150
+  mode: debug
+  version: v1.0.0
+  log_path: log/obs.log
+  log_level: info
+  save_root_path: /obs/file/
+connection_list:
+  log_config:
+    user: root
+    pass: 123456
+    host: 192.168.31.62
+    port: 27017
+    database: log

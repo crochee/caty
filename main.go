@@ -13,31 +13,28 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
 	"obs/config"
 	"obs/logger"
 	"obs/router"
-	"obs/version"
 )
 
 func main() {
-	config.InitConfig(os.Getenv("config"))
+	config.InitConfig()
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", config.Cfg.ServiceConfig.ServiceInfo.Port),
+		Addr:    fmt.Sprintf(":%d", config.Cfg.YamlConfig.ServiceInformation.Port),
 		Handler: router.GinRun(),
 	}
 	go func() {
-		logger.Infof("obs %s run on %s ...", version.Version, gin.Mode())
+		logger.Exit("obs running...")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal(err.Error())
 		}
 	}()
-	quit := make(chan os.Signal, 1)
+	quit := make(chan os.Signal)
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
-	signal.Notify(quit, syscall.SIGINT)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

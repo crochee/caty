@@ -7,6 +7,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -42,6 +43,7 @@ func Log(ctx *gin.Context) {
 	param.BodySize = ctx.Writer.Size()
 
 	if raw != "" {
+
 		var buf strings.Builder
 		buf.WriteString(path)
 		buf.WriteByte('?')

@@ -50,7 +50,6 @@ func CreateBucket(ctx *gin.Context) {
 		response.ErrorWithMessage(ctx, "create bucket failed")
 		return
 	}
-	path := config.Cfg.ServiceConfig.ServiceInfo.SaveRootPath + bucket.BucketName
 	if err = os.MkdirAll(path, os.ModePerm); err != nil {
 		logger.Errorf("mkdir %s failed.Error:%v", path, err)
 		response.ErrorWithMessage(ctx, "create bucket failed")
@@ -83,7 +82,11 @@ func HeadBucket(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
+<<<<<<< HEAD
 	path := config.Cfg.ServiceConfig.ServiceInfo.SaveRootPath + bucket.BucketName
+=======
+	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + bucket.BucketName
+>>>>>>> 188945471614632159fc4b071c6643ca75a44b69
 	fileInfo, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -121,7 +124,7 @@ func DeleteBucket(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
-	path := config.Cfg.ServiceConfig.ServiceInfo.SaveRootPath + bucket.BucketName
+	path := config.Cfg.YamlConfig.ServiceInformation.SaveRootPath + bucket.BucketName
 	if err := os.RemoveAll(path); err != nil {
 		logger.Errorf("delete path(%s) failed.Error:%v", path, err)
 		response.ErrorWithMessage(ctx, "delete bucket failed")

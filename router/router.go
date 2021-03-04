@@ -29,7 +29,6 @@ import (
 func GinRun() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.Recovery, middleware.Log)
-
 	if gin.Mode() != gin.ReleaseMode {
 		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")
