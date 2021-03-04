@@ -52,7 +52,7 @@ func UploadFile(ctx *gin.Context) {
 		return
 	}
 
-	path := fmt.Sprintf("%s%s/%s/%s", config.Cfg.YamlConfig.ServiceInformation.SaveRootPath,
+	path := fmt.Sprintf("%s%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		bucketName.BucketName, fileInfo.Path, fileInfo.File.Filename)
 	fileDir := filepath.Dir(path)
 	if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
@@ -132,7 +132,7 @@ func DeleteFile(ctx *gin.Context) {
 		return
 	}
 
-	path := fmt.Sprintf("%s%s/%s", config.Cfg.YamlConfig.ServiceInformation.SaveRootPath,
+	path := fmt.Sprintf("%s%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		bucketName.BucketName, fileTarget.Path)
 	if err := os.RemoveAll(path); err != nil {
 		logger.Errorf("delete path(%s) failed.Error:%v", path, err)
@@ -180,7 +180,7 @@ func SignFile(ctx *gin.Context) {
 	v.Add("ak", ak)
 	v.Add("sk", sk)
 	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
-		fmt.Sprintf("%s:%d", config.Cfg.IP.String(), config.Cfg.YamlConfig.ServiceInformation.Port),
+		fmt.Sprintf("%s:%d", config.Cfg.IP.String(), config.Cfg.ServiceConfig.ServiceInfo.Port),
 		bucketName.BucketName,
 		v.Encode(),
 	)})
@@ -212,7 +212,7 @@ func DownloadFile(ctx *gin.Context) {
 		return
 	}
 
-	path := fmt.Sprintf("%s%s/%s", config.Cfg.ServiceConfig.ServiceInfo.SaveRootPath,
+	path := fmt.Sprintf("%s%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		bucketName.BucketName, fileTarget.Path)
 	http.ServeFile(ctx.Writer, ctx.Request, path)
 	file, err := os.Open(path)

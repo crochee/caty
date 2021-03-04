@@ -24,6 +24,7 @@ func InitConfig(path string) {
 	if err != nil {
 		panic(err)
 	}
+
 	gin.SetMode(config.ServiceInfo.Mode)
 	logger.InitLogger(config.ServiceInfo.LogPath, config.ServiceInfo.LogLevel)
 

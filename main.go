@@ -19,9 +19,9 @@ import (
 )
 
 func main() {
-	config.InitConfig()
+	config.InitConfig(os.Getenv("config"))
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", config.Cfg.YamlConfig.ServiceInformation.Port),
+		Addr:    fmt.Sprintf(":%d", config.Cfg.ServiceConfig.ServiceInfo.Port),
 		Handler: router.GinRun(),
 	}
 	go func() {
@@ -30,11 +30,11 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 	}()
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT)
 	<-quit
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

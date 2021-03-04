@@ -33,7 +33,7 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
-			logger.Errorf("[Recovery] %v\n%v\n%v", string(httpRequest), err, string(debug.Stack()))
+			logger.Errorf("[Recovery] %s\n%v\n%s", string(httpRequest), err, debug.Stack())
 			if brokenPipe {
 				ctx.AbortWithStatusJSON(http.StatusInternalServerError,
 					response.Error(http.StatusInternalServerError,

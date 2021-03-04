@@ -17,6 +17,7 @@ func TestInitConfig(t *testing.T) {
 		},
 		List: Connection{
 			Mysql: &SqlConfig{
+				Type:     "mysql",
 				User:     "root",
 				Password: "123456",
 				Host:     "192.168.31.62",
@@ -26,7 +27,7 @@ func TestInitConfig(t *testing.T) {
 			},
 			Mongo: &MongoConfig{
 				User:     "root",
-				PassWord: "123456",
+				Password: "123456",
 				Host:     "192.168.31.62",
 				Port:     27017,
 				Database: "log",

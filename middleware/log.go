@@ -7,7 +7,6 @@
 package middleware
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
