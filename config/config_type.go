@@ -19,7 +19,6 @@ type ServiceConfig struct {
 }
 
 type ServiceInformation struct {
-	Port        int    `json:"port" yaml:"port"`
 	Mode        string `json:"mode" yaml:"mode"`
 	LogPath     string `json:"log_path" yaml:"log_path"`
 	LogLevel    string `json:"log_level" yaml:"log_level"`

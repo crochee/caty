@@ -1,5 +1,4 @@
 service_info:
-    port: 8150
     mode: debug
     log_path: ./log/obs.log
     log_level: debug

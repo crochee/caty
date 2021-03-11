@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,7 +20,7 @@ import (
 func main() {
 	config.InitConfig(os.Getenv("config"))
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", config.Cfg.ServiceConfig.ServiceInfo.Port),
+		Addr:    ":8150",
 		Handler: router.GinRun(),
 	}
 	go func() {
