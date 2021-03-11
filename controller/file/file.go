@@ -100,7 +100,7 @@ func UploadFile(ctx *gin.Context) {
 	v.Add("ak", ak)
 	v.Add("sk", sk)
 	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
-		fmt.Sprintf("%s:%d", config.Cfg.IP.String(), config.Cfg.ServiceConfig.ServiceInfo.Port),
+		fmt.Sprintf("%s:8150", config.Cfg.IP.String()),
 		bucketName.BucketName,
 		v.Encode(),
 	)})
@@ -180,7 +180,7 @@ func SignFile(ctx *gin.Context) {
 	v.Add("ak", ak)
 	v.Add("sk", sk)
 	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
-		fmt.Sprintf("%s:%d", config.Cfg.IP.String(), config.Cfg.ServiceConfig.ServiceInfo.Port),
+		fmt.Sprintf("%s:8150", config.Cfg.IP.String()),
 		bucketName.BucketName,
 		v.Encode(),
 	)})
