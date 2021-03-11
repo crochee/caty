@@ -18,3 +18,4 @@ CREATE USER 'crochee'@'%' IDENTIFIED WITH mysql_native_password BY '1234567'
 GRANT ALL PRIVILEGES ON *.* TO 'crochee'@'%'
 
 ## 已有的容器更新为自动重启 docker update --restart=always
+## HeidiSQL
