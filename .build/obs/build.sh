@@ -4,7 +4,7 @@ set -ex
 WORKER_SPACE=$(pwd)
 COMPONENT=osb
 
-function compile() {
+component_compile() {
   go build -o ${COMPONENT} -tags jsoniter .
   cp ${COMPONENT} ${WORKER_SPACE}/.build/obs
   cp -r ${WORKER_SPACE}/conf ${WORKER_SPACE}/.build/obs
@@ -12,17 +12,17 @@ function compile() {
   cp -r ${WORKER_SPACE}/docs/swagger* ${WORKER_SPACE}/.build/obs/docs/
 }
 
-function images() {
+docker_build() {
   docker build -t ${COMPONENT}:latest .
   docker tag ${COMPONENT}:latest obs:latest
 }
 
-function clean() {
+clean_file() {
   rm -rf ${WORKER_SPACE}/.build/obs/conf
   rm -rf ${WORKER_SPACE}/.build/obs/${COMPONENT}
   rm -rf ${WORKER_SPACE}/.build/obs/docs
 }
 
-compile
-images
-clean
+component_compile
+docker_build
+clean_file
