@@ -6,6 +6,7 @@ package db
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -98,6 +99,9 @@ type MysqlLogger struct {
 }
 
 func (m MysqlLogger) Print(v ...interface{}) {
+
 	values := gorm.LogFormatter(v...)
-	logger.Infof(strings.Repeat("%v ", len(values)), values...)
+	_, _ = os.Stdout.WriteString(fmt.Sprintf(strings.Repeat("%v ", len(values)), values...))
+	_ = os.Stdout.Sync()
+	//logger.Infof(strings.Repeat("%v ", len(values)), values...)
 }

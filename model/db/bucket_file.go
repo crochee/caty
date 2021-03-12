@@ -7,7 +7,8 @@ package db
 import "time"
 
 type BucketFile struct {
-	ID uint `gorm:"primary_key"`
+	ID       uint `gorm:"primary_key"`
+	BucketId uint `gorm:"column:bucket_id"`
 
 	File string `gorm:"column:file"`
 

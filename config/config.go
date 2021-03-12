@@ -16,7 +16,9 @@ import (
 )
 
 // Cfg 全局配置参数
-var Cfg Config
+var (
+	Cfg Config
+)
 
 // InitConfig init Config
 func InitConfig(path string) {
@@ -26,7 +28,7 @@ func InitConfig(path string) {
 	}
 
 	gin.SetMode(config.ServiceInfo.Mode)
-	logger.InitLogger(config.ServiceInfo.LogPath, config.ServiceInfo.LogLevel)
+	logger.InitSystemLogger(config.ServiceInfo.LogPath, config.ServiceInfo.LogLevel)
 
 	logger.Debugf("config:%+v", config)
 	Cfg.ServiceConfig = config

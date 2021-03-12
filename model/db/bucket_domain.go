@@ -4,18 +4,15 @@
 
 package db
 
-import (
-	"time"
-)
+import "time"
 
 type Bucket struct {
 	ID uint `gorm:"primary_key"`
 
-	Domain string `json:"domain" gorm:"column:domain;type:varchar(50);not null"`
 	Bucket string `json:"bucket" gorm:"column:bucket;type:varchar(50);not null"`
-	User   string `json:"user" gorm:"column:user;type:varchar(50);not null"`
 
-	BucketFileList []BucketFile `gorm:"ForeignKey:id;AssociationForeignKey:id"`
+	Domain string `json:"domain" gorm:"column:domain;type:varchar(50);not null"`
+	User   string `json:"user" gorm:"column:user;type:varchar(50);not null"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
