@@ -17,5 +17,17 @@ grant all PRIVILEGES on *.* to root@'%' WITH GRANT OPTION;
 CREATE USER 'crochee'@'%' IDENTIFIED WITH mysql_native_password BY '1234567'
 GRANT ALL PRIVILEGES ON *.* TO 'crochee'@'%'
 
+# 由于Mysql5.6以上的版本修改了Password算法，这里需要更新密码算法，便于使用Navicat连接
+use mysql
+
+update user set host='%' where user='root';
+
+grant all PRIVILEGES on *.* to root@'%' WITH GRANT OPTION;
+
+ALTER user 'root'@'%' IDENTIFIED BY '1234567' PASSWORD EXPIRE NEVER;
+
+ALTER user 'root'@'%' IDENTIFIED WITH mysql_native_password BY '1234567';
+
+FLUSH PRIVILEGES;
 ## 已有的容器更新为自动重启 docker update --restart=always
 ## HeidiSQL
