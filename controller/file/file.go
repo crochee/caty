@@ -37,7 +37,7 @@ import (
 // @Success 200 {object} model.FileTarget
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/{bucket_name} [post]
+// @Router /v1/file [post]
 func UploadFile(ctx *gin.Context) {
 	var bucketName model.BucketName
 	if err := ctx.ShouldBindUri(&bucketName); err != nil {

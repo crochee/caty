@@ -42,22 +42,15 @@ func SetLoggerWriter(path string) io.Writer {
 // @param: level 日志等级
 func NewLogger(path, level string) *Logger {
 	logger := &Logger{
-		logger: NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path)),
+		Logger: NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path)),
 	}
-	logger.loggerSugar = logger.logger.Sugar()
+	logger.LoggerSugar = logger.Logger.Sugar()
 	return logger
 }
 
 type Logger struct {
-	logger      *zap.Logger
-	loggerSugar *zap.SugaredLogger
-}
-
-func (l *Logger) With(key, value string) *Logger {
-	field := zap.String(key, value)
-	l.logger = l.logger.With(field)
-	l.loggerSugar = l.loggerSugar.With(field)
-	return l
+	Logger      *zap.Logger
+	LoggerSugar *zap.SugaredLogger
 }
 
 // Debugf 打印Debug信息
@@ -68,7 +61,7 @@ func (l *Logger) Debugf(format string, v ...interface{}) {
 	if l == nil {
 		return
 	}
-	l.loggerSugar.Debugf(format, v...)
+	l.LoggerSugar.Debugf(format, v...)
 }
 
 // Debug 打印Debug信息
@@ -78,7 +71,7 @@ func (l *Logger) Debug(message string) {
 	if l == nil {
 		return
 	}
-	l.logger.Debug(message)
+	l.Logger.Debug(message)
 }
 
 // Infof 打印Info信息
@@ -89,7 +82,7 @@ func (l *Logger) Infof(format string, v ...interface{}) {
 	if l == nil {
 		return
 	}
-	l.loggerSugar.Infof(format, v...)
+	l.LoggerSugar.Infof(format, v...)
 }
 
 // Info 打印Info信息
@@ -99,7 +92,7 @@ func (l *Logger) Info(message string) {
 	if l == nil {
 		return
 	}
-	l.logger.Info(message)
+	l.Logger.Info(message)
 }
 
 // Errorf 打印Error信息
@@ -110,7 +103,7 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 	if l == nil {
 		return
 	}
-	l.loggerSugar.Errorf(format, v...)
+	l.LoggerSugar.Errorf(format, v...)
 }
 
 // Error 打印Error信息
@@ -120,26 +113,5 @@ func (l *Logger) Error(message string) {
 	if l == nil {
 		return
 	}
-	l.logger.Error(message)
-}
-
-// Fatalf 打印Fatal信息
-//
-// @param: format 格式信息
-// @param: v 参数信息
-func (l *Logger) Fatalf(format string, v ...interface{}) {
-	if l == nil {
-		return
-	}
-	l.loggerSugar.Fatalf(format, v...)
-}
-
-// Fatal 打印Fatal信息
-//
-// @param: message 信息
-func (l *Logger) Fatal(message string) {
-	if l == nil {
-		return
-	}
-	l.logger.Fatal(message)
+	l.Logger.Error(message)
 }

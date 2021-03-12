@@ -28,17 +28,17 @@ import (
 // @Success 200 {object} model.AkSk
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_name} [post]
+// @Router /v1/bucket [post]
 func CreateBucket(ctx *gin.Context) {
 	var bucket model.BucketName
 	if err := ctx.ShouldBindUri(&bucket); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
 	var bucketAction model.BucketAction
 	if err := ctx.ShouldBindJSON(&bucketAction); err != nil {
-		logger.Errorf("bind body failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
 		return
 	}
@@ -46,16 +46,16 @@ func CreateBucket(ctx *gin.Context) {
 	newToken.AddAction(bucketAction.Action)
 	ak, sk, err := newToken.Create()
 	if err != nil {
-		logger.Errorf("create token failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("create token failed.Error:%v", err)
 		response.ErrorWithMessage(ctx, "create bucket failed")
 		return
 	}
 	if err = os.MkdirAll("", os.ModePerm); err != nil {
-		logger.Errorf("mkdir %s failed.Error:%v", "path", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("mkdir %s failed.Error:%v", "path", err)
 		response.ErrorWithMessage(ctx, "create bucket failed")
 		return
 	}
-	logger.Info("create bucket success")
+	logger.FromContext(ctx.Request.Context()).Info("create bucket success")
 	ctx.JSON(http.StatusOK, model.AkSk{
 		Ak: ak,
 		Sk: sk,
@@ -78,7 +78,7 @@ func CreateBucket(ctx *gin.Context) {
 func HeadBucket(ctx *gin.Context) {
 	var bucket model.BucketName
 	if err := ctx.ShouldBindUri(&bucket); err != nil {
-		logger.Errorf("bind uri failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
@@ -90,7 +90,7 @@ func HeadBucket(ctx *gin.Context) {
 			ctx.Status(http.StatusNotFound)
 			return
 		}
-		logger.Errorf("find path(%s) failed.Error:%v", path, err)
+		logger.FromContext(ctx.Request.Context()).Errorf("find path(%s) failed.Error:%v", path, err)
 		response.ErrorWithMessage(ctx, "get bucket info failed")
 		return
 	}
@@ -98,7 +98,7 @@ func HeadBucket(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	logger.Infof("get bucket(%s) status success", path)
+	logger.FromContext(ctx.Request.Context()).Infof("get bucket(%s) status success", path)
 	ctx.Header("Last-Modified", fileInfo.ModTime().String())
 	ctx.Status(http.StatusOK)
 }
@@ -117,13 +117,13 @@ func HeadBucket(ctx *gin.Context) {
 func DeleteBucket(ctx *gin.Context) {
 	var bucket model.BucketName
 	if err := ctx.ShouldBindUri(&bucket); err != nil {
-		logger.Errorf("bind uri  failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind uri  failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
 	path := config.Cfg.ServiceConfig.ServiceInfo.StoragePath + bucket.BucketName
 	if err := os.RemoveAll(path); err != nil {
-		logger.Errorf("delete path(%s) failed.Error:%v", path, err)
+		logger.FromContext(ctx.Request.Context()).Errorf("delete path(%s) failed.Error:%v", path, err)
 		response.ErrorWithMessage(ctx, "delete bucket failed")
 		return
 	}

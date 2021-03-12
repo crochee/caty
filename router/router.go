@@ -47,6 +47,9 @@ func GinRun() *gin.Engine {
 
 	v1Router := router.Group("/v1")
 
+	{
+		v1Router.POST("/bucket", bucket.CreateBucket)
+	}
 	bucketRouter := v1Router.Group("/bucket")
 	{
 		bucketRouter.POST("/:bucket_name", bucket.CreateBucket)
