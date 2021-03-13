@@ -133,13 +133,16 @@ func SignFile(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
 		return
 	}
-	var sign string
-	if sign, err = bucket.SignFile(ctx.Request.Context(), token, target.BucketId, target.FileId); err != nil {
+	var (
+		sign     string
+		fileName string
+	)
+	if sign, fileName, err = bucket.SignFile(ctx.Request.Context(), token, target.BucketId, target.FileId); err != nil {
 		response.ErrorWith(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, fmt.Sprintf("/v1/bucket/%d/file/%d?%s=%s",
-		target.BucketId, target.FileId, middleware.Signature, sign))
+	ctx.JSON(http.StatusOK, fmt.Sprintf("/v1/bucket/%d/file/%s?%s=%s",
+		target.BucketId, fileName, middleware.Signature, sign))
 }
 
 // DownloadFile godoc

@@ -9,7 +9,7 @@ import (
 	"net"
 )
 
-// ExternalIP export native ip
+// ExternalIP export native ip net.IP
 func ExternalIP() (net.IP, error) {
 	iFaceList, err := net.Interfaces()
 	if err != nil {

@@ -12,7 +12,7 @@ import (
 	"net/http/httptest"
 )
 
-// PerformRequest unit test function
+// PerformRequest unit test function httptest.ResponseRecorder
 func PerformRequest(r http.Handler, method, path string, body io.Reader,
 	headers http.Header) *httptest.ResponseRecorder {
 	req := httptest.NewRequest(method, path, body)

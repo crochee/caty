@@ -25,7 +25,7 @@ import (
 func UploadFile(ctx context.Context, token *tokenx.Token, bucketId uint, file *multipart.FileHeader) (uint, error) {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
-	bucket := &db.Bucket{ID: bucketId}
+	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
@@ -77,18 +77,15 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketId uint, file *m
 func DeleteFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
-	bucket := &db.Bucket{ID: bucketId}
+	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return response.Errors(http.StatusInternalServerError, err)
 	}
-	bucketFile := &db.BucketFile{
-		ID:       fileId,
-		BucketId: bucket.ID,
-	}
+	bucketFile := &db.BucketFile{}
 	if err := tx.Model(bucketFile).Where("id =? AND bucket_id= ?", fileId, bucketId).
-		Delete(bucketFile).Error; err != nil {
+		Find(bucketFile).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return response.Errors(http.StatusInternalServerError, err)
@@ -109,24 +106,21 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint)
 }
 
 // SignFile 文件签名
-func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (string, error) {
+func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (string, string, error) {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
-	bucket := &db.Bucket{ID: bucketId}
+	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", "", response.Errors(http.StatusInternalServerError, err)
 	}
-	bucketFile := &db.BucketFile{
-		ID:       fileId,
-		BucketId: bucket.ID,
-	}
+	bucketFile := &db.BucketFile{}
 	if err := tx.Model(bucketFile).Where("id =? AND bucket_id= ?", fileId, bucketId).
 		Find(bucketFile).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", "", response.Errors(http.StatusInternalServerError, err)
 	}
 	xToken := &tokenx.TokenClaims{
 		Now: time.Now(),
@@ -142,13 +136,16 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (
 	if err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("create token failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", "", response.Errors(http.StatusInternalServerError, err)
 	}
-	var sign string
-	if sign, err = tokenx.CreateSign(tokenx.Signature(signString)); err != nil {
+	var (
+		sign      string
+		tokenSign = tokenx.Signature(signString)
+	)
+	if sign, err = tokenx.CreateSign(&tokenSign); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("create sian failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", "", response.Errors(http.StatusInternalServerError, err)
 	}
-	return sign, nil
+	return sign, bucketFile.File, nil
 }

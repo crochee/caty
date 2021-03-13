@@ -38,13 +38,13 @@ func Token(ctx *gin.Context) {
 }
 
 func queryToken(ctx *gin.Context) (string, error) {
-	sign := ctx.GetString(Signature)
+	sign := ctx.Query(Signature)
 	if sign != "" {
 		signImpl, err := tokenx.ParseSign(sign)
 		if err != nil {
 			return "", err
 		}
-		return string(signImpl), nil
+		return string(*signImpl), nil
 	}
 	xAuthToken := ctx.Request.Header.Get(XAuthToken)
 	if xAuthToken == "" {
