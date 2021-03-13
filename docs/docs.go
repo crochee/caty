@@ -19,119 +19,12 @@ var doc = `{
         "description": "{{.Description}}",
         "title": "{{.Title}}",
         "contact": {},
-        "license": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/test/all": {
-            "post": {
-                "description": "返回请求数据",
-                "consumes": [
-                    "application/octet-stream"
-                ],
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "CPTS"
-                ],
-                "summary": "返回请求数据",
-                "parameters": [
-                    {
-                        "description": "数据流",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {},
-                    "400": {},
-                    "500": {}
-                }
-            }
-        },
-        "/test/person": {
-            "post": {
-                "description": "上传人物信息",
-                "consumes": [
-                    "application/x-www-form-urlencoded"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "CPTS"
-                ],
-                "summary": "上传人物信息",
-                "parameters": [
-                    {
-                        "description": "任务信息",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/cpts.Person"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/cpts.Person"
-                        }
-                    },
-                    "400": {},
-                    "500": {}
-                }
-            }
-        },
-        "/test/query": {
-            "get": {
-                "description": "请求参数编码",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "CPTS"
-                ],
-                "summary": "请求参数处理",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "名字",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "年龄",
-                        "name": "age",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/cpts.QueryRequest"
-                        }
-                    },
-                    "400": {},
-                    "500": {}
-                }
-            }
-        },
-        "/v1/bucket/{bucket_name}": {
+        "/v1/bucket": {
             "post": {
                 "description": "create bucket",
                 "consumes": [
@@ -146,31 +39,30 @@ var doc = `{
                 "summary": "CreateBucket",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "bucket action",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.BucketAction"
+                            "$ref": "#/definitions/file.Name"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "bucket_id",
                         "schema": {
-                            "$ref": "#/definitions/model.AkSk"
+                            "type": "int"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -182,7 +74,9 @@ var doc = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/v1/bucket/{bucket_id}": {
             "delete": {
                 "description": "delete bucket",
                 "consumes": [
@@ -197,15 +91,23 @@ var doc = `{
                 "summary": "DeleteBucket",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
+                        "type": "integer",
+                        "description": "bucket id",
+                        "name": "bucket_id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -234,20 +136,18 @@ var doc = `{
                 "summary": "HeadBucket",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
+                        "type": "integer",
+                        "description": "bucket id",
+                        "name": "bucket_id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "headers": {
-                            "Last-Modified": {
-                                "type": "string",
-                                "description": "last modify"
-                            }
+                        "description": "bucket info",
+                        "schema": {
+                            "$ref": "#/definitions/bucket.Info"
                         }
                     },
                     "400": {
@@ -256,7 +156,24 @@ var doc = `{
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
-                    "404": {},
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -266,51 +183,7 @@ var doc = `{
                 }
             }
         },
-        "/v1/file/{bucket_name}": {
-            "get": {
-                "description": "download File",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "DownloadFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "target path",
-                        "name": "path",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {},
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            },
+        "/v1/bucket/{bucket_id}/file": {
             "post": {
                 "description": "upload file",
                 "consumes": [
@@ -325,9 +198,9 @@ var doc = `{
                 "summary": "UploadFile",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "bucket name",
-                        "name": "bucket_name",
+                        "name": "bucket_id",
                         "in": "path",
                         "required": true
                     },
@@ -337,24 +210,83 @@ var doc = `{
                         "name": "file",
                         "in": "formData",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "file",
-                        "name": "path",
-                        "in": "formData",
-                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "file id",
                         "schema": {
-                            "$ref": "#/definitions/model.FileTarget"
+                            "type": "int"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bucket/{bucket_id}/file/{file_id}": {
+            "get": {
+                "description": "download File",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "file"
+                ],
+                "summary": "DownloadFile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "bucket id",
+                        "name": "bucket_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "file id",
+                        "name": "file_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sign",
+                        "name": "sign",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -381,24 +313,32 @@ var doc = `{
                 "summary": "DeleteFile",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
+                        "type": "integer",
+                        "description": "bucket id",
+                        "name": "bucket_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "target path",
-                        "name": "path",
-                        "in": "query",
+                        "type": "integer",
+                        "description": "file id",
+                        "name": "file_id",
+                        "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "200": {},
+                    "204": {
+                        "description": ""
+                    },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -425,29 +365,35 @@ var doc = `{
                 "summary": "SignFile",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
+                        "type": "integer",
+                        "description": "bucket id",
+                        "name": "bucket_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "target path",
-                        "name": "path",
+                        "type": "integer",
+                        "description": "file id",
+                        "name": "file_id",
                         "in": "query",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "file link",
                         "schema": {
-                            "$ref": "#/definitions/model.FileTarget"
+                            "type": "string"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -463,61 +409,30 @@ var doc = `{
         }
     },
     "definitions": {
-        "cpts.Person": {
+        "bucket.Info": {
             "type": "object",
             "properties": {
-                "age": {
+                "count": {
                     "type": "integer"
+                },
+                "last_modified": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
-                "score": {
-                    "type": "number"
-                }
-            }
-        },
-        "cpts.QueryRequest": {
-            "type": "object",
-            "properties": {
-                "age": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.AkSk": {
-            "type": "object",
-            "required": [
-                "ak",
-                "sk"
-            ],
-            "properties": {
-                "ak": {
-                    "type": "string"
-                },
-                "sk": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.BucketAction": {
-            "type": "object",
-            "properties": {
-                "action": {
+                "size": {
                     "type": "integer"
                 }
             }
         },
-        "model.FileTarget": {
+        "file.Name": {
             "type": "object",
             "required": [
-                "path"
+                "bucket_name"
             ],
             "properties": {
-                "path": {
+                "bucket_name": {
                     "type": "string"
                 }
             }
@@ -537,7 +452,7 @@ var doc = `{
     "securityDefinitions": {
         "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "sk",
+            "name": "X-Auth-Token",
             "in": "header"
         }
     }

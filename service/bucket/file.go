@@ -22,13 +22,6 @@ import (
 )
 
 // UploadFile 上传文件
-//
-// @param ctx 请求context
-// @param token token信息
-// @param bucketId 桶id
-// @param file 文件
-// @Success uint 文件id
-// @Failure error 自定义错误
 func UploadFile(ctx context.Context, token *tokenx.Token, bucketId uint, file *multipart.FileHeader) (uint, error) {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
@@ -81,12 +74,6 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketId uint, file *m
 }
 
 // DeleteFile 删除文件
-//
-// @param ctx 请求context
-// @param token token信息
-// @param bucketId 桶id
-// @param fileId 文件id
-// @Failure error 自定义错误
 func DeleteFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
@@ -122,13 +109,6 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint)
 }
 
 // SignFile 文件签名
-//
-// @param ctx 请求context
-// @param token token信息
-// @param bucketId 桶id
-// @param fileId 文件id
-// @Success string 签名信息
-// @Failure error 自定义错误
 func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (string, error) {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()

@@ -22,12 +22,6 @@ import (
 )
 
 // CreateBucket 创建桶
-//
-// @param ctx 请求context
-// @param token token信息
-// @param bucketName 桶名
-// @Success uint 桶id
-// @Failure error 自定义错误
 func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) (uint, error) {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
@@ -55,13 +49,7 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) (
 	return bucket.ID, nil
 }
 
-// HeadBucket 查询桶信息
-//
-// @param ctx 请求context
-// @param token token信息
-// @param bucketId 桶名
-// @Success *Info 桶信息
-// @Failure error 自定义错误
+// HeadBucket 查询桶信息 Info
 func HeadBucket(ctx context.Context, token *tokenx.Token, bucketId uint) (*Info, error) {
 	conn := db.NewDB()
 	bucket := &db.Bucket{ID: bucketId}
@@ -102,11 +90,6 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketId uint) (*Info,
 }
 
 // DeleteBucket 删除桶
-//
-// @param ctx 请求context
-// @param token token信息
-// @param bucketId 桶名
-// @Failure error 自定义错误
 func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketId uint) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()

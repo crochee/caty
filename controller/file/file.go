@@ -30,7 +30,7 @@ import (
 // @Produce application/json
 // @Param bucket_id path int true "bucket name"
 // @Param file formData file true "file"
-// @Success 201 int "file id"
+// @Success 201 {int} int "file id"
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -111,7 +111,7 @@ func DeleteFile(ctx *gin.Context) {
 // @Produce application/json
 // @Param bucket_id path int true "bucket id"
 // @Param file_id query int true "file id"
-// @Success 200 string "file link"
+// @Success 200 {string} string "file link"
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse

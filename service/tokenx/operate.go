@@ -10,11 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// QueryToken 查询token
-//
-// @param ctx gin.context
-// @Success *Token token信息
-// @Failure error 自定义错误
+// QueryToken 查询 Token
 func QueryToken(ctx *gin.Context) (*Token, error) {
 	token, ok := ctx.Get("token")
 	if !ok {

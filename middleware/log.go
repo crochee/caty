@@ -17,8 +17,6 @@ import (
 )
 
 // Log request log
-//
-// @param ctx *gin.Context
 func Log(ctx *gin.Context) {
 	// Start timer
 	start := time.Now()

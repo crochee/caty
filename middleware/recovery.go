@@ -22,8 +22,6 @@ import (
 )
 
 // Recovery panic log
-//
-// @param ctx *gin.Context
 func Recovery(ctx *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {

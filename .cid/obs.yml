@@ -1,4 +1,0 @@
-product:
-    type: docker
-    name: obs:latest
-script: ./.build/obs/build.sh

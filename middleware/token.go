@@ -20,8 +20,6 @@ const (
 )
 
 // Token add trace_id
-//
-// @param ctx *gin.Context
 func Token(ctx *gin.Context) {
 	xAuthToken, err := queryToken(ctx)
 	if err != nil { // 缺少token 禁止访问

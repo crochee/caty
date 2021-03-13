@@ -7,14 +7,13 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+
 	"obs/logger"
 )
 
 const RequestTraceId = "trace_id"
 
 // TraceId add trace_id
-//
-// @param ctx *gin.Context
 func TraceId(ctx *gin.Context) {
 	tracdId := ctx.Request.Header.Get(RequestTraceId)
 	if tracdId != "" {

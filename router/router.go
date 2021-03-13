@@ -23,8 +23,6 @@ import (
 // @name X-Auth-Token
 
 // GinRun gin router
-//
-// @Success *gin.Engine gin router
 func GinRun() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.CrossDomain, middleware.TraceId, middleware.Recovery, middleware.Log)
@@ -38,7 +36,7 @@ func GinRun() *gin.Engine {
 	}
 
 	v1Router := router.Group("/v1")
-
+	v1Router.Use(middleware.Token)
 	{
 		// bucket
 		v1Router.POST("/bucket", file.CreateBucket)

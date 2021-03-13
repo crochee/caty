@@ -48,20 +48,12 @@ const (
 )
 
 // CreateToken 生成token
-//
-// @param claims jwt.Claims的token实现
-// @Success string token加密信息
-// @Failure error 标准错误
 func CreateToken(claims *TokenClaims) (string, error) {
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return tokenImpl.SignedString(secret)
 }
 
-// ParseToken 解析出token信息
-//
-// @param tokenString token的加密信息
-// @Success TokenClaims jwt.Claims的token实现
-// @Failure error 标准错误
+// ParseToken 解析出token信息 TokenClaims
 func ParseToken(tokenString string) (*TokenClaims, error) {
 	claims := new(TokenClaims)
 	tokenImpl, err := jwt.ParseWithClaims(tokenString, claims,
@@ -90,20 +82,12 @@ func (s Signature) Valid() error {
 }
 
 // CreateSign 生成签名加密信息
-//
-// @param claims jwt.Claims的签名实现
-// @Success string 签名加密信息
-// @Failure error 标准错误
 func CreateSign(claims Signature) (string, error) {
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return tokenImpl.SignedString(secret)
 }
 
-// ParseSign 解析出签名信息
-//
-// @param signString 签名的加密信息
-// @Success Signature jwt.Claims的签名实现
-// @Failure error 标准错误
+// ParseSign 解析出签名信息 Signature
 func ParseSign(signString string) (Signature, error) {
 	var claims Signature
 	tokenImpl, err := jwt.ParseWithClaims(signString, claims,

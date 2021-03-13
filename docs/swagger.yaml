@@ -1,41 +1,21 @@
 definitions:
-  cpts.Person:
+  bucket.Info:
     properties:
-      age:
+      count:
         type: integer
+      last_modified:
+        type: string
       name:
         type: string
-      score:
-        type: number
-    type: object
-  cpts.QueryRequest:
-    properties:
-      age:
-        type: integer
-      name:
-        type: string
-    type: object
-  model.AkSk:
-    properties:
-      ak:
-        type: string
-      sk:
-        type: string
-    required:
-    - ak
-    - sk
-    type: object
-  model.BucketAction:
-    properties:
-      action:
+      size:
         type: integer
     type: object
-  model.FileTarget:
+  file.Name:
     properties:
-      path:
+      bucket_name:
         type: string
     required:
-    - path
+    - bucket_name
     type: object
   response.ErrorResponse:
     properties:
@@ -47,96 +27,63 @@ definitions:
 info:
   contact: {}
   description: This is a obs server.
-  license: {}
   title: obs Swagger API
   version: "1.0"
 paths:
-  /test/all:
+  /v1/bucket:
     post:
       consumes:
-      - application/octet-stream
-      description: 返回请求数据
+      - application/json
+      description: create bucket
       parameters:
-      - description: 数据流
+      - description: bucket name
         in: body
         name: request
         required: true
         schema:
-          type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200": {}
-        "400": {}
-        "500": {}
-      summary: 返回请求数据
-      tags:
-      - CPTS
-  /test/person:
-    post:
-      consumes:
-      - application/x-www-form-urlencoded
-      description: 上传人物信息
-      parameters:
-      - description: 任务信息
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/cpts.Person'
+          $ref: '#/definitions/file.Name'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: bucket_id
           schema:
-            $ref: '#/definitions/cpts.Person'
-        "400": {}
-        "500": {}
-      summary: 上传人物信息
-      tags:
-      - CPTS
-  /test/query:
-    get:
-      consumes:
-      - application/json
-      description: 请求参数编码
-      parameters:
-      - description: 名字
-        in: query
-        name: name
-        type: string
-      - description: 年龄
-        in: query
-        name: age
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
+            type: int
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/cpts.QueryRequest'
-        "400": {}
-        "500": {}
-      summary: 请求参数处理
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: CreateBucket
       tags:
-      - CPTS
-  /v1/bucket/{bucket_name}:
+      - bucket
+  /v1/bucket/{bucket_id}:
     delete:
       consumes:
       - application/json
       description: delete bucket
       parameters:
-      - description: bucket name
+      - description: bucket id
         in: path
-        name: bucket_name
+        name: bucket_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
-        "200": {}
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
         "403":
           description: Forbidden
           schema:
@@ -153,24 +100,34 @@ paths:
       - application/json
       description: head bucket
       parameters:
-      - description: bucket name
+      - description: bucket id
         in: path
-        name: bucket_name
+        name: bucket_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          headers:
-            Last-Modified:
-              description: last modify
-              type: string
+          description: bucket info
+          schema:
+            $ref: '#/definitions/bucket.Info'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-        "404": {}
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -178,62 +135,71 @@ paths:
       summary: HeadBucket
       tags:
       - bucket
+  /v1/bucket/{bucket_id}/file:
     post:
       consumes:
-      - application/json
-      description: create bucket
+      - multipart/form-data
+      description: upload file
       parameters:
       - description: bucket name
         in: path
-        name: bucket_name
+        name: bucket_id
         required: true
-        type: string
-      - description: bucket action
-        in: body
-        name: request
+        type: integer
+      - description: file
+        in: formData
+        name: file
         required: true
-        schema:
-          $ref: '#/definitions/model.BucketAction'
+        type: file
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: file id
           schema:
-            $ref: '#/definitions/model.AkSk'
+            type: int
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: CreateBucket
+      summary: UploadFile
       tags:
-      - bucket
-  /v1/file/{bucket_name}:
+      - file
+  /v1/bucket/{bucket_id}/file/{file_id}:
     delete:
       consumes:
       - application/json
       description: delete file
       parameters:
-      - description: bucket name
+      - description: bucket id
         in: path
-        name: bucket_name
+        name: bucket_id
         required: true
-        type: string
-      - description: target path
-        in: query
-        name: path
+        type: integer
+      - description: file id
+        in: path
+        name: file_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
-        "200": {}
+        "204":
+          description: ""
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
@@ -248,22 +214,31 @@ paths:
       - application/json
       description: download File
       parameters:
-      - description: bucket name
+      - description: bucket id
         in: path
-        name: bucket_name
+        name: bucket_id
         required: true
-        type: string
-      - description: target path
+        type: integer
+      - description: file id
+        in: path
+        name: file_id
+        required: true
+        type: integer
+      - description: sign
         in: query
-        name: path
-        required: true
+        name: sign
         type: string
       produces:
       - application/octet-stream
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
@@ -278,25 +253,29 @@ paths:
       - application/json
       description: head file sign info
       parameters:
-      - description: bucket name
+      - description: bucket id
         in: path
-        name: bucket_name
+        name: bucket_id
         required: true
-        type: string
-      - description: target path
+        type: integer
+      - description: file id
         in: query
-        name: path
+        name: file_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: file link
           schema:
-            $ref: '#/definitions/model.FileTarget'
+            type: string
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
@@ -306,47 +285,9 @@ paths:
       summary: SignFile
       tags:
       - file
-    post:
-      consumes:
-      - multipart/form-data
-      description: upload file
-      parameters:
-      - description: bucket name
-        in: path
-        name: bucket_name
-        required: true
-        type: string
-      - description: file
-        in: formData
-        name: file
-        required: true
-        type: file
-      - description: file
-        in: formData
-        name: path
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.FileTarget'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: UploadFile
-      tags:
-      - file
 securityDefinitions:
   ApiKeyAuth:
     in: header
-    name: sk
+    name: X-Auth-Token
     type: apiKey
 swagger: "2.0"

@@ -10,11 +10,6 @@ import (
 )
 
 // DirSize 统计文件夹的大小
-//
-// @param path 文件夹路径
-// @Success int64 总文件大小
-// @Success int 总文件数
-// @Failure error 标准错误
 func DirSize(path string) (int64, int, error) {
 	var (
 		size  int64

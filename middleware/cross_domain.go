@@ -13,8 +13,6 @@ import (
 )
 
 // CrossDomain skip the cross-domain phase
-//
-// @param ctx *gin.Context
 func CrossDomain(ctx *gin.Context) {
 	ctx.Header("Access-Control-Allow-Headers", "Content-Type,ak,sk")
 	ctx.Header("Access-Control-Allow-Origin", ctx.GetHeader("Origin"))

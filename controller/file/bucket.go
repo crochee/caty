@@ -23,7 +23,7 @@ import (
 // @Accept application/json
 // @Produce  application/json
 // @Param request body Name true "bucket name"
-// @Success 201 int "bucket_id"
+// @Success 201 {int} int "bucket_id"
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
