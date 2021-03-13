@@ -12,7 +12,6 @@ import (
 	"obs/controller/file"
 
 	"obs/controller/bucket"
-	"obs/controller/cpts"
 	_ "obs/docs"
 	"obs/middleware"
 )
@@ -26,9 +25,11 @@ import (
 // @name X-Auth-Token
 
 // GinRun gin router
+//
+// @Success *gin.Engine gin router
 func GinRun() *gin.Engine {
 	router := gin.New()
-	router.Use(middleware.Recovery, middleware.Log)
+	router.Use(middleware.CrossDomain, middleware.TraceId, middleware.Recovery, middleware.Log)
 	if gin.Mode() != gin.ReleaseMode {
 		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")
@@ -38,23 +39,23 @@ func GinRun() *gin.Engine {
 		pprof.Register(router)
 	}
 
-	testRouter := router.Group("/test")
-	{
-		testRouter.GET("/query", cpts.QueryEncode)
-		testRouter.POST("/person", cpts.FindPerson)
-		testRouter.POST("/all", cpts.PayAll)
-	}
-
 	v1Router := router.Group("/v1")
 
 	{
+		// bucket
 		v1Router.POST("/bucket", bucket.CreateBucket)
-	}
-	bucketRouter := v1Router.Group("/bucket")
-	{
-		bucketRouter.POST("/:bucket_name", bucket.CreateBucket)
-		bucketRouter.HEAD("/:bucket_name", bucket.HeadBucket)
-		bucketRouter.DELETE("/:bucket_name", bucket.DeleteBucket)
+		v1Router.HEAD("/bucket/:bucket_id", bucket.HeadBucket)
+		v1Router.DELETE("/bucket/:bucket_id", bucket.DeleteBucket)
+
+		// file
+		fileRouter := v1Router.Group("/bucket/:bucket_id")
+		{
+			fileRouter.POST("/file", file.UploadFile)
+			fileRouter.DELETE("/file/:file_id", file.DeleteFile)
+			fileRouter.HEAD("/file/:file_id", file.SignFile)
+			fileRouter.GET("/file", file.DownloadFile)
+			fileRouter.GET("/files", file.FileList)
+		}
 	}
 
 	fileRouter := v1Router.Group("/file")

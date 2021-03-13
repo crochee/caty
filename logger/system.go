@@ -18,9 +18,9 @@ var systemLogger *Logger
 // @param: level 日志等级
 func InitSystemLogger(path, level string) {
 	systemLogger = &Logger{
-		logger: NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path)),
+		Logger: NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path)),
 	}
-	systemLogger.loggerSugar = systemLogger.logger.Sugar()
+	systemLogger.LoggerSugar = systemLogger.Logger.Sugar()
 }
 
 // Debugf 打印Debug信息
@@ -29,7 +29,7 @@ func InitSystemLogger(path, level string) {
 // @param: v 参数信息
 func Debugf(format string, v ...interface{}) {
 	if systemLogger != nil {
-		systemLogger.loggerSugar.Debugf(format, v...)
+		systemLogger.LoggerSugar.Debugf(format, v...)
 	}
 }
 
@@ -38,7 +38,7 @@ func Debugf(format string, v ...interface{}) {
 // @param: message 信息
 func Debug(message string) {
 	if systemLogger != nil {
-		systemLogger.logger.Debug(message)
+		systemLogger.Logger.Debug(message)
 	}
 }
 
@@ -48,7 +48,7 @@ func Debug(message string) {
 // @param: v 参数信息
 func Infof(format string, v ...interface{}) {
 	if systemLogger != nil {
-		systemLogger.loggerSugar.Infof(format, v...)
+		systemLogger.LoggerSugar.Infof(format, v...)
 	}
 }
 
@@ -57,7 +57,7 @@ func Infof(format string, v ...interface{}) {
 // @param: message 信息
 func Info(message string) {
 	if systemLogger != nil {
-		systemLogger.logger.Info(message)
+		systemLogger.Logger.Info(message)
 	}
 }
 
@@ -67,7 +67,7 @@ func Info(message string) {
 // @param: v 参数信息
 func Errorf(format string, v ...interface{}) {
 	if systemLogger != nil {
-		systemLogger.loggerSugar.Errorf(format, v...)
+		systemLogger.LoggerSugar.Errorf(format, v...)
 	}
 }
 
@@ -76,7 +76,7 @@ func Errorf(format string, v ...interface{}) {
 // @param: message 信息
 func Error(message string) {
 	if systemLogger != nil {
-		systemLogger.logger.Error(message)
+		systemLogger.Logger.Error(message)
 	}
 }
 
@@ -86,7 +86,7 @@ func Error(message string) {
 // @param: v 参数信息
 func Fatalf(format string, v ...interface{}) {
 	if systemLogger != nil {
-		systemLogger.loggerSugar.Fatalf(format, v...)
+		systemLogger.LoggerSugar.Fatalf(format, v...)
 	}
 }
 
@@ -95,7 +95,7 @@ func Fatalf(format string, v ...interface{}) {
 // @param: message 信息
 func Fatal(message string) {
 	if systemLogger != nil {
-		systemLogger.logger.Fatal(message)
+		systemLogger.Logger.Fatal(message)
 	}
 }
 
@@ -104,9 +104,9 @@ func Fatal(message string) {
 // @param: message 信息
 func Exit(message string) {
 	if systemLogger != nil {
-		systemLogger.logger.Info(message)
-		_ = systemLogger.logger.Sync()
-		_ = systemLogger.loggerSugar.Sync()
+		systemLogger.Logger.Info(message)
+		_ = systemLogger.Logger.Sync()
+		_ = systemLogger.LoggerSugar.Sync()
 	}
 	os.Exit(1)
 }

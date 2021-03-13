@@ -11,23 +11,7 @@ import (
 )
 
 func TestBucket_TableName(t *testing.T) {
-	config.Cfg = config.Config{
-		ServiceConfig: &config.ServiceConfig{
-			List: config.Connection{
-				Mysql: &config.SqlConfig{
-					Type:     "mysql",
-					User:     "root",
-					Password: "1234567",
-					Host:     "192.168.31.62",
-					Port:     3307,
-					Database: "obs",
-					Charset:  "utf8",
-					Debug:    true,
-				},
-				Mongo: nil,
-			},
-		},
-	}
+	config.InitConfig("../../conf/config.yml")
 	Setup()
 	test := &Bucket{
 		Domain: "123",
@@ -37,8 +21,26 @@ func TestBucket_TableName(t *testing.T) {
 	tx := NewDB().Begin()
 	defer tx.Commit()
 	// 级联插入
-	if err := tx.Create(test).Error; err != nil {
+	result := tx.Create(test)
+	if err := result.Error; err != nil {
 		tx.Rollback()
 		t.Fatal(err)
 	}
+	t.Log(result.Value, test.ID)
+}
+
+func TestQuery(t *testing.T) {
+	config.InitConfig("../../conf/config.yml")
+	Setup()
+	bucket := &Bucket{
+		ID: 8,
+	}
+	tx := NewDB().Begin()
+	defer tx.Commit()
+	// 级联插入
+	if err := tx.Find(bucket).Error; err != nil {
+		tx.Rollback()
+		t.Fatal(err)
+	}
+	t.Log(bucket)
 }

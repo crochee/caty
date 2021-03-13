@@ -17,6 +17,8 @@ import (
 )
 
 // Log request log
+//
+// @param ctx *gin.Context
 func Log(ctx *gin.Context) {
 	// Start timer
 	start := time.Now()
@@ -42,7 +44,6 @@ func Log(ctx *gin.Context) {
 	param.BodySize = ctx.Writer.Size()
 
 	if raw != "" {
-
 		var buf strings.Builder
 		buf.WriteString(path)
 		buf.WriteByte('?')
@@ -50,7 +51,7 @@ func Log(ctx *gin.Context) {
 		path = buf.String()
 	}
 	param.Path = path
-	logger.Info(defaultLogFormatter(param))
+	logger.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
 }
 
 // defaultLogFormatter is the default log format function Logger middleware uses.

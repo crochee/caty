@@ -5,44 +5,52 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"errors"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"obs/logger"
+	"obs/service/tokenx"
 )
 
-const XAuthToken = "X-Auth-Token"
+const (
+	XAuthToken = "X-Auth-Token"
+	Signature  = "sign"
+)
 
-// TraceId add trace_id
+// Token add trace_id
+//
+// @param ctx *gin.Context
 func Token(ctx *gin.Context) {
+	xAuthToken, err := queryToken(ctx)
+	if err != nil { // 缺少token 禁止访问
+		logger.FromContext(ctx.Request.Context()).Error(err.Error())
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	var claims *tokenx.TokenClaims
+	if claims, err = tokenx.ParseToken(xAuthToken); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("parse token failed.Error:%v", err)
+		ctx.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	ctx.Set("token", claims.Token)
+	ctx.Next()
+}
+
+func queryToken(ctx *gin.Context) (string, error) {
+	sign := ctx.GetString(Signature)
+	if sign != "" {
+		signImpl, err := tokenx.ParseSign(sign)
+		if err != nil {
+			return "", err
+		}
+		return string(*signImpl), nil
+	}
 	xAuthToken := ctx.Request.Header.Get(XAuthToken)
-	if xAuthToken == "" { // 缺少token 禁止访问
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
+	if xAuthToken == "" {
+		return "", errors.New("missing token")
 	}
-	claims, err := ctoken.ParseTokenThenRefresh(tokenString, ctx.Request.RemoteAddr, ok)
-	if err != nil {
-		logger.Errorf("parse token failed.Error:%v", err)
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	defer claims.Put()
-	ctx.Set("email", claims.Email)
-	ctx.Set("nick", claims.Nick)
-	ctx.Set("permissions", claims.Permissions)
-	ctx.Set("token", tokenString)
-	ctx.Next()
-	claims, err := ctoken.ParseTokenThenRefresh(tokenString, ctx.Request.RemoteAddr, ok)
-	if err != nil {
-		logger.Errorf("parse token failed.Error:%v", err)
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	if tracdId != "" {
-		log := logger.FromContext(ctx.Request.Context())
-		log.Logger = log.Logger.With(zap.String(RequestTraceId, tracdId))
-		log.LoggerSugar = log.LoggerSugar.With(RequestTraceId, tracdId)
-		logger.With(ctx.Request.Context(), log)
-	}
-	ctx.Next()
+	return xAuthToken, nil
 }

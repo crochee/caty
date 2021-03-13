@@ -22,6 +22,8 @@ import (
 )
 
 // Recovery panic log
+//
+// @param ctx *gin.Context
 func Recovery(ctx *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -33,7 +35,7 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
-			logger.Errorf("[Recovery] %s\n%v\n%s", string(httpRequest), err, debug.Stack())
+			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s", httpRequest, err, debug.Stack())
 			if brokenPipe {
 				ctx.AbortWithStatusJSON(http.StatusInternalServerError,
 					response.Error(http.StatusInternalServerError,

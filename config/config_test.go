@@ -9,7 +9,6 @@ import "testing"
 func TestInitConfig(t *testing.T) {
 	cf := &ServiceConfig{
 		ServiceInfo: ServiceInformation{
-			Port:        8150,
 			Mode:        "debug",
 			LogPath:     "./log/obs.log",
 			LogLevel:    "debug",
@@ -19,11 +18,12 @@ func TestInitConfig(t *testing.T) {
 			Mysql: &SqlConfig{
 				Type:     "mysql",
 				User:     "root",
-				Password: "123456",
+				Password: "1234567",
 				Host:     "192.168.31.62",
-				Port:     3306,
+				Port:     3307,
 				Database: "obs",
 				Charset:  "utf8",
+				Debug:    true,
 			},
 			Mongo: &MongoConfig{
 				User:     "root",

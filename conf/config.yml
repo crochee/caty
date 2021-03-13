@@ -1,5 +1,5 @@
 service_info:
-    mode: debug
+    mode: release
     log_path: ./log/obs.log
     log_level: debug
     storage_path: /obs/
@@ -7,11 +7,12 @@ list:
     mysql:
         type: mysql
         user: root
-        password: "123456"
+        password: "1234567"
         host: 192.168.31.62
-        port: 3306
+        port: 3307
         database: obs
         charset: utf8
+        debug: true
     mongo:
         user: root
         password: "123456"

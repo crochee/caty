@@ -15,12 +15,14 @@ import (
 
 	"obs/config"
 	"obs/logger"
+	"obs/model/db"
 	"obs/router"
 )
 
 func main() {
-	config.InitConfig(os.Getenv("config"))
-
+	// 初始化
+	setup()
+	// 初始化请求日志
 	requestLog := logger.NewLogger(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
 		config.Cfg.ServiceConfig.ServiceInfo.LogLevel)
 	srv := &http.Server{
@@ -51,4 +53,14 @@ func main() {
 		logger.Fatalf("Server forced to shutdown:%v", err)
 	}
 	logger.Exit("obs server exit!")
+}
+
+func setup() {
+	// 初始化配置
+	config.InitConfig(os.Getenv("config"))
+	// 初始化系统日志
+	logger.InitSystemLogger(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
+		config.Cfg.ServiceConfig.ServiceInfo.LogLevel)
+	// 初始化数据库
+	db.Setup()
 }

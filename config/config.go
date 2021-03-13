@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"obs/logger"
+
 	"obs/util"
 )
 
@@ -28,14 +28,12 @@ func InitConfig(path string) {
 	}
 
 	gin.SetMode(config.ServiceInfo.Mode)
-	logger.InitSystemLogger(config.ServiceInfo.LogPath, config.ServiceInfo.LogLevel)
 
-	logger.Debugf("config:%+v", config)
 	Cfg.ServiceConfig = config
 
 	Cfg.Pid = os.Getpid()                            // pid获取
 	if Cfg.IP, err = util.ExternalIP(); err != nil { // ip获取
-		logger.Fatal(err.Error())
+		panic(err)
 	}
 }
 

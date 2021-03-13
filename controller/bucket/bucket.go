@@ -6,15 +6,14 @@ package bucket
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 
-	"obs/config"
 	"obs/logger"
-	"obs/model"
 	"obs/response"
-	"obs/service/verify"
+	"obs/service/bucket"
+	"obs/service/tokenx"
 )
 
 // CreateBucket godoc
@@ -23,43 +22,34 @@ import (
 // @Tags bucket
 // @Accept application/json
 // @Produce  application/json
-// @Param bucket_name path string true "bucket name"
-// @Param request body model.BucketAction true "bucket action"
-// @Success 200 {object} model.AkSk
+// @Param request body Name true "bucket name"
+// @Success 201 int "bucket_id"
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /v1/bucket [post]
 func CreateBucket(ctx *gin.Context) {
-	var bucket model.BucketName
-	if err := ctx.ShouldBindUri(&bucket); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
-		return
-	}
-	var bucketAction model.BucketAction
-	if err := ctx.ShouldBindJSON(&bucketAction); err != nil {
+	var name Name
+	if err := ctx.ShouldBindBodyWith(&name, binding.JSON); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
 		return
 	}
-	newToken := &verify.Token{}
-	newToken.AddAction(bucketAction.Action)
-	ak, sk, err := newToken.Create()
+	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("create token failed.Error:%v", err)
-		response.ErrorWithMessage(ctx, "create bucket failed")
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
-	if err = os.MkdirAll("", os.ModePerm); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("mkdir %s failed.Error:%v", "path", err)
-		response.ErrorWithMessage(ctx, "create bucket failed")
+	if token.ActionMap["OBS"] < tokenx.Write { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
 		return
 	}
-	logger.FromContext(ctx.Request.Context()).Info("create bucket success")
-	ctx.JSON(http.StatusOK, model.AkSk{
-		Ak: ak,
-		Sk: sk,
-	})
+	var id uint
+	if id, err = bucket.CreateBucket(ctx.Request.Context(), token, name.BucketName); err != nil {
+		response.ErrorWith(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusCreated, id)
 }
 
 // HeadBucket godoc
@@ -68,39 +58,36 @@ func CreateBucket(ctx *gin.Context) {
 // @Tags bucket
 // @Accept application/json
 // @Produce  application/json
-// @Param bucket_name path string true "bucket name"
-// @Success 200
-// @Header 200 {string} Last-Modified "last modify"
-// @Failure 404
+// @Param bucket_id path int true "bucket id"
+// @Success 200 {object} bucket.Info "bucket info"
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_name} [head]
+// @Router /v1/bucket/{bucket_id} [head]
 func HeadBucket(ctx *gin.Context) {
-	var bucket model.BucketName
-	if err := ctx.ShouldBindUri(&bucket); err != nil {
+	var id Id
+	if err := ctx.ShouldBindUri(&id); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
-	path := config.Cfg.ServiceConfig.ServiceInfo.StoragePath + bucket.BucketName
-
-	fileInfo, err := os.Stat(path)
+	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		if os.IsNotExist(err) {
-			ctx.Status(http.StatusNotFound)
-			return
-		}
-		logger.FromContext(ctx.Request.Context()).Errorf("find path(%s) failed.Error:%v", path, err)
-		response.ErrorWithMessage(ctx, "get bucket info failed")
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
-	if !fileInfo.IsDir() {
-		ctx.Status(http.StatusNotFound)
+	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
 		return
 	}
-	logger.FromContext(ctx.Request.Context()).Infof("get bucket(%s) status success", path)
-	ctx.Header("Last-Modified", fileInfo.ModTime().String())
-	ctx.Status(http.StatusOK)
+	var info *bucket.Info
+	if info, err = bucket.HeadBucket(ctx.Request.Context(), token, id.BucketId); err != nil {
+		response.ErrorWith(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, info)
 }
 
 // DeleteBucket godoc
@@ -109,22 +96,31 @@ func HeadBucket(ctx *gin.Context) {
 // @Tags bucket
 // @Accept application/json
 // @Produce  application/json
-// @Param bucket_name path string true "bucket name"
+// @Param bucket_id path int true "bucket id"
 // @Success 200
+// @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_name} [delete]
+// @Router /v1/bucket/{bucket_id} [delete]
 func DeleteBucket(ctx *gin.Context) {
-	var bucket model.BucketName
-	if err := ctx.ShouldBindUri(&bucket); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind uri  failed.Error:%v", err)
+	var id Id
+	if err := ctx.ShouldBindUri(&id); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
-	path := config.Cfg.ServiceConfig.ServiceInfo.StoragePath + bucket.BucketName
-	if err := os.RemoveAll(path); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("delete path(%s) failed.Error:%v", path, err)
-		response.ErrorWithMessage(ctx, "delete bucket failed")
+	token, err := tokenx.QueryToken(ctx)
+	if err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		return
+	}
+	if token.ActionMap["OBS"] < tokenx.Delete { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
+		return
+	}
+	if err = bucket.DeleteBucket(ctx.Request.Context(), token, id.BucketId); err != nil {
+		response.ErrorWith(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusOK)

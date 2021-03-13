@@ -9,7 +9,7 @@ import "time"
 type Bucket struct {
 	ID uint `gorm:"primary_key"`
 
-	Bucket string `json:"bucket" gorm:"column:bucket;type:varchar(50);not null"`
+	Bucket string `json:"bucket" gorm:"column:bucket;type:varchar(50);not null;"`
 
 	Domain string `json:"domain" gorm:"column:domain;type:varchar(50);not null"`
 	User   string `json:"user" gorm:"column:user;type:varchar(50);not null"`
