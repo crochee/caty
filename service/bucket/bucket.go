@@ -7,16 +7,18 @@ package bucket
 import (
 	"context"
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"net/http"
+	"os"
+	"path/filepath"
+
+	"github.com/jinzhu/gorm"
+
 	"obs/config"
 	"obs/logger"
 	"obs/model/db"
 	"obs/response"
 	"obs/service/tokenx"
 	"obs/util"
-	"os"
-	"path/filepath"
 )
 
 // CreateBucket 创建桶
@@ -62,18 +64,13 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) (
 // @Failure error 自定义错误
 func HeadBucket(ctx context.Context, token *tokenx.Token, bucketId uint) (*Info, error) {
 	conn := db.NewDB()
-	bucket := &db.Bucket{
-		ID: bucketId,
-	}
-	if err := conn.Find(bucket).Error; err != nil {
+	bucket := &db.Bucket{ID: bucketId}
+	if err := conn.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, response.Error(http.StatusNotFound, fmt.Sprintf("not found bucket %s", bucket.Bucket))
 		}
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return nil, response.Errors(http.StatusInternalServerError, err)
-	}
-	if bucket.Domain != token.Domain {
-		return nil, response.Error(http.StatusForbidden, "Please make sure that id 's what you need")
 	}
 
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s",
@@ -114,17 +111,15 @@ func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketId uint) error
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
 
-	bucket := &db.Bucket{
-		ID: bucketId,
-	}
-	if err := tx.Find(bucket).Error; err != nil {
+	bucket := &db.Bucket{ID: bucketId}
+	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			tx.Rollback()
+			return response.Error(http.StatusNotFound, fmt.Sprintf("not found bucket %s", bucket.Bucket))
+		}
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return response.Error(http.StatusBadRequest, "Please make sure that id 's what you need")
-	}
-	if bucket.Domain != token.Domain {
-		tx.Rollback()
-		return response.Error(http.StatusForbidden, "Please make sure that id 's what you need")
+		return response.Errors(http.StatusInternalServerError, err)
 	}
 	if err := tx.Delete(bucket).Error; err != nil {
 		tx.Rollback()

@@ -6,23 +6,20 @@ package file
 
 import (
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
-	"net/url"
-	"os"
 	"path/filepath"
-	"time"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
 	"obs/config"
 	"obs/logger"
-	"obs/model"
+	"obs/middleware"
+	"obs/model/db"
 	"obs/response"
-	"obs/service/verify"
-	"obs/util"
+	"obs/service/bucket"
+	"obs/service/tokenx"
 )
 
 // UploadFile godoc
@@ -30,80 +27,43 @@ import (
 // @Description upload file
 // @Tags file
 // @Accept multipart/form-data
-// @Produce  application/json
-// @Param bucket_name path string true "bucket name"
+// @Produce application/json
+// @Param bucket_id path int true "bucket name"
 // @Param file formData file true "file"
-// @Param path formData string true "file"
-// @Success 200 {object} model.FileTarget
+// @Success 201 int "file id"
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file [post]
+// @Router /v1/bucket/{bucket_id}/file [post]
 func UploadFile(ctx *gin.Context) {
-	var bucketName model.BucketName
-	if err := ctx.ShouldBindUri(&bucketName); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
+	var id Id
+	if err := ctx.ShouldBindUri(&id); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
 		return
 	}
-	var fileInfo model.FileInfo
+	var fileInfo Info
 	if err := ctx.ShouldBindWith(&fileInfo, binding.FormMultipart); err != nil {
-		logger.Errorf("bind body failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your payload"))
 		return
 	}
-
-	path := fmt.Sprintf("%s%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
-		bucketName.BucketName, fileInfo.Path, fileInfo.File.Filename)
-	fileDir := filepath.Dir(path)
-	if err := os.MkdirAll(fileDir, os.ModePerm); err != nil {
-		logger.Errorf("mkdir %s failed.Error:%v", fileDir, err)
-		response.ErrorWithMessage(ctx, "upload file failed")
-		return
-	}
-	dstFile, err := os.Create(path)
+	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.Errorf("create %s file failed.Error:%v", path, err)
-		response.ErrorWithMessage(ctx, "upload file failed")
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
-	defer dstFile.Close()
-	var srcFile multipart.File
-	if srcFile, err = fileInfo.File.Open(); err != nil {
-		logger.Errorf("open %s file failed.Error:%v", fileInfo.File.Filename, err)
-		response.ErrorWithMessage(ctx, "open file failed")
+	if token.ActionMap["OBS"] < tokenx.Write { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
 		return
 	}
-	defer srcFile.Close()
-	buf := util.AcquireBuf()
-	defer util.ReleaseBuf(buf)
-	var length int64
-	if length, err = io.CopyBuffer(dstFile, srcFile, buf); err != nil {
-		logger.Errorf("copy failed.Error:%v", err)
-		response.ErrorWithMessage(ctx, "copy failed")
+	var fileId uint
+	if fileId, err = bucket.UploadFile(ctx.Request.Context(), token, id.BucketId, fileInfo.File); err != nil {
+		response.ErrorWith(ctx, err)
 		return
 	}
-	if length != fileInfo.File.Size {
-		logger.Errorf("file write %d,but need %d", length, fileInfo.File.Size)
-		response.ErrorWithMessage(ctx, "write size wrong")
-		return
-	}
-	newToken := &verify.Token{ExpiresAt: time.Now().Add(30 * time.Minute)}
-	newToken.AddAction(verify.Read)
-	ak, sk, err := newToken.Create()
-	if err != nil {
-		logger.Errorf("create token failed.Error:%v", err)
-		response.ErrorWithMessage(ctx, "create sign failed")
-		return
-	}
-	v := url.Values{}
-	v.Set("path", fmt.Sprintf("%s/%s", fileInfo.Path, fileInfo.File.Filename))
-	v.Add("ak", ak)
-	v.Add("sk", sk)
-	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
-		fmt.Sprintf("%s:8150", config.Cfg.IP.String()),
-		bucketName.BucketName,
-		v.Encode(),
-	)})
+	ctx.JSON(http.StatusCreated, fileId)
 }
 
 // DeleteFile godoc
@@ -111,35 +71,36 @@ func UploadFile(ctx *gin.Context) {
 // @Description delete file
 // @Tags file
 // @Accept application/json
-// @Produce  application/json
-// @Param bucket_name path string true "bucket name"
-// @Param path query string true "target path"
-// @Success 200
+// @Produce application/json
+// @Param bucket_id path int true "bucket id"
+// @Param file_id path int true "file id"
+// @Success 204
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/{bucket_name} [delete]
+// @Router /v1/bucket/{bucket_id}/file/{file_id} [delete]
 func DeleteFile(ctx *gin.Context) {
-	var bucketName model.BucketName
-	if err := ctx.ShouldBindUri(&bucketName); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
+	var target Target
+	if err := ctx.ShouldBindUri(&target); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
 		return
 	}
-	var fileTarget model.FileTarget
-	if err := ctx.ShouldBindQuery(&fileTarget); err != nil {
-		logger.Errorf("bind query failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your query"))
+	token, err := tokenx.QueryToken(ctx)
+	if err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
-
-	path := fmt.Sprintf("%s%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
-		bucketName.BucketName, fileTarget.Path)
-	if err := os.RemoveAll(path); err != nil {
-		logger.Errorf("delete path(%s) failed.Error:%v", path, err)
-		response.ErrorWithMessage(ctx, "delete target failed")
+	if token.ActionMap["OBS"] < tokenx.Delete { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
 		return
 	}
-	ctx.Status(http.StatusOK)
+	if err = bucket.DeleteFile(ctx.Request.Context(), token, target.BucketId, target.FileId); err != nil {
+		response.ErrorWith(ctx, err)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }
 
 // SignFile godoc
@@ -147,43 +108,38 @@ func DeleteFile(ctx *gin.Context) {
 // @Description head file sign info
 // @Tags file
 // @Accept application/json
-// @Produce  application/json
-// @Param bucket_name path string true "bucket name"
-// @Param path query string true "target path"
-// @Success 200 {object} model.FileTarget
+// @Produce application/json
+// @Param bucket_id path int true "bucket id"
+// @Param file_id query int true "file id"
+// @Success 200 string "file link"
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/{bucket_name} [head]
+// @Router /v1/bucket/{bucket_id}/file/{file_id} [head]
 func SignFile(ctx *gin.Context) {
-	var bucketName model.BucketName
-	if err := ctx.ShouldBindUri(&bucketName); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
+	var target Target
+	if err := ctx.ShouldBindUri(&target); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
 		return
 	}
-	var fileTarget model.FileTarget
-	if err := ctx.ShouldBindQuery(&fileTarget); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
-		return
-	}
-	newToken := &verify.Token{ExpiresAt: time.Now().Add(30 * time.Minute)}
-	newToken.AddAction(verify.Read)
-	ak, sk, err := newToken.Create()
+	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.Errorf("create token failed.Error:%v", err)
-		response.ErrorWithMessage(ctx, "create sign failed")
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
-	v := url.Values{}
-	v.Set("path", fileTarget.Path)
-	v.Add("ak", ak)
-	v.Add("sk", sk)
-	ctx.JSON(http.StatusOK, &model.FileTarget{Path: fmt.Sprintf("%s/v1/file/%s?%s",
-		fmt.Sprintf("%s:8150", config.Cfg.IP.String()),
-		bucketName.BucketName,
-		v.Encode(),
-	)})
+	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
+		return
+	}
+	var sign string
+	if sign, err = bucket.SignFile(ctx.Request.Context(), token, target.BucketId, target.FileId); err != nil {
+		response.ErrorWith(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, fmt.Sprintf("/v1/bucket/%d/file/%d?%s=%s",
+		target.BucketId, target.FileId, middleware.Signature, sign))
 }
 
 // DownloadFile godoc
@@ -192,49 +148,60 @@ func SignFile(ctx *gin.Context) {
 // @Tags file
 // @Accept application/json
 // @Produce application/octet-stream
-// @Param bucket_name path string true "bucket name"
-// @Param path query string true "target path"
+// @Param bucket_id path int true "bucket id"
+// @Param file_id path int true "file id"
+// @Param sign query string false "sign"
 // @Success 200
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/file/{bucket_name} [get]
+// @Router /v1/bucket/{bucket_id}/file/{file_id} [get]
 func DownloadFile(ctx *gin.Context) {
-	var bucketName model.BucketName
-	if err := ctx.ShouldBindUri(&bucketName); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
+	bucketIdStr := ctx.Param("bucket_id")
+	fileIdString := ctx.Param("file_id")
+	if bucketIdStr == "" || fileIdString == "" {
+		logger.FromContext(ctx.Request.Context()).Errorf("get url %s %s failed", bucketIdStr, fileIdString)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
 		return
 	}
-	var fileTarget model.FileTarget
-	if err := ctx.ShouldBindQuery(&fileTarget); err != nil {
-		logger.Errorf("bind url failed.Error:%v", err)
+	bucketId, err := strconv.Atoi(bucketIdStr)
+	if err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("strconv %s failed", bucketIdStr)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
+		return
+	}
+	var token *tokenx.Token
+	if token, err = tokenx.QueryToken(ctx); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		return
+	}
+	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
+		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
 		return
 	}
 
-	path := fmt.Sprintf("%s%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
-		bucketName.BucketName, fileTarget.Path)
-	http.ServeFile(ctx.Writer, ctx.Request, path)
-	file, err := os.Open(path)
+	conn := db.NewDB()
+	b := new(db.Bucket)
+	if err = conn.Model(b).Where("id =? AND domain= ?", bucketId, token.Domain).Find(b).Error; err != nil {
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
+		return
+	}
+	bucketFile := &db.BucketFile{}
+	if fileId, sErr := strconv.Atoi(fileIdString); sErr != nil {
+		err = conn.Model(bucketFile).Where("file =? AND bucket_id= ?", fileIdString, bucketId).
+			Find(bucketFile).Error
+	} else {
+		err = conn.Model(bucketFile).Where("id =? AND bucket_id= ?", fileId, bucketId).
+			Find(bucketFile).Error
+	}
 	if err != nil {
-		logger.Errorf("open file failed.Error:%v", err)
-		response.ErrorWithMessage(ctx, "open file failed")
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
 		return
 	}
-	defer file.Close()
-	buf := util.AcquireBuf()
-	defer util.ReleaseBuf(buf)
-	// 让浏览器自动下载
-	ctx.Header("Content-Type", "application/octet-stream")
-	// 让浏览器自动下载
-	ctx.Header("Content-Disposition", "attachment; filename="+path)
-	// 让浏览器自动打开
-	//ctx.Header("Content-Disposition", "inline; filename="+path)
-	if length, err := io.CopyBuffer(ctx.Writer, file, buf); err != nil {
-		logger.Errorf("write file %d failed.Error:%v", length, err)
-		response.ErrorWithMessage(ctx, "download file failed")
-		return
-	}
-	ctx.Writer.Flush()
-	ctx.Status(http.StatusOK)
+	path := filepath.Clean(fmt.Sprintf("%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
+		b.Bucket, bucketFile.File))
+	http.ServeFile(ctx.Writer, ctx.Request, path)
 }

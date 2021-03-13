@@ -10,8 +10,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"obs/controller/file"
-
-	"obs/controller/bucket"
 	_ "obs/docs"
 	"obs/middleware"
 )
@@ -43,9 +41,9 @@ func GinRun() *gin.Engine {
 
 	{
 		// bucket
-		v1Router.POST("/bucket", bucket.CreateBucket)
-		v1Router.HEAD("/bucket/:bucket_id", bucket.HeadBucket)
-		v1Router.DELETE("/bucket/:bucket_id", bucket.DeleteBucket)
+		v1Router.POST("/bucket", file.CreateBucket)
+		v1Router.HEAD("/bucket/:bucket_id", file.HeadBucket)
+		v1Router.DELETE("/bucket/:bucket_id", file.DeleteBucket)
 
 		// file
 		fileRouter := v1Router.Group("/bucket/:bucket_id")
@@ -54,16 +52,9 @@ func GinRun() *gin.Engine {
 			fileRouter.DELETE("/file/:file_id", file.DeleteFile)
 			fileRouter.HEAD("/file/:file_id", file.SignFile)
 			fileRouter.GET("/file", file.DownloadFile)
-			fileRouter.GET("/files", file.FileList)
+			//fileRouter.GET("/files", file.FileList)
 		}
 	}
 
-	fileRouter := v1Router.Group("/file")
-	{
-		fileRouter.POST("/:bucket_name", file.UploadFile)
-		fileRouter.DELETE("/:bucket_name", file.DeleteFile)
-		fileRouter.HEAD("/:bucket_name", file.SignFile)
-		fileRouter.GET("/:bucket_name", file.DownloadFile)
-	}
 	return router
 }

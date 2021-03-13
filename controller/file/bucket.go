@@ -2,7 +2,7 @@
 // Author: OnlyOneFace
 // Date: 2020/12/13
 
-package bucket
+package file
 
 import (
 	"net/http"
@@ -25,6 +25,7 @@ import (
 // @Param request body Name true "bucket name"
 // @Success 201 int "bucket_id"
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /v1/bucket [post]
 func CreateBucket(ctx *gin.Context) {
@@ -74,7 +75,7 @@ func HeadBucket(ctx *gin.Context) {
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
@@ -95,9 +96,9 @@ func HeadBucket(ctx *gin.Context) {
 // @Description delete bucket
 // @Tags bucket
 // @Accept application/json
-// @Produce  application/json
+// @Produce application/json
 // @Param bucket_id path int true "bucket id"
-// @Success 200
+// @Success 204
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -111,7 +112,7 @@ func DeleteBucket(ctx *gin.Context) {
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
 		return
 	}
@@ -123,5 +124,5 @@ func DeleteBucket(ctx *gin.Context) {
 		response.ErrorWith(ctx, err)
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }

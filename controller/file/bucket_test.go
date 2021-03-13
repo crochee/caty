@@ -4,7 +4,7 @@
 // Create: 2020/12/22
 
 // Package bucket
-package bucket
+package file
 
 import (
 	"bytes"

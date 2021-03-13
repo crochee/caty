@@ -85,7 +85,7 @@ func ParseToken(tokenString string) (*TokenClaims, error) {
 // Signature jwt.Claims的签名实现
 type Signature string
 
-func (s *Signature) Valid() error {
+func (s Signature) Valid() error {
 	return nil
 }
 
@@ -94,7 +94,7 @@ func (s *Signature) Valid() error {
 // @param claims jwt.Claims的签名实现
 // @Success string 签名加密信息
 // @Failure error 标准错误
-func CreateSign(claims *Signature) (string, error) {
+func CreateSign(claims Signature) (string, error) {
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return tokenImpl.SignedString(secret)
 }
@@ -104,22 +104,22 @@ func CreateSign(claims *Signature) (string, error) {
 // @param signString 签名的加密信息
 // @Success Signature jwt.Claims的签名实现
 // @Failure error 标准错误
-func ParseSign(signString string) (*Signature, error) {
-	claims := new(Signature)
+func ParseSign(signString string) (Signature, error) {
+	var claims Signature
 	tokenImpl, err := jwt.ParseWithClaims(signString, claims,
 		func(token *jwt.Token) (interface{}, error) {
 			return secret, nil
 		})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	var ok bool
-	if claims, ok = tokenImpl.Claims.(*Signature); !ok {
-		return nil, errors.New("cannot convert sign claim")
+	if claims, ok = tokenImpl.Claims.(Signature); !ok {
+		return "", errors.New("cannot convert sign claim")
 	}
 	//验证token，如果token被修改过则为false
 	if !tokenImpl.Valid {
-		return nil, errors.New("sign is invalid")
+		return "", errors.New("sign is invalid")
 	}
 	return claims, nil
 }

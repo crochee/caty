@@ -10,7 +10,9 @@ type BucketFile struct {
 	ID       uint `gorm:"primary_key"`
 	BucketId uint `gorm:"column:bucket_id"`
 
-	File string `gorm:"column:file"`
+	File    string    `gorm:"column:file"`
+	Size    int64     `gorm:"column:size"`
+	ModTime time.Time `gorm:"column:mod_time"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

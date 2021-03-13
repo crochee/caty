@@ -15,11 +15,13 @@ import (
 
 	"obs/config"
 	"obs/middleware"
+	"obs/model/db"
 	"obs/util"
 )
 
 func TestUploadFile(t *testing.T) {
-	config.InitConfig()
+	config.InitConfig("../../conf/config.yml")
+	db.Setup()
 	body := new(bytes.Buffer)
 	mw := multipart.NewWriter(body)
 	_ = mw.WriteField("path", "data")
@@ -28,7 +30,7 @@ func TestUploadFile(t *testing.T) {
 	_ = mw.Close()
 	uri := fmt.Sprintf("/v1/file/%s", "cptsbuild")
 	router := gin.New()
-	router.Use(middleware.Verify)
+	router.Use(middleware.Token)
 	header := make(http.Header)
 	header.Add("Content-Type", mw.FormDataContentType())
 	header.Add("ak", "2pa4kh0996gk008uqpj2nq3hj9vs7lablep0")
@@ -40,13 +42,14 @@ func TestUploadFile(t *testing.T) {
 }
 
 func TestDeleteFile(t *testing.T) {
-	config.InitConfig()
+	config.InitConfig("../../conf/config.yml")
+	db.Setup()
 	uri := fmt.Sprintf("/v1/file/%s?path=%s",
 		"cptsbuild",
 		"data/self.txt",
 	)
 	router := gin.New()
-	router.Use(middleware.Verify)
+	router.Use(middleware.Token)
 	router.DELETE("/v1/file/:bucket_name", DeleteFile)
 	header := make(http.Header)
 	header.Add("ak", "2pa4kh0996gk008uqpj2nq3hj9vs7lablep0")
@@ -57,13 +60,14 @@ func TestDeleteFile(t *testing.T) {
 }
 
 func TestSignFile(t *testing.T) {
-	config.InitConfig()
+	config.InitConfig("../../conf/config.yml")
+	db.Setup()
 	uri := fmt.Sprintf("/v1/file/%s?path=%s",
 		"cptsbuild",
 		"data/test.txt",
 	)
 	router := gin.New()
-	router.Use(middleware.Verify)
+	router.Use(middleware.Token)
 	router.HEAD("/v1/file/:bucket_name", SignFile)
 	header := make(http.Header)
 	header.Add("ak", "2pa4kh0996gk008uqpj2nq3hj9vs7lablep0")
@@ -74,13 +78,14 @@ func TestSignFile(t *testing.T) {
 }
 
 func TestDownloadFile(t *testing.T) {
-	config.InitConfig()
+	config.InitConfig("../../conf/config.yml")
+	db.Setup()
 	uri := fmt.Sprintf("/v1/file/%s?path=%s",
 		"cptsbuild",
 		"data/test.txt",
 	)
 	router := gin.New()
-	router.Use(middleware.Verify)
+	router.Use(middleware.Token)
 	router.GET("/v1/file/:bucket_name", DownloadFile)
 	header := make(http.Header)
 	header.Add("ak", "2pa4kh0996gk008uqpj2nq3hj9vs7lablep0")
