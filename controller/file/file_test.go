@@ -56,7 +56,7 @@ func TestSignFile(t *testing.T) {
 	router.Use(middleware.Token)
 	router.HEAD("/v1/bucket/:bucket_id/file/:file_id", SignFile)
 	header := make(http.Header)
-	header.Add(middleware.XAuthToken, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzX2F0IjoiMjAyMS0wMy0xNFQwMDo1NDoyOS4wMDcxMDE4KzA4OjAwIiwidG9rZW4iOnsiZG9tYWluIjoidGVzdCIsInVzZXIiOiIxMjMiLCJhY3Rpb25fbWFwIjp7Ik9CUyI6M319fQ.e3BuyBDOb-Pgj1mceXTxGChYDO6M9cy34TPFbIWKdoA")
+	header.Add(middleware.XAuthToken, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzX2F0IjoiMjAyMS0wMy0xNFQwMTo1MDoxNy4yNDM3NzQ0KzA4OjAwIiwidG9rZW4iOnsiZG9tYWluIjoidGVzdCIsInVzZXIiOiIxMjMiLCJhY3Rpb25fbWFwIjp7Ik9CUyI6M319fQ.GlRqQiysDnqLVDKVLT7gfe4dcG8l71M52RO8w2kSFf4")
 	w := util.PerformRequest(router, http.MethodHead, "/v1/bucket/9/file/3", nil, header)
 	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
 }
@@ -67,7 +67,7 @@ func TestDownloadFile(t *testing.T) {
 	router := gin.New()
 	router.Use(middleware.Token)
 	router.GET("/v1/bucket/:bucket_id/file/:file_id", DownloadFile)
-	uri := "/v1/bucket/9/file/3?sign=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ImV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUpsZUhCcGNtVnpYMkYwSWpvaU1qQXlNUzB3TXkweE5GUXdNVG94TlRveE9TNHhOak13T1RZNEt6QTRPakF3SWl3aWRHOXJaVzRpT25zaVpHOXRZV2x1SWpvaWRHVnpkQ0lzSW5WelpYSWlPaUl4TWpNaUxDSmhZM1JwYjI1ZmJXRndJanA3SWs5Q1V5STZNSDE5ZlEuYjBBSGw5cEZfQlJYSHBOakpyR0VTbFIxQU5SY3RLZDRfcXpSSWRIZ2xBYyI.ZTeUBgJyQUOhY_ragehji8j2E7I19GckU3u0bNUEAvI"
+	uri := "/v1/bucket/9/file/test.txt?sign=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ImV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUpsZUhCcGNtVnpYMkYwSWpvaU1qQXlNUzB3TXkweE5GUXdNVG8xTVRvd05TNDRPRE0zTURnck1EZzZNREFpTENKMGIydGxiaUk2ZXlKa2IyMWhhVzRpT2lKMFpYTjBJaXdpZFhObGNpSTZJakV5TXlJc0ltRmpkR2x2Ymw5dFlYQWlPbnNpVDBKVElqb3dmWDE5LlRnbnVJWUtQZ0dnS0Q4cy0tZDhhUEw0d1lQcVZJV3VwSWEwc082Wks2Q3ci.djB-SW-7GcTlb80k2xVHtEeT_rehOdqiXpeAo3Qio3M"
 	header := make(http.Header)
 	//header.Add(middleware.XAuthToken, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzX2F0IjoiMjAyMS0wMy0xNFQwMDo1NDoyOS4wMDcxMDE4KzA4OjAwIiwidG9rZW4iOnsiZG9tYWluIjoidGVzdCIsInVzZXIiOiIxMjMiLCJhY3Rpb25fbWFwIjp7Ik9CUyI6M319fQ.e3BuyBDOb-Pgj1mceXTxGChYDO6M9cy34TPFbIWKdoA")
 	w := util.PerformRequest(router, http.MethodGet, uri, nil, header)

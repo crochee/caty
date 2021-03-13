@@ -49,7 +49,7 @@ func GinRun() *gin.Engine {
 			fileRouter.POST("/file", file.UploadFile)
 			fileRouter.DELETE("/file/:file_id", file.DeleteFile)
 			fileRouter.HEAD("/file/:file_id", file.SignFile)
-			fileRouter.GET("/file", file.DownloadFile)
+			fileRouter.GET("/file/:file_id", file.DownloadFile)
 			//fileRouter.GET("/files", file.FileList)
 		}
 	}

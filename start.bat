@@ -1,4 +1,4 @@
 @echo off
-go build -tags=jsoniter
-set config_path=conf/config.yml
+go build -tags jsoniter -o obs.exe
+set config=conf/config.yml
 obs.exe

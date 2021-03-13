@@ -7,6 +7,7 @@ package file
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strconv"
 
@@ -206,5 +207,8 @@ func DownloadFile(ctx *gin.Context) {
 	}
 	path := filepath.Clean(fmt.Sprintf("%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		b.Bucket, bucketFile.File))
+	ctx.Writer.Header().Set("Content-Type", "application/octet-stream")
+	ctx.Writer.Header().Set("Content-Disposition",
+		fmt.Sprintf(`attachment; filename="%s"`, url.PathEscape(bucketFile.File)))
 	http.ServeFile(ctx.Writer, ctx.Request, path)
 }

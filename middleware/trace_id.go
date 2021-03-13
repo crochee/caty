@@ -15,12 +15,12 @@ const RequestTraceId = "trace_id"
 
 // TraceId add trace_id
 func TraceId(ctx *gin.Context) {
-	tracdId := ctx.Request.Header.Get(RequestTraceId)
-	if tracdId != "" {
+	tracedId := ctx.Request.Header.Get(RequestTraceId)
+	if tracedId != "" {
 		log := logger.FromContext(ctx.Request.Context())
 		if log != nil {
-			log.Logger = log.Logger.With(zap.String(RequestTraceId, tracdId))
-			log.LoggerSugar = log.LoggerSugar.With(RequestTraceId, tracdId)
+			log.Logger = log.Logger.With(zap.String(RequestTraceId, tracedId))
+			log.LoggerSugar = log.LoggerSugar.With(RequestTraceId, tracedId)
 			logger.With(ctx.Request.Context(), log)
 		}
 	}
