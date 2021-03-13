@@ -51,7 +51,7 @@ func UploadFile(ctx *gin.Context) {
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Write { //权限不够
@@ -89,7 +89,7 @@ func DeleteFile(ctx *gin.Context) {
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Delete { //权限不够
@@ -126,7 +126,7 @@ func SignFile(ctx *gin.Context) {
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
@@ -173,7 +173,7 @@ func DownloadFile(ctx *gin.Context) {
 	var token *tokenx.Token
 	if token, err = tokenx.QueryToken(ctx); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Read { //权限不够

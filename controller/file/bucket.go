@@ -38,7 +38,7 @@ func CreateBucket(ctx *gin.Context) {
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Write { //权限不够
@@ -62,6 +62,7 @@ func CreateBucket(ctx *gin.Context) {
 // @Param bucket_id path int true "bucket id"
 // @Success 200 {object} bucket.Info "bucket info"
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 404 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -76,7 +77,7 @@ func HeadBucket(ctx *gin.Context) {
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
@@ -113,7 +114,7 @@ func DeleteBucket(ctx *gin.Context) {
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusInternalServerError, "Unauthorized"))
+		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if token.ActionMap["OBS"] < tokenx.Delete { //权限不够

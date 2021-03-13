@@ -46,7 +46,7 @@ func queryToken(ctx *gin.Context) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return string(*signImpl), nil
+		return string(signImpl), nil
 	}
 	xAuthToken := ctx.Request.Header.Get(XAuthToken)
 	if xAuthToken == "" {
