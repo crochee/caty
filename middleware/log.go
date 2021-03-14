@@ -87,7 +87,9 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 	buf.WriteString(strconv.Itoa(param.BodySize))
 	buf.WriteString("| ")
 	buf.WriteString(param.Path)
-	buf.WriteByte('\n')
-	buf.WriteString(param.ErrorMessage)
+	if param.ErrorMessage != "" {
+		buf.WriteString(" | ")
+		buf.WriteString(param.ErrorMessage)
+	}
 	return buf.String()
 }
