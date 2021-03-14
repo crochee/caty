@@ -105,6 +105,7 @@ func Login(ctx *gin.Context) {
 // @Produce application/json
 // @Param request body ModifyInfo true "request's content"
 // @Success 200
+// @Success 304
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -121,9 +122,8 @@ func Modify(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
 		return
 	}
-	if modifyInfo.NewPassWord == modifyInfo.OldPassWord {
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest,
-			"The new and old passwords are consistent"))
+	if modifyInfo.OldPassWord == "" {
+		ctx.Status(http.StatusNotModified)
 		return
 	}
 

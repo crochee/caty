@@ -63,11 +63,11 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 		return response.Error(http.StatusForbidden, "wrong password")
 	}
 	var columnList = make([]interface{}, 0, 2)
-	if newPassWord != "" {
+	if newPassWord != "" && domain.PassWord != newPassWord {
 		domain.PassWord = newPassWord
 		columnList = append(columnList, "pass_word")
 	}
-	if nick != "" {
+	if nick != "" && domain.Nick != nick {
 		domain.Nick = nick
 		columnList = append(columnList, "nick")
 	}

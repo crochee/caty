@@ -26,6 +26,7 @@ import (
 // GinRun gin router
 func GinRun() *gin.Engine {
 	router := gin.New()
+	router.Use(middleware.CrossDomain)
 	if gin.Mode() != gin.ReleaseMode {
 		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")
@@ -35,7 +36,7 @@ func GinRun() *gin.Engine {
 		pprof.Register(router)
 	}
 
-	router.Use(middleware.CrossDomain, middleware.TraceId, middleware.Recovery, middleware.Log)
+	router.Use(middleware.TraceId, middleware.Recovery, middleware.Log)
 
 	v1Router := router.Group("/v1")
 	userRouter := v1Router.Group("/user")
