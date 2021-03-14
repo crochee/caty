@@ -32,7 +32,7 @@ func Setup() {
 	db.DB().SetMaxOpenConns(30)                   //最大连接数
 	db.DB().SetConnMaxLifetime(time.Second * 300) //设置连接空闲超时
 
-	registerModel(db, new(Bucket), new(BucketFile))
+	registerModel(db, new(Bucket), new(BucketFile), new(Domain), new(User))
 }
 
 func NewDB() *gorm.DB {

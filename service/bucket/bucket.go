@@ -22,38 +22,37 @@ import (
 )
 
 // CreateBucket 创建桶
-func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) (uint, error) {
+func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
 	bucket := &db.Bucket{
 		Bucket: bucketName,
 		Domain: token.Domain,
-		User:   token.User,
 	}
 	if err := tx.Create(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
-		return 0, response.Errors(http.StatusInternalServerError, err)
+		return response.Errors(http.StatusInternalServerError, err)
 	}
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))
 	if err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("get path abs failed.Error:%v", err)
-		return 0, response.Error(http.StatusInternalServerError, "clear bucket failed")
+		return response.Error(http.StatusInternalServerError, "clear bucket failed")
 	}
 	if err = os.MkdirAll(filepath.Clean(path), os.ModePerm); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("create bucket failed.Error:%v", err)
-		return 0, response.Error(http.StatusInternalServerError, "create bucket failed")
+		return response.Error(http.StatusInternalServerError, "create bucket failed")
 	}
-	return bucket.ID, nil
+	return nil
 }
 
 // HeadBucket 查询桶信息 Info
-func HeadBucket(ctx context.Context, token *tokenx.Token, bucketId uint) (*Info, error) {
+func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*Info, error) {
 	conn := db.NewDB()
-	bucket := &db.Bucket{}
-	if err := conn.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
+	bucket := &db.Bucket{Bucket: bucketName}
+	if err := conn.Find(bucket).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, response.Error(http.StatusNotFound, fmt.Sprintf("not found bucket %s", bucket.Bucket))
 		}
@@ -90,12 +89,12 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketId uint) (*Info,
 }
 
 // DeleteBucket 删除桶
-func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketId uint) error {
+func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketName string) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
 
 	bucket := &db.Bucket{}
-	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
+	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).Find(bucket).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			tx.Rollback()
 			return response.Error(http.StatusNotFound, fmt.Sprintf("not found bucket %s", bucket.Bucket))

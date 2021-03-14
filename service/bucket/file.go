@@ -22,14 +22,15 @@ import (
 )
 
 // UploadFile 上传文件
-func UploadFile(ctx context.Context, token *tokenx.Token, bucketId uint, file *multipart.FileHeader) (uint, error) {
+func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, file *multipart.FileHeader) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
 	bucket := &db.Bucket{}
-	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
+	if err := tx.Model(bucket).Where("bucket =? AND domain= ?",
+		bucketName, token.Domain).Find(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
-		return 0, response.Errors(http.StatusInternalServerError, err)
+		return response.Errors(http.StatusInternalServerError, err)
 	}
 	path := filepath.Clean(fmt.Sprintf("%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		bucket.Bucket, file.Filename))
@@ -37,54 +38,54 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketId uint, file *m
 	if err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("create file %s failed.Error:%v", path, err)
-		return 0, response.Errors(http.StatusInternalServerError, err)
+		return response.Errors(http.StatusInternalServerError, err)
 	}
 	defer dstFile.Close()
 	var srcFile multipart.File
 	if srcFile, err = file.Open(); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("open %s file failed.Error:%v", file.Filename, err)
-		return 0, response.Errors(http.StatusInternalServerError, err)
+		return response.Errors(http.StatusInternalServerError, err)
 	}
 	defer srcFile.Close()
 
 	if _, err = io.Copy(dstFile, srcFile); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("copy %s file failed.Error:%v", file.Filename, err)
-		return 0, response.Error(http.StatusInternalServerError, "copy failed")
+		return response.Error(http.StatusInternalServerError, "copy failed")
 	}
 	var stat os.FileInfo
 	if stat, err = dstFile.Stat(); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("get %s file stat failed.Error:%v", dstFile.Name(), err)
-		return 0, response.Error(http.StatusInternalServerError, "get file stat failed")
+		return response.Error(http.StatusInternalServerError, "get file stat failed")
 	}
 	bucketFile := &db.BucketFile{
-		BucketId: bucket.ID,
-		File:     stat.Name(),
-		Size:     stat.Size(),
-		ModTime:  stat.ModTime(),
+		File:    stat.Name(),
+		Bucket:  bucket.Bucket,
+		Size:    stat.Size(),
+		ModTime: stat.ModTime(),
 	}
 	if err = tx.Create(bucketFile).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("insert file failed.Error:%v", err)
-		return 0, response.Errors(http.StatusInternalServerError, err)
+		return response.Errors(http.StatusInternalServerError, err)
 	}
-	return bucketFile.ID, nil
+	return nil
 }
 
 // DeleteFile 删除文件
-func DeleteFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) error {
+func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName string) error {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
 	bucket := &db.Bucket{}
-	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
+	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).Find(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return response.Errors(http.StatusInternalServerError, err)
 	}
 	bucketFile := &db.BucketFile{}
-	if err := tx.Model(bucketFile).Where("id =? AND bucket_id= ?", fileId, bucketId).
+	if err := tx.Model(bucketFile).Where("file =? AND bucket= ?", fileName, bucket.Bucket).
 		Find(bucketFile).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
@@ -106,21 +107,22 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint)
 }
 
 // SignFile 文件签名
-func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (string, string, error) {
+func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName string) (string, error) {
 	tx := db.NewDB().Begin()
 	defer tx.Commit()
 	bucket := &db.Bucket{}
-	if err := tx.Model(bucket).Where("id =? AND domain= ?", bucketId, token.Domain).Find(bucket).Error; err != nil {
+	if err := tx.Model(bucket).Where("bucket =? AND domain= ?",
+		bucketName, token.Domain).Find(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return "", "", response.Errors(http.StatusInternalServerError, err)
+		return "", response.Errors(http.StatusInternalServerError, err)
 	}
 	bucketFile := &db.BucketFile{}
-	if err := tx.Model(bucketFile).Where("id =? AND bucket_id= ?", fileId, bucketId).
-		Find(bucketFile).Error; err != nil {
+	if err := tx.Model(bucketFile).Where("file =? AND bucket= ?",
+		fileName, bucket.Bucket).Find(bucketFile).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return "", "", response.Errors(http.StatusInternalServerError, err)
+		return "", response.Errors(http.StatusInternalServerError, err)
 	}
 	xToken := &tokenx.TokenClaims{
 		Now: time.Now(),
@@ -136,7 +138,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (
 	if err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("create token failed.Error:%v", err)
-		return "", "", response.Errors(http.StatusInternalServerError, err)
+		return "", response.Errors(http.StatusInternalServerError, err)
 	}
 	var (
 		sign      string
@@ -145,7 +147,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketId, fileId uint) (
 	if sign, err = tokenx.CreateSign(&tokenSign); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("create sian failed.Error:%v", err)
-		return "", "", response.Errors(http.StatusInternalServerError, err)
+		return "", response.Errors(http.StatusInternalServerError, err)
 	}
-	return sign, bucketFile.File, nil
+	return sign, nil
 }

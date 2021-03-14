@@ -40,16 +40,16 @@ func GinRun() *gin.Engine {
 	{
 		// bucket
 		v1Router.POST("/bucket", file.CreateBucket)
-		v1Router.HEAD("/bucket/:bucket_id", file.HeadBucket)
-		v1Router.DELETE("/bucket/:bucket_id", file.DeleteBucket)
+		v1Router.HEAD("/bucket/:bucket_name", file.HeadBucket)
+		v1Router.DELETE("/bucket/:bucket_name", file.DeleteBucket)
 
 		// file
-		fileRouter := v1Router.Group("/bucket/:bucket_id")
+		fileRouter := v1Router.Group("/bucket/:bucket_name")
 		{
 			fileRouter.POST("/file", file.UploadFile)
-			fileRouter.DELETE("/file/:file_id", file.DeleteFile)
-			fileRouter.HEAD("/file/:file_id", file.SignFile)
-			fileRouter.GET("/file/:file_id", file.DownloadFile)
+			fileRouter.DELETE("/file/:file_name", file.DeleteFile)
+			fileRouter.HEAD("/file/:file_name", file.SignFile)
+			fileRouter.GET("/file/:file_name", file.DownloadFile)
 			//fileRouter.GET("/files", file.FileList)
 		}
 	}

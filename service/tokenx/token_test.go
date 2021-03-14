@@ -13,8 +13,8 @@ func TestCreateToken(t *testing.T) {
 	var tokenImpl = &TokenClaims{
 		Now: time.Now(),
 		Token: &Token{
-			Domain: "test",
-			User:   "123",
+			Domain: "123",
+			User:   "test123",
 			ActionMap: map[string]Action{
 				"OBS": Admin,
 			},

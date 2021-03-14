@@ -7,13 +7,17 @@ package db
 import "time"
 
 type BucketFile struct {
-	ID       uint `gorm:"primary_key"`
-	BucketId uint `gorm:"column:bucket_id"`
+	File string `gorm:"primary_key:file"`
 
-	File    string    `gorm:"unique_index:file"`
+	Bucket string `gorm:"column:bucket;type:varchar(50);not null;"`
+
 	Size    int64     `gorm:"column:size"`
 	ModTime time.Time `gorm:"column:mod_time"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+func (b *BucketFile) TableName() string {
+	return "bucket_file"
 }

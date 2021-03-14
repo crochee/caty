@@ -15,8 +15,7 @@ func TestBucket_TableName(t *testing.T) {
 	Setup()
 	test := &Bucket{
 		Domain: "123",
-		Bucket: "bucket",
-		User:   "123-1",
+		Bucket: "bucket12",
 	}
 	tx := NewDB().Begin()
 	defer tx.Commit()
@@ -26,15 +25,13 @@ func TestBucket_TableName(t *testing.T) {
 		tx.Rollback()
 		t.Fatal(err)
 	}
-	t.Log(result.Value, test.ID)
+	t.Log(test)
 }
 
 func TestQuery(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
 	Setup()
-	bucket := &Bucket{
-		ID: 8,
-	}
+	bucket := &Bucket{Bucket: "bucket12"}
 	tx := NewDB().Begin()
 	defer tx.Commit()
 	// 级联插入

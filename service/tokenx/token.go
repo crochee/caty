@@ -16,6 +16,8 @@ var (
 	// uid.New().String()
 	secret      = []byte(`2plsm96getq7o0bub6uifr4dov90vht5oo10`)
 	ExpiresTime = 30 * time.Minute
+
+	AllService = "*"
 )
 
 type Token struct {
@@ -41,11 +43,20 @@ func (t *TokenClaims) Valid() error {
 type Action uint8
 
 const (
-	Read   Action = 0
-	Write  Action = 1
-	Delete Action = 2
-	Admin  Action = 3
+	Not    Action = 0
+	Read   Action = 1
+	Write  Action = 2
+	Delete Action = 3
+	Admin  Action = 4
 )
+
+var ActionString = map[Action]string{
+	Not:    "not",
+	Read:   "read",
+	Write:  "write",
+	Delete: "delete",
+	Admin:  "admin",
+}
 
 // CreateToken 生成token
 func CreateToken(claims *TokenClaims) (string, error) {

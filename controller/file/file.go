@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -29,16 +28,16 @@ import (
 // @Tags file
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param bucket_id path int true "bucket name"
+// @Param bucket_name path string true "bucket name"
 // @Param file formData file true "file"
-// @Success 201 {int} int "file id"
+// @Success 204
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_id}/file [post]
+// @Router /v1/bucket/{bucket_name}/file [post]
 func UploadFile(ctx *gin.Context) {
-	var id Id
-	if err := ctx.ShouldBindUri(&id); err != nil {
+	var name Name
+	if err := ctx.ShouldBindUri(&name); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
 		return
@@ -55,16 +54,15 @@ func UploadFile(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
-	if token.ActionMap["OBS"] < tokenx.Write { //权限不够
-		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
+	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Write); err != nil {
+		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
 		return
 	}
-	var fileId uint
-	if fileId, err = bucket.UploadFile(ctx.Request.Context(), token, id.BucketId, fileInfo.File); err != nil {
+	if err = bucket.UploadFile(ctx.Request.Context(), token, name.BucketName, fileInfo.File); err != nil {
 		response.ErrorWith(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusCreated, fileId)
+	ctx.Status(http.StatusNoContent)
 }
 
 // DeleteFile godoc
@@ -73,13 +71,13 @@ func UploadFile(ctx *gin.Context) {
 // @Tags file
 // @Accept application/json
 // @Produce application/json
-// @Param bucket_id path int true "bucket id"
-// @Param file_id path int true "file id"
+// @Param bucket_name path string true "bucket name"
+// @Param file_name path string true "file name"
 // @Success 204
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_id}/file/{file_id} [delete]
+// @Router /v1/bucket/{bucket_name}/file/{file_name} [delete]
 func DeleteFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
@@ -93,11 +91,11 @@ func DeleteFile(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
-	if token.ActionMap["OBS"] < tokenx.Delete { //权限不够
-		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
+	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Delete); err != nil {
+		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
 		return
 	}
-	if err = bucket.DeleteFile(ctx.Request.Context(), token, target.BucketId, target.FileId); err != nil {
+	if err = bucket.DeleteFile(ctx.Request.Context(), token, target.BucketName, target.FileName); err != nil {
 		response.ErrorWith(ctx, err)
 		return
 	}
@@ -110,13 +108,13 @@ func DeleteFile(ctx *gin.Context) {
 // @Tags file
 // @Accept application/json
 // @Produce application/json
-// @Param bucket_id path int true "bucket id"
-// @Param file_id query int true "file id"
+// @Param bucket_name path string true "bucket name"
+// @Param file_name path string true "file name"
 // @Success 200 {string} string "file link"
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_id}/file/{file_id} [head]
+// @Router /v1/bucket/{bucket_name}/file/{file_name} [head]
 func SignFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
@@ -130,20 +128,17 @@ func SignFile(ctx *gin.Context) {
 		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
-	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
-		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
+	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Read); err != nil {
+		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
 		return
 	}
-	var (
-		sign     string
-		fileName string
-	)
-	if sign, fileName, err = bucket.SignFile(ctx.Request.Context(), token, target.BucketId, target.FileId); err != nil {
+	var sign string
+	if sign, err = bucket.SignFile(ctx.Request.Context(), token, target.BucketName, target.FileName); err != nil {
 		response.ErrorWith(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, fmt.Sprintf("/v1/bucket/%d/file/%s?%s=%s",
-		target.BucketId, fileName, middleware.Signature, sign))
+	ctx.JSON(http.StatusOK, fmt.Sprintf("/v1/bucket/%s/file/%s?%s=%s",
+		target.BucketName, target.FileName, middleware.Signature, sign))
 }
 
 // DownloadFile godoc
@@ -152,8 +147,8 @@ func SignFile(ctx *gin.Context) {
 // @Tags file
 // @Accept application/json
 // @Produce application/octet-stream
-// @Param bucket_id path int true "bucket id"
-// @Param file_id path int true "file id"
+// @Param bucket_name path string true "bucket name"
+// @Param file_name path string true "file name"
 // @Param sign query string false "sign"
 // @Success 200
 // @Failure 400 {object} response.ErrorResponse
@@ -161,46 +156,35 @@ func SignFile(ctx *gin.Context) {
 // @Failure 500 {object} response.ErrorResponse
 // @Router /v1/bucket/{bucket_id}/file/{file_id} [get]
 func DownloadFile(ctx *gin.Context) {
-	bucketIdStr := ctx.Param("bucket_id")
-	fileIdString := ctx.Param("file_id")
-	if bucketIdStr == "" || fileIdString == "" {
-		logger.FromContext(ctx.Request.Context()).Errorf("get url %s %s failed", bucketIdStr, fileIdString)
+	var target Target
+	if err := ctx.ShouldBindUri(&target); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
 		return
 	}
-	bucketId, err := strconv.Atoi(bucketIdStr)
+
+	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("strconv %s failed", bucketIdStr)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "check your url"))
-		return
-	}
-	var token *tokenx.Token
-	if token, err = tokenx.QueryToken(ctx); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
-	if token.ActionMap["OBS"] < tokenx.Read { //权限不够
-		response.ErrorWith(ctx, response.Error(http.StatusForbidden, "Insufficient permissions"))
+	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Read); err != nil {
+		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
 		return
 	}
 
 	conn := db.NewDB()
 	b := new(db.Bucket)
-	if err = conn.Model(b).Where("id =? AND domain= ?", bucketId, token.Domain).Find(b).Error; err != nil {
+	if err = conn.Model(b).Where("bucket =? AND domain= ?",
+		target.BucketName, token.Domain).Find(b).Error; err != nil {
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
 		return
 	}
 	bucketFile := &db.BucketFile{}
-	if fileId, sErr := strconv.Atoi(fileIdString); sErr != nil {
-		err = conn.Model(bucketFile).Where("file =? AND bucket_id= ?", fileIdString, bucketId).
-			Find(bucketFile).Error
-	} else {
-		err = conn.Model(bucketFile).Where("id =? AND bucket_id= ?", fileId, bucketId).
-			Find(bucketFile).Error
-	}
-	if err != nil {
+	if err = conn.Model(bucketFile).Where("file =? AND bucket= ?",
+		target.FileName, b.Bucket).Find(bucketFile).Error; err != nil {
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		response.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
 		return
