@@ -9,7 +9,7 @@ import "time"
 type Domain struct {
 	Domain string `gorm:"primary_key:domain;type:varchar(50);not null"`
 
-	Email    string `gorm:"type:varchar(50);not null;unique_index;column:email"`
+	Email    string `gorm:"type:varchar(50);not null;unique_index:email"`
 	Nick     string `gorm:"type:varchar(50);not null;column:nick"`
 	PassWord string `gorm:"type:varchar(20);not null;column:pass_word"`
 

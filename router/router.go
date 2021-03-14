@@ -10,6 +10,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"obs/controller/file"
+	"obs/controller/user"
 	_ "obs/docs"
 	"obs/middleware"
 )
@@ -36,6 +37,12 @@ func GinRun() *gin.Engine {
 	}
 
 	v1Router := router.Group("/v1")
+	userRouter := v1Router.Group("/user")
+	{
+		userRouter.POST("/register", user.Register)
+		userRouter.POST("/login", user.Login)
+		userRouter.PUT("/modify", user.Modify)
+	}
 	v1Router.Use(middleware.Token)
 	{
 		// bucket

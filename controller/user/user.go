@@ -5,12 +5,19 @@
 package user
 
 import (
+	"net/http"
+
+	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"net/http"
-	"obs/config"
+	"github.com/json-iterator/go"
+
 	"obs/logger"
-	"os"
+	"obs/model/db"
+	"obs/response"
+	"obs/service/tokenx"
+	"obs/service/userx"
+	"obs/util"
 )
 
 // Register godoc
@@ -19,57 +26,111 @@ import (
 // @Tags user
 // @Accept application/json
 // @Produce application/json
-// @Param request body RegisterRequest true "register request's content"
+// @Param request body Domain true "register request's content"
 // @Success 200
-// @Failure 400
-// @Failure 500 {object} util.HttpErr
-// @Router /user/register [post]
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /v1/user/register [post]
 func Register(ctx *gin.Context) {
-	var registerRequest RegisterRequest
-	err := ctx.ShouldBindBodyWith(&registerRequest, binding.JSON)
-	if err != nil {
-		logger.Errorf("register bind body fail,%v", err)
-		ctx.Status(http.StatusBadRequest)
+	var domainInfo Domain
+	if err := ctx.ShouldBindBodyWith(&domainInfo, binding.JSON); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
 		return
 	}
 	// 检测邮箱的合法性
-	if !util.VerifyEmail(registerRequest.Email) {
-		util.Error(ctx, util.RegisterErr)
+	if !util.VerifyEmail(domainInfo.Email) {
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
 		return
 	}
-	// 邮件确认
-	//if err = email.SendEmail(email.FromQQEmail{}, &email.NeedParameterfForEmail{
-	//	From:        "console",
-	//	To:          []string{registerRequest.Email},
-	//	Subject:     "[Console] Remind!",
-	//	Files:       nil,
-	//	ContentType: "",
-	//	Content:     Remind,
-	//}); err != nil {
-	//	logger.Errorf("send email failed.Error:%v", err)
-	//	util.Error(ctx, util.RegisterErr)
-	//	return
-	//}
-	user := &cmysql.UserInfo{
-		Email:    registerRequest.Email,
-		Nick:     registerRequest.Nick,
-		PassWord: registerRequest.PassWord,
-	}
-	// 开启事务
-	dbTx := user.Conn().Begin()
-	if err = dbTx.Table(user.TableName()).Create(user).Error; err != nil {
-		dbTx.Rollback() // 事务回滚
-		logger.Errorf("register user fail,%v", err)
-		util.Error(ctx, util.RegisterErr)
+	permission, err := jsoniter.ConfigFastest.MarshalToString(map[string]tokenx.Action{
+		tokenx.AllService: tokenx.Admin,
+	})
+	if err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("marshal permission failed.Error:%v", err)
+		response.ErrorWithCode(ctx, http.StatusInternalServerError)
 		return
 	}
-	// 创建用户空间
-	if err = os.MkdirAll(config.Cfg.SavePath+user.Email, os.ModePerm); err != nil {
-		dbTx.Rollback() // 事务回滚
-		logger.Errorf("register mkdir fail,%v", err)
-		util.Error(ctx, util.RegisterErr)
+	domain := &db.Domain{
+		Domain:     uid.New().String(),
+		Email:      domainInfo.Email,
+		Nick:       domainInfo.Nick,
+		PassWord:   domainInfo.PassWord,
+		Permission: permission,
+	}
+	if err = db.NewDB().Create(domain).Error; err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("insert domain failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
 		return
 	}
-	dbTx.Commit() // 事务提交
+	ctx.Status(http.StatusOK)
+}
+
+// Login godoc
+// @Summary Login
+// @Description user login
+// @Tags user
+// @Accept application/json
+// @Produce application/json
+// @Param request body LoginInfo true "login request's content"
+// @Success 200 {string} string
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /user/login [post]
+func Login(ctx *gin.Context) {
+	var loginInfo LoginInfo
+	if err := ctx.ShouldBindBodyWith(&loginInfo, binding.JSON); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
+		return
+	}
+	// 检测邮箱的合法性
+	if !util.VerifyEmail(loginInfo.Email) {
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
+		return
+	}
+	token, err := userx.UserLogin(ctx.Request.Context(), loginInfo.Email, loginInfo.PassWord)
+	if err != nil {
+		response.ErrorWith(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, token)
+}
+
+// Modify godoc
+// @Summary Modify
+// @Description user modify
+// @Tags user
+// @Accept application/json
+// @Produce application/json
+// @Param request body ModifyInfo true "request's content"
+// @Success 200
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /v1/user/modify [put]
+func Modify(ctx *gin.Context) {
+	var modifyInfo ModifyInfo
+	if err := ctx.ShouldBindBodyWith(&modifyInfo, binding.JSON); err != nil {
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
+		return
+	}
+	// 检测邮箱的合法性
+	if !util.VerifyEmail(modifyInfo.Email) {
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
+		return
+	}
+	if modifyInfo.NewPassWord == modifyInfo.OldPassWord {
+		response.ErrorWith(ctx, response.Error(http.StatusBadRequest,
+			"The new and old passwords are consistent"))
+		return
+	}
+
+	if err := userx.ModifyUser(ctx.Request.Context(), modifyInfo.Email, modifyInfo.NewPassWord,
+		modifyInfo.OldPassWord, modifyInfo.Nick); err != nil {
+		response.ErrorWith(ctx, err)
+		return
+	}
 	ctx.Status(http.StatusOK)
 }

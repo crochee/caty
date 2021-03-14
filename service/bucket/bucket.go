@@ -59,6 +59,9 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*I
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return nil, response.Errors(http.StatusInternalServerError, err)
 	}
+	if bucket.Domain != token.Domain {
+		return nil, response.Error(http.StatusForbidden, "checkout your information")
+	}
 
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s",
 		config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))

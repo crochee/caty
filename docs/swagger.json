@@ -7,6 +7,52 @@
         "version": "1.0"
     },
     "paths": {
+        "/user/login": {
+            "post": {
+                "description": "user login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "login request's content",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.LoginInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/bucket": {
             "post": {
                 "description": "create bucket",
@@ -33,10 +79,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "bucket_id",
-                        "schema": {
-                            "type": "int"
-                        }
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -59,7 +102,67 @@
                 }
             }
         },
-        "/v1/bucket/{bucket_id}": {
+        "/v1/bucket/{bucket_id}/file/{file_id}": {
+            "get": {
+                "description": "download File",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "file"
+                ],
+                "summary": "DownloadFile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "file_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sign",
+                        "name": "sign",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bucket/{bucket_name}": {
             "delete": {
                 "description": "delete bucket",
                 "consumes": [
@@ -74,9 +177,9 @@
                 "summary": "DeleteBucket",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "bucket id",
-                        "name": "bucket_id",
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
                         "in": "path",
                         "required": true
                     }
@@ -119,9 +222,9 @@
                 "summary": "HeadBucket",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "bucket id",
-                        "name": "bucket_id",
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
                         "in": "path",
                         "required": true
                     }
@@ -166,7 +269,7 @@
                 }
             }
         },
-        "/v1/bucket/{bucket_id}/file": {
+        "/v1/bucket/{bucket_name}/file": {
             "post": {
                 "description": "upload file",
                 "consumes": [
@@ -181,9 +284,9 @@
                 "summary": "UploadFile",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "bucket name",
-                        "name": "bucket_id",
+                        "name": "bucket_name",
                         "in": "path",
                         "required": true
                     },
@@ -196,11 +299,8 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "file id",
-                        "schema": {
-                            "type": "int"
-                        }
+                    "204": {
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -223,65 +323,7 @@
                 }
             }
         },
-        "/v1/bucket/{bucket_id}/file/{file_id}": {
-            "get": {
-                "description": "download File",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "DownloadFile",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "bucket id",
-                        "name": "bucket_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "file id",
-                        "name": "file_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "sign",
-                        "name": "sign",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            },
+        "/v1/bucket/{bucket_name}/file/{file_name}": {
             "delete": {
                 "description": "delete file",
                 "consumes": [
@@ -296,16 +338,16 @@
                 "summary": "DeleteFile",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "bucket id",
-                        "name": "bucket_id",
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "file id",
-                        "name": "file_id",
+                        "type": "string",
+                        "description": "file name",
+                        "name": "file_name",
                         "in": "path",
                         "required": true
                     }
@@ -348,17 +390,17 @@
                 "summary": "SignFile",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "bucket id",
-                        "name": "bucket_id",
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "file id",
-                        "name": "file_id",
-                        "in": "query",
+                        "type": "string",
+                        "description": "file name",
+                        "name": "file_name",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -377,6 +419,98 @@
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/modify": {
+            "put": {
+                "description": "user modify",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Modify",
+                "parameters": [
+                    {
+                        "description": "request's content",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.ModifyInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/register": {
+            "post": {
+                "description": "register user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "register",
+                "parameters": [
+                    {
+                        "description": "register request's content",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.Domain"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -427,6 +561,60 @@
                     "type": "integer"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.Domain": {
+            "type": "object",
+            "required": [
+                "email",
+                "nick",
+                "pass_word"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "nick": {
+                    "type": "string"
+                },
+                "pass_word": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.LoginInfo": {
+            "type": "object",
+            "required": [
+                "email",
+                "pass_word"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "pass_word": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.ModifyInfo": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "new_pass_word": {
+                    "type": "string"
+                },
+                "nick": {
+                    "type": "string"
+                },
+                "old_pass_word": {
                     "type": "string"
                 }
             }

@@ -24,12 +24,78 @@ definitions:
       message:
         type: string
     type: object
+  user.Domain:
+    properties:
+      email:
+        type: string
+      nick:
+        type: string
+      pass_word:
+        type: string
+    required:
+    - email
+    - nick
+    - pass_word
+    type: object
+  user.LoginInfo:
+    properties:
+      email:
+        type: string
+      pass_word:
+        type: string
+    required:
+    - email
+    - pass_word
+    type: object
+  user.ModifyInfo:
+    properties:
+      email:
+        type: string
+      new_pass_word:
+        type: string
+      nick:
+        type: string
+      old_pass_word:
+        type: string
+    required:
+    - email
+    type: object
 info:
   contact: {}
   description: This is a obs server.
   title: obs Swagger API
   version: "1.0"
 paths:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: user login
+      parameters:
+      - description: login request's content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoginInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login
+      tags:
+      - user
   /v1/bucket:
     post:
       consumes:
@@ -46,9 +112,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: bucket_id
-          schema:
-            type: int
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -64,17 +128,57 @@ paths:
       summary: CreateBucket
       tags:
       - bucket
-  /v1/bucket/{bucket_id}:
+  /v1/bucket/{bucket_id}/file/{file_id}:
+    get:
+      consumes:
+      - application/json
+      description: download File
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: file name
+        in: path
+        name: file_name
+        required: true
+        type: string
+      - description: sign
+        in: query
+        name: sign
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DownloadFile
+      tags:
+      - file
+  /v1/bucket/{bucket_name}:
     delete:
       consumes:
       - application/json
       description: delete bucket
       parameters:
-      - description: bucket id
+      - description: bucket name
         in: path
-        name: bucket_id
+        name: bucket_name
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -100,11 +204,11 @@ paths:
       - application/json
       description: head bucket
       parameters:
-      - description: bucket id
+      - description: bucket name
         in: path
-        name: bucket_id
+        name: bucket_name
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -135,7 +239,7 @@ paths:
       summary: HeadBucket
       tags:
       - bucket
-  /v1/bucket/{bucket_id}/file:
+  /v1/bucket/{bucket_name}/file:
     post:
       consumes:
       - multipart/form-data
@@ -143,9 +247,9 @@ paths:
       parameters:
       - description: bucket name
         in: path
-        name: bucket_id
+        name: bucket_name
         required: true
-        type: integer
+        type: string
       - description: file
         in: formData
         name: file
@@ -154,10 +258,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: file id
-          schema:
-            type: int
+        "204":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -173,22 +275,22 @@ paths:
       summary: UploadFile
       tags:
       - file
-  /v1/bucket/{bucket_id}/file/{file_id}:
+  /v1/bucket/{bucket_name}/file/{file_name}:
     delete:
       consumes:
       - application/json
       description: delete file
       parameters:
-      - description: bucket id
+      - description: bucket name
         in: path
-        name: bucket_id
+        name: bucket_name
         required: true
-        type: integer
-      - description: file id
+        type: string
+      - description: file name
         in: path
-        name: file_id
+        name: file_name
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -209,60 +311,21 @@ paths:
       summary: DeleteFile
       tags:
       - file
-    get:
-      consumes:
-      - application/json
-      description: download File
-      parameters:
-      - description: bucket id
-        in: path
-        name: bucket_id
-        required: true
-        type: integer
-      - description: file id
-        in: path
-        name: file_id
-        required: true
-        type: integer
-      - description: sign
-        in: query
-        name: sign
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: DownloadFile
-      tags:
-      - file
     head:
       consumes:
       - application/json
       description: head file sign info
       parameters:
-      - description: bucket id
+      - description: bucket name
         in: path
-        name: bucket_id
+        name: bucket_name
         required: true
-        type: integer
-      - description: file id
-        in: query
-        name: file_id
+        type: string
+      - description: file name
+        in: path
+        name: file_name
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -285,6 +348,66 @@ paths:
       summary: SignFile
       tags:
       - file
+  /v1/user/modify:
+    put:
+      consumes:
+      - application/json
+      description: user modify
+      parameters:
+      - description: request's content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.ModifyInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Modify
+      tags:
+      - user
+  /v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: register user
+      parameters:
+      - description: register request's content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.Domain'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: register
+      tags:
+      - user
 securityDefinitions:
   ApiKeyAuth:
     in: header
