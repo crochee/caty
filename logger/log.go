@@ -9,10 +9,13 @@ package logger
 import (
 	"io"
 	"os"
+	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"obs/model/mongox"
 )
 
 const (
@@ -25,6 +28,13 @@ const (
 func SetLoggerWriter(path string) io.Writer {
 	if path == "" {
 		return os.Stdout
+	}
+	if strings.HasPrefix(path, "mongodb://") {
+		client, err := mongox.Setup(path)
+		if err != nil {
+			panic(err)
+		}
+		return &MongoLogger{client: client}
 	}
 	return &lumberjack.Logger{
 		Filename:   path,

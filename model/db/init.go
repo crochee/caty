@@ -19,6 +19,7 @@ import (
 
 var db *gorm.DB
 
+// Setup init mysql db
 func Setup() {
 	var err error
 	if db, err = createPool(config.Cfg.ServiceConfig.List.Mysql); err != nil {
@@ -35,6 +36,7 @@ func Setup() {
 	registerModel(db, new(Bucket), new(BucketFile), new(Domain), new(User))
 }
 
+// NewDB get gorm.DB
 func NewDB() *gorm.DB {
 	if err := db.DB().Ping(); err != nil {
 		_ = db.Close()
@@ -99,9 +101,7 @@ type MysqlLogger struct {
 }
 
 func (m MysqlLogger) Print(v ...interface{}) {
-
 	values := gorm.LogFormatter(v...)
 	_, _ = os.Stdout.WriteString(fmt.Sprintf(strings.Repeat("%v ", len(values)), values...))
 	_ = os.Stdout.Sync()
-	//logger.Infof(strings.Repeat("%v ", len(values)), values...)
 }
