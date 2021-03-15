@@ -10,38 +10,37 @@ import (
 )
 
 type ErrorResponse struct {
-	Code    int64  `json:"code"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
 // Error according to the given message structure returns an error
-func Error(code int, message string) ErrorResponse {
-	return ErrorResponse{
-		Code:    int64(code),
+func Error(code int, message string) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    code,
 		Message: message,
 	}
 }
 
 // Errors according to the given message and error structure returns an error
-func ErrorAll(code int, err error, message string) ErrorResponse {
-	return ErrorResponse{
-		Code:    int64(code),
+func ErrorAll(code int, err error, message string) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    code,
 		Message: err.Error() + "#" + message,
 	}
 }
 
-func Errors(code int, err error) ErrorResponse {
-	return ErrorResponse{
-		Code:    int64(code),
+func Errors(code int, err error) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    code,
 		Message: err.Error(),
 	}
 }
 
-func (e ErrorResponse) Error() string {
+func (e *ErrorResponse) Error() string {
 	var buf bytes.Buffer
-	buf.WriteString(strconv.FormatInt(e.Code, 10))
-	buf.WriteString(`.#`)
+	buf.WriteString(strconv.Itoa(e.Code))
+	buf.WriteByte('#')
 	buf.WriteString(e.Message)
-	buf.WriteByte('.')
 	return buf.String()
 }

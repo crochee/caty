@@ -95,6 +95,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: CreateBucket
       tags:
       - bucket
@@ -126,13 +128,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: DeleteBucket
       tags:
       - bucket
-    head:
+    get:
       consumes:
       - application/json
-      description: head bucket
+      description: get bucket
       parameters:
       - description: bucket name
         in: path
@@ -166,7 +170,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: HeadBucket
+      security:
+      - ApiKeyAuth: []
+      summary: GetBucket
       tags:
       - bucket
   /v1/bucket/{bucket_name}/file:
@@ -202,6 +208,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: UploadFile
       tags:
       - file
@@ -238,6 +246,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: DeleteFile
       tags:
       - file
@@ -277,13 +287,16 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: DownloadFile
       tags:
       - file
-    head:
+  /v1/bucket/{bucket_name}/file/{file_name}/sign:
+    get:
       consumes:
       - application/json
-      description: head file sign info
+      description: get file sign info
       parameters:
       - description: bucket name
         in: path
@@ -314,6 +327,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: SignFile
       tags:
       - file

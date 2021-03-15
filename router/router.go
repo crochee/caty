@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"obs/controller/file"
 	"obs/controller/user"
 	_ "obs/docs"
@@ -49,7 +50,7 @@ func GinRun() *gin.Engine {
 	{
 		// bucket
 		v1Router.POST("/bucket", file.CreateBucket)
-		v1Router.HEAD("/bucket/:bucket_name", file.HeadBucket)
+		v1Router.GET("/bucket/:bucket_name", file.GetBucket)
 		v1Router.DELETE("/bucket/:bucket_name", file.DeleteBucket)
 
 		// file
@@ -57,7 +58,7 @@ func GinRun() *gin.Engine {
 		{
 			fileRouter.POST("/file", file.UploadFile)
 			fileRouter.DELETE("/file/:file_name", file.DeleteFile)
-			fileRouter.HEAD("/file/:file_name", file.SignFile)
+			fileRouter.GET("/file/:file_name/sign", file.SignFile)
 			fileRouter.GET("/file/:file_name", file.DownloadFile)
 			//fileRouter.GET("/files", file.FileList)
 		}

@@ -53,10 +53,10 @@ func TestSignFile(t *testing.T) {
 	db.Setup()
 	router := gin.New()
 	router.Use(middleware.Token)
-	router.HEAD("/v1/bucket/:bucket_name/file/:file_name", SignFile)
+	router.GET("/v1/bucket/:bucket_name/file/:file_name", SignFile)
 	header := make(http.Header)
 	header.Add(middleware.XAuthToken, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzX2F0IjoiMjAyMS0wMy0xNFQxNToxMToyMy42NDA3MDk1KzA4OjAwIiwidG9rZW4iOnsiZG9tYWluIjoiMTIzIiwidXNlciI6InRlc3QxMjMiLCJhY3Rpb25fbWFwIjp7Ik9CUyI6M319fQ.ZOX-KpOVeDhOV9qN4SWw5DWPDsl4LY1NrrXHv1yqNSU")
-	w := util.PerformRequest(router, http.MethodHead, "/v1/bucket/test/file/lcf.txt", nil, header)
+	w := util.PerformRequest(router, http.MethodGet, "/v1/bucket/test/file/lcf.txt", nil, header)
 	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
 }
 

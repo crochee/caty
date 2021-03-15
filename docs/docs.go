@@ -26,6 +26,11 @@ var doc = `{
     "paths": {
         "/v1/bucket": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "create bucket",
                 "consumes": [
                     "application/json"
@@ -74,53 +79,13 @@ var doc = `{
             }
         },
         "/v1/bucket/{bucket_name}": {
-            "delete": {
-                "description": "delete bucket",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "bucket"
-                ],
-                "summary": "DeleteBucket",
-                "parameters": [
+            "get": {
+                "security": [
                     {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
+                        "ApiKeyAuth": []
                     }
                 ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "head": {
-                "description": "head bucket",
+                "description": "get bucket",
                 "consumes": [
                     "application/json"
                 ],
@@ -130,7 +95,7 @@ var doc = `{
                 "tags": [
                     "bucket"
                 ],
-                "summary": "HeadBucket",
+                "summary": "GetBucket",
                 "parameters": [
                     {
                         "type": "string",
@@ -178,10 +143,65 @@ var doc = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete bucket",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bucket"
+                ],
+                "summary": "DeleteBucket",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/v1/bucket/{bucket_name}/file": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "upload file",
                 "consumes": [
                     "multipart/form-data"
@@ -236,6 +256,11 @@ var doc = `{
         },
         "/v1/bucket/{bucket_name}/file/{file_name}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "download File",
                 "consumes": [
                     "application/json"
@@ -294,6 +319,11 @@ var doc = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "delete file",
                 "consumes": [
                     "application/json"
@@ -344,9 +374,16 @@ var doc = `{
                         }
                     }
                 }
-            },
-            "head": {
-                "description": "head file sign info",
+            }
+        },
+        "/v1/bucket/{bucket_name}/file/{file_name}/sign": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get file sign info",
                 "consumes": [
                     "application/json"
                 ],

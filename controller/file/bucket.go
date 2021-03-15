@@ -19,9 +19,10 @@ import (
 // CreateBucket godoc
 // @Summary CreateBucket
 // @Description create bucket
+// @Security ApiKeyAuth
 // @Tags bucket
 // @Accept application/json
-// @Produce  application/json
+// @Produce application/json
 // @Param request body Name true "bucket name"
 // @Success 201
 // @Failure 400 {object} response.ErrorResponse
@@ -52,12 +53,13 @@ func CreateBucket(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-// HeadBucket godoc
-// @Summary HeadBucket
-// @Description head bucket
+// GetBucket godoc
+// @Summary GetBucket
+// @Description get bucket
+// @Security ApiKeyAuth
 // @Tags bucket
 // @Accept application/json
-// @Produce  application/json
+// @Produce application/json
 // @Param bucket_name path string true "bucket name"
 // @Success 200 {object} bucket.Info "bucket info"
 // @Failure 400 {object} response.ErrorResponse
@@ -65,8 +67,8 @@ func CreateBucket(ctx *gin.Context) {
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 404 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_name} [head]
-func HeadBucket(ctx *gin.Context) {
+// @Router /v1/bucket/{bucket_name} [get]
+func GetBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
@@ -94,6 +96,7 @@ func HeadBucket(ctx *gin.Context) {
 // DeleteBucket godoc
 // @Summary DeleteBucket
 // @Description delete bucket
+// @Security ApiKeyAuth
 // @Tags bucket
 // @Accept application/json
 // @Produce application/json

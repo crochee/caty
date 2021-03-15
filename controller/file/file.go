@@ -25,6 +25,7 @@ import (
 // UploadFile godoc
 // @Summary UploadFile
 // @Description upload file
+// @Security ApiKeyAuth
 // @Tags file
 // @Accept multipart/form-data
 // @Produce application/json
@@ -68,6 +69,7 @@ func UploadFile(ctx *gin.Context) {
 // DeleteFile godoc
 // @Summary DeleteFile
 // @Description delete file
+// @Security ApiKeyAuth
 // @Tags file
 // @Accept application/json
 // @Produce application/json
@@ -104,7 +106,8 @@ func DeleteFile(ctx *gin.Context) {
 
 // SignFile godoc
 // @Summary SignFile
-// @Description head file sign info
+// @Description get file sign info
+// @Security ApiKeyAuth
 // @Tags file
 // @Accept application/json
 // @Produce application/json
@@ -114,7 +117,7 @@ func DeleteFile(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_name}/file/{file_name} [head]
+// @Router /v1/bucket/{bucket_name}/file/{file_name}/sign [get]
 func SignFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
@@ -144,6 +147,7 @@ func SignFile(ctx *gin.Context) {
 // DownloadFile godoc
 // @Summary DownloadFile
 // @Description download File
+// @Security ApiKeyAuth
 // @Tags file
 // @Accept application/json
 // @Produce application/octet-stream
