@@ -76,7 +76,7 @@ func Register(ctx *gin.Context) {
 // @Success 200 {string} string
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /user/login [post]
+// @Router /v1/user/login [post]
 func Login(ctx *gin.Context) {
 	var loginInfo LoginInfo
 	if err := ctx.ShouldBindBodyWith(&loginInfo, binding.JSON); err != nil {

@@ -66,36 +66,6 @@ info:
   title: obs Swagger API
   version: "1.0"
 paths:
-  /user/login:
-    post:
-      consumes:
-      - application/json
-      description: user login
-      parameters:
-      - description: login request's content
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/user.LoginInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: Login
-      tags:
-      - user
   /v1/bucket:
     post:
       consumes:
@@ -347,6 +317,36 @@ paths:
       summary: SignFile
       tags:
       - file
+  /v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: user login
+      parameters:
+      - description: login request's content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoginInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login
+      tags:
+      - user
   /v1/user/modify:
     put:
       consumes:
