@@ -6,6 +6,7 @@ package bucket
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -53,7 +54,7 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*I
 	conn := db.NewDB()
 	bucket := &db.Bucket{Bucket: bucketName}
 	if err := conn.Find(bucket).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, response.Error(http.StatusNotFound, fmt.Sprintf("not found bucket %s", bucket.Bucket))
 		}
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
@@ -98,7 +99,7 @@ func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 
 	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).Find(bucket).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			tx.Rollback()
 			return response.Error(http.StatusNotFound, fmt.Sprintf("not found bucket %s", bucket.Bucket))
 		}

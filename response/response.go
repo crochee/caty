@@ -5,6 +5,7 @@
 package response
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,12 +13,12 @@ import (
 
 // ErrorWith gin response with format err
 func ErrorWith(ctx *gin.Context, err error) {
-	switch value := err.(type) {
-	case *ErrorResponse:
-		ctx.JSON(int(value.Code), value)
-	default:
+	var er ErrorResponse
+	if errors.As(err, &er) {
+		ctx.JSON(int(er.Code), er)
+	} else {
 		ctx.JSON(http.StatusInternalServerError,
-			Error(http.StatusInternalServerError, value.Error()))
+			Error(http.StatusInternalServerError, err.Error()))
 	}
 }
 

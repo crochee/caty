@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
 	"os"
@@ -34,7 +35,7 @@ func main() {
 	}
 	go func() {
 		logger.Info("obs running...")
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 			logger.Fatal(err.Error())
 		}
 	}()

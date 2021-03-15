@@ -7,6 +7,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -24,24 +25,25 @@ import (
 // Recovery panic log
 func Recovery(ctx *gin.Context) {
 	defer func() {
-		if err := recover(); err != nil {
+		if r := recover(); r != nil {
 			var brokenPipe bool
-			if ne, ok := err.(*net.OpError); ok {
-				if se, ok := ne.Err.(*os.SyscallError); ok {
+			if ne, ok := r.(*net.OpError); ok {
+				var se *os.SyscallError
+				if errors.As(ne.Err, &se) {
 					brokenPipe = strings.Contains(strings.ToLower(se.Error()), "broken pipe") ||
 						strings.Contains(strings.ToLower(se.Error()), "connection reset by peer")
 				}
 			}
 			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
-			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s", httpRequest, err, debug.Stack())
+			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s", httpRequest, r, debug.Stack())
 			if brokenPipe {
 				ctx.AbortWithStatusJSON(http.StatusInternalServerError,
 					response.Error(http.StatusInternalServerError,
-						fmt.Sprintf("broken pipe or connection reset by peer;%v", err)))
+						fmt.Sprintf("broken pipe or connection reset by peer;%v", r)))
 				return
 			}
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError,
-				response.Error(http.StatusInternalServerError, fmt.Sprint(err)))
+				response.Error(http.StatusInternalServerError, fmt.Sprint(r)))
 		}
 	}()
 	ctx.Next()
