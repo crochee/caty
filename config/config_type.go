@@ -26,8 +26,7 @@ type ServiceInformation struct {
 }
 
 type Connection struct {
-	Mysql *SqlConfig   `json:"mysql,omitempty" yml:"mysql,omitempty"`
-	Mongo *MongoConfig `json:"mongo,omitempty" yml:"mongo,omitempty"`
+	Mysql *SqlConfig `json:"mysql,omitempty" yml:"mysql,omitempty"`
 }
 
 type SqlConfig struct {
@@ -39,12 +38,4 @@ type SqlConfig struct {
 	Database string `json:"database" yaml:"database"`
 	Charset  string `json:"charset" yaml:"charset"`
 	Debug    bool   `json:"debug,omitempty" yaml:"debug,omitempty"`
-}
-
-type MongoConfig struct {
-	User     string `yaml:"user" yaml:"user"`
-	Password string `yaml:"password" yaml:"password"`
-	Host     string `yaml:"host" yaml:"host"`
-	Port     int    `yaml:"port" yaml:"port"`
-	Database string `yaml:"database" yaml:"database"`
 }

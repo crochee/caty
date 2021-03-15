@@ -1,6 +1,6 @@
 service_info:
-    mode: release
-    log_path: ./log/obs.log
+    mode: debug
+    log_path: mongodb://admin:1234567@192.168.31.62:27017
     log_level: debug
     storage_path: /obs/
 list:
@@ -13,9 +13,3 @@ list:
         database: obs
         charset: utf8
         debug: true
-    mongo:
-        user: root
-        password: "123456"
-        host: 192.168.31.62
-        port: 27017
-        database: log

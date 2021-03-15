@@ -10,7 +10,7 @@ func TestInitConfig(t *testing.T) {
 	cf := &ServiceConfig{
 		ServiceInfo: ServiceInformation{
 			Mode:        "debug",
-			LogPath:     "./log/obs.log",
+			LogPath:     "mongodb://admin:1234567@192.168.31.62:27017",
 			LogLevel:    "debug",
 			StoragePath: "/obs/",
 		},
@@ -24,13 +24,6 @@ func TestInitConfig(t *testing.T) {
 				Database: "obs",
 				Charset:  "utf8",
 				Debug:    true,
-			},
-			Mongo: &MongoConfig{
-				User:     "root",
-				Password: "123456",
-				Host:     "192.168.31.62",
-				Port:     27017,
-				Database: "log",
 			},
 		},
 	}
