@@ -128,46 +128,6 @@ paths:
       summary: CreateBucket
       tags:
       - bucket
-  /v1/bucket/{bucket_id}/file/{file_id}:
-    get:
-      consumes:
-      - application/json
-      description: download File
-      parameters:
-      - description: bucket name
-        in: path
-        name: bucket_name
-        required: true
-        type: string
-      - description: file name
-        in: path
-        name: file_name
-        required: true
-        type: string
-      - description: sign
-        in: query
-        name: sign
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: DownloadFile
-      tags:
-      - file
   /v1/bucket/{bucket_name}:
     delete:
       consumes:
@@ -311,6 +271,45 @@ paths:
       summary: DeleteFile
       tags:
       - file
+    get:
+      consumes:
+      - application/json
+      description: download File
+      parameters:
+      - description: bucket name
+        in: path
+        name: bucket_name
+        required: true
+        type: string
+      - description: file name
+        in: path
+        name: file_name
+        required: true
+        type: string
+      - description: sign
+        in: query
+        name: sign
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: DownloadFile
+      tags:
+      - file
     head:
       consumes:
       - application/json
@@ -364,6 +363,8 @@ paths:
       - application/json
       responses:
         "200":
+          description: ""
+        "304":
           description: ""
         "400":
           description: Bad Request

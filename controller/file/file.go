@@ -154,7 +154,7 @@ func SignFile(ctx *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 403 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /v1/bucket/{bucket_id}/file/{file_id} [get]
+// @Router /v1/bucket/{bucket_name}/file/{file_name} [get]
 func DownloadFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {

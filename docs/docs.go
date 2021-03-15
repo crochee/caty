@@ -119,66 +119,6 @@ var doc = `{
                 }
             }
         },
-        "/v1/bucket/{bucket_id}/file/{file_id}": {
-            "get": {
-                "description": "download File",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "DownloadFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "file name",
-                        "name": "file_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "sign",
-                        "name": "sign",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/bucket/{bucket_name}": {
             "delete": {
                 "description": "delete bucket",
@@ -341,6 +281,64 @@ var doc = `{
             }
         },
         "/v1/bucket/{bucket_name}/file/{file_name}": {
+            "get": {
+                "description": "download File",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "file"
+                ],
+                "summary": "DownloadFile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bucket name",
+                        "name": "bucket_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "file_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sign",
+                        "name": "sign",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "delete file",
                 "consumes": [
@@ -475,6 +473,9 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
+                        "description": ""
+                    },
+                    "304": {
                         "description": ""
                     },
                     "400": {
