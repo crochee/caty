@@ -1,4 +1,7 @@
 FROM centos:latest
+
+RUN yum update -y &&\
+    yum install -y git tar wget
 ENV GO_VERSION "1.16.2"
 #下载go
 RUN wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz &&\
