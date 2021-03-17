@@ -12,4 +12,3 @@ list:
         port: 3307
         database: obs
         charset: utf8
-        debug: true
