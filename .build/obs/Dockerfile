@@ -8,6 +8,8 @@ RUN git clone ${URL} &&\
 
 FROM centos:latest
 WORKDIR /opt/cloud/obs
+ARG cfg=./conf/config.yml
+ENV config=${cfg}
 RUN mkdir -p /opt/cloud/obs/docs &&\
     mkdir -p /opt/cloud/obs/conf
 COPY --from=builder /opt/cloud/obs/obs .
