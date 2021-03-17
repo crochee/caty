@@ -9,9 +9,11 @@ RUN git clone ${URL} &&\
 
 FROM centos:latest
 WORKDIR /opt/cloud/obs
+RUN mkdir -p /opt/cloud/obs/docs &&\
+    mkdir -p /opt/cloud/obs/conf
 COPY --from=builder /opt/cloud/obs .
-COPY --from=builder /opt/cloud/obs/docs .
-COPY --from=builder /opt/cloud/obs/conf .
+COPY --from=builder /opt/cloud/obs/docs ./docs
+COPY --from=builder /opt/cloud/obs/conf ./conf
 COPY --from=builder /opt/cloud/obs/.build/obs/entrypoint.sh .
 RUN rm -rf ./docs/docs.go && chmod +x ./obs && chmod +x ./entrypoint.sh
 
