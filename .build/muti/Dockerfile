@@ -13,7 +13,7 @@ COPY --from=builder /opt/cloud/obs .
 COPY --from=builder /opt/cloud/obs/docs .
 COPY --from=builder /opt/cloud/obs/conf .
 COPY --from=builder /opt/cloud/obs/.build/obs/entrypoint.sh .
-RUN rm -rf ./docs/docs.go&&chmod +x ./obs
+RUN rm -rf ./docs/docs.go && chmod +x ./obs
 
 EXPOSE 8150
 ENTRYPOINT ["entrypoint.sh"]
