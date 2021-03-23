@@ -5,10 +5,10 @@ package docs
 
 import (
 	"bytes"
-	"encoding/json"
 	"strings"
 
 	"github.com/alecthomas/template"
+	"github.com/json-iterator/go"
 	"github.com/swaggo/swag"
 )
 
@@ -19,6 +19,7 @@ var doc = `{
         "description": "{{.Description}}",
         "title": "{{.Title}}",
         "contact": {},
+        "license": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -54,9 +55,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -171,9 +170,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
-                    },
+                    "204": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -230,9 +227,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
-                    },
+                    "204": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -295,9 +290,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
+                    "200": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -352,9 +345,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
-                    },
+                    "204": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -509,12 +500,8 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "304": {
-                        "description": ""
-                    },
+                    "200": {},
+                    "304": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -561,9 +548,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
+                    "200": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -711,8 +696,11 @@ func (s *s) ReadDoc() string {
 
 	t, err := template.New("swagger_info").Funcs(template.FuncMap{
 		"marshal": func(v interface{}) string {
-			a, _ := json.Marshal(v)
-			return string(a)
+			a, err := jsoniter.ConfigFastest.MarshalToString(v)
+			if err != nil {
+				return ""
+			}
+			return a
 		},
 	}).Parse(doc)
 	if err != nil {

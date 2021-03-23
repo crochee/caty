@@ -20,6 +20,8 @@ import (
 	"obs/router"
 )
 
+//go:generate swag i -g router/router.go
+//go:generate go build
 func main() {
 	// 初始化
 	setup()

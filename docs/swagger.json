@@ -4,6 +4,7 @@
         "description": "This is a obs server.",
         "title": "obs Swagger API",
         "contact": {},
+        "license": {},
         "version": "1.0"
     },
     "paths": {
@@ -37,9 +38,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -154,9 +153,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
-                    },
+                    "204": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -213,9 +210,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
-                    },
+                    "204": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -278,9 +273,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
+                    "200": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -335,9 +328,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
-                    },
+                    "204": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -492,12 +483,8 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "304": {
-                        "description": ""
-                    },
+                    "200": {},
+                    "304": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -544,9 +531,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": ""
-                    },
+                    "200": {},
                     "400": {
                         "description": "Bad Request",
                         "schema": {
