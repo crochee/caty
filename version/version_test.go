@@ -30,7 +30,7 @@ func TestCompareVersion(t *testing.T) {
 		},
 		{
 			"==3",
-			"1.0.0.s",
+			"1.0.s",
 			"1.0.1",
 			-1,
 			true,
