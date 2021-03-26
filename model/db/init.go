@@ -12,6 +12,7 @@ import (
 
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -99,4 +100,25 @@ func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
 			})}) // 开启debug 日志模式 conn = conn.Debug()
 	}
 	return conn, nil
+}
+
+var Mock sqlmock.Sqlmock
+
+func SetUpMock() {
+	// 创建sqlmock
+	var (
+		slqDb *sql.DB
+		err   error
+	)
+	if slqDb, Mock, err = sqlmock.New(); err != nil {
+		loggers.Fatal(err.Error())
+		return
+	}
+	// 结合gorm、sqlmock
+	if db, err = gorm.Open(mysql.New(mysql.Config{
+		SkipInitializeWithVersion: true,
+		Conn:                      slqDb,
+	}), &gorm.Config{}); err != nil {
+		loggers.Fatal(err.Error())
+	}
 }
