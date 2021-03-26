@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
+	"obs/e"
 	"obs/logger"
-	"obs/response"
 	"obs/service/bucket"
 	"obs/service/tokenx"
 )
@@ -25,29 +25,29 @@ import (
 // @Produce application/json
 // @Param request body Name true "bucket name"
 // @Success 201
-// @Failure 400 {object} response.ErrorResponse
-// @Failure 403 {object} response.ErrorResponse
-// @Failure 500 {object} response.ErrorResponse
+// @Failure 400 {object} e.ErrorResponse
+// @Failure 403 {object} e.ErrorResponse
+// @Failure 500 {object} e.ErrorResponse
 // @Router /v1/bucket [post]
 func CreateBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindBodyWith(&name, binding.JSON); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
+		e.Error(ctx, e.ParsePayloadFailed)
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
+		e.Error(ctx, e.ParsePayloadFailed)
 		return
 	}
 	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Write); err != nil {
-		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
+		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
 	if err = bucket.CreateBucket(ctx.Request.Context(), token, name.BucketName); err != nil {
-		response.ErrorWith(ctx, err)
+		e.ErrorWith(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusCreated)
@@ -72,22 +72,22 @@ func GetBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
+		e.ErrorWith(ctx, e.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Read); err != nil {
-		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
+		e.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
 		return
 	}
 	var info *bucket.Info
 	if info, err = bucket.HeadBucket(ctx.Request.Context(), token, name.BucketName); err != nil {
-		response.ErrorWith(ctx, err)
+		e.ErrorWith(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, info)
@@ -110,21 +110,21 @@ func DeleteBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "bucket_name is nil"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "bucket_name is nil"))
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusUnauthorized, "Unauthorized"))
+		e.ErrorWith(ctx, e.Error(http.StatusUnauthorized, "Unauthorized"))
 		return
 	}
 	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Delete); err != nil {
-		response.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
+		e.ErrorWith(ctx, response.Errors(http.StatusForbidden, err))
 		return
 	}
 	if err = bucket.DeleteBucket(ctx.Request.Context(), token, name.BucketName); err != nil {
-		response.ErrorWith(ctx, err)
+		e.ErrorWith(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusNoContent)

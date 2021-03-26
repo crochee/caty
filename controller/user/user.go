@@ -6,6 +6,7 @@ package user
 
 import (
 	"net/http"
+	"obs/e"
 
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
@@ -35,12 +36,12 @@ func Register(ctx *gin.Context) {
 	var domainInfo Domain
 	if err := ctx.ShouldBindBodyWith(&domainInfo, binding.JSON); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "Check your payload"))
 		return
 	}
 	// 检测邮箱的合法性
 	if !util.VerifyEmail(domainInfo.Email) {
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "Invalid email"))
 		return
 	}
 	permission, err := jsoniter.ConfigFastest.MarshalToString(map[string]tokenx.Action{
@@ -60,7 +61,7 @@ func Register(ctx *gin.Context) {
 	}
 	if err = db.NewDB().Create(domain).Error; err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("insert domain failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
+		e.ErrorWith(ctx, response.Errors(http.StatusInternalServerError, err))
 		return
 	}
 	ctx.Status(http.StatusOK)
@@ -81,17 +82,17 @@ func Login(ctx *gin.Context) {
 	var loginInfo LoginInfo
 	if err := ctx.ShouldBindBodyWith(&loginInfo, binding.JSON); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "Check your payload"))
 		return
 	}
 	// 检测邮箱的合法性
 	if !util.VerifyEmail(loginInfo.Email) {
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "Invalid email"))
 		return
 	}
 	token, err := userx.UserLogin(ctx.Request.Context(), loginInfo.Email, loginInfo.PassWord)
 	if err != nil {
-		response.ErrorWith(ctx, err)
+		e.ErrorWith(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, token)
@@ -114,12 +115,12 @@ func Modify(ctx *gin.Context) {
 	var modifyInfo ModifyInfo
 	if err := ctx.ShouldBindBodyWith(&modifyInfo, binding.JSON); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Check your payload"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "Check your payload"))
 		return
 	}
 	// 检测邮箱的合法性
 	if !util.VerifyEmail(modifyInfo.Email) {
-		response.ErrorWith(ctx, response.Error(http.StatusBadRequest, "Invalid email"))
+		e.ErrorWith(ctx, e.Error(http.StatusBadRequest, "Invalid email"))
 		return
 	}
 	if modifyInfo.OldPassWord == "" {
@@ -129,7 +130,7 @@ func Modify(ctx *gin.Context) {
 
 	if err := userx.ModifyUser(ctx.Request.Context(), modifyInfo.Email, modifyInfo.NewPassWord,
 		modifyInfo.OldPassWord, modifyInfo.Nick); err != nil {
-		response.ErrorWith(ctx, err)
+		e.ErrorWith(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusOK)

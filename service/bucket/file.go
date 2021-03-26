@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"obs/e"
 	"os"
 	"path/filepath"
 	"time"
@@ -52,13 +53,13 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, fil
 	if _, err = io.Copy(dstFile, srcFile); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("copy %s file failed.Error:%v", file.Filename, err)
-		return response.Error(http.StatusInternalServerError, "copy failed")
+		return e.Error(http.StatusInternalServerError, "copy failed")
 	}
 	var stat os.FileInfo
 	if stat, err = dstFile.Stat(); err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("get %s file stat failed.Error:%v", dstFile.Name(), err)
-		return response.Error(http.StatusInternalServerError, "get file stat failed")
+		return e.Error(http.StatusInternalServerError, "get file stat failed")
 	}
 	bucketFile := &db.BucketFile{
 		File:    stat.Name(),

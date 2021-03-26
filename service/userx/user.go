@@ -7,6 +7,7 @@ package userx
 import (
 	"context"
 	"net/http"
+	"obs/e"
 	"time"
 
 	"github.com/json-iterator/go"
@@ -25,7 +26,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 		return "", response.Errors(http.StatusInternalServerError, err)
 	}
 	if domain.PassWord != passWord {
-		return "", response.Error(http.StatusForbidden, "wrong password")
+		return "", e.Error(http.StatusForbidden, "wrong password")
 	}
 	var permission map[string]tokenx.Action
 	if err := jsoniter.ConfigFastest.UnmarshalFromString(domain.Permission, &permission); err != nil {
@@ -60,7 +61,7 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 	}
 	if domain.PassWord != oldPassWord {
 		tx.Rollback()
-		return response.Error(http.StatusForbidden, "wrong password")
+		return e.Error(http.StatusForbidden, "wrong password")
 	}
 	var columnList = make([]interface{}, 0, 2)
 	if newPassWord != "" && domain.PassWord != newPassWord {
