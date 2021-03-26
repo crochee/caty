@@ -5,6 +5,7 @@
 package e
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -45,5 +46,25 @@ func Error(ctx *gin.Context, code Code) {
 	ctx.JSON(code.Status(), &ErrorResponse{
 		Code:    code.String(),
 		Message: code.English(),
+	})
+}
+
+// Errors gin response with error
+func Errors(ctx *gin.Context, err error) {
+	var errorCode *ErrorCode
+	if errors.As(err, &errorCode) {
+		ErrorWith(ctx, errorCode.code, errorCode.message)
+		return
+	}
+	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
+		ctx.JSON(Unknown.Status(), &ErrorResponse{
+			Code:    Unknown.String(),
+			Message: Unknown.Chinese(),
+		})
+		return
+	}
+	ctx.JSON(Unknown.Status(), &ErrorResponse{
+		Code:    Unknown.String(),
+		Message: Unknown.English(),
 	})
 }

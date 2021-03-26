@@ -48,3 +48,21 @@ func (forbidden) English() string {
 func (forbidden) Chinese() string {
 	return "权限不足，操作被禁止"
 }
+
+type unknown struct{}
+
+func (unknown) String() string {
+	return "OBS.00003"
+}
+
+func (unknown) Status() int {
+	return http.StatusInternalServerError
+}
+
+func (unknown) English() string {
+	return "An unknown error occurred"
+}
+
+func (u unknown) Chinese() string {
+	return "发生未知错误"
+}

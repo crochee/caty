@@ -7,4 +7,5 @@ package e
 var (
 	ParsePayloadFailed = payload{}
 	Forbidden          = forbidden{}
+	Unknown            = unknown{}
 )

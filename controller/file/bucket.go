@@ -33,7 +33,7 @@ func CreateBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindBodyWith(&name, binding.JSON); err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		e.Error(ctx, e.ParsePayloadFailed)
+		e.Errors(ctx, err)
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
@@ -47,7 +47,7 @@ func CreateBucket(ctx *gin.Context) {
 		return
 	}
 	if err = bucket.CreateBucket(ctx.Request.Context(), token, name.BucketName); err != nil {
-		e.ErrorWith(ctx, err)
+		e.Errors(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusCreated)

@@ -9,16 +9,15 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"obs/e"
 	"os"
 	"path/filepath"
 
 	"gorm.io/gorm"
 
 	"obs/config"
+	"obs/e"
 	"obs/logger"
 	"obs/model/db"
-	"obs/response"
 	"obs/service/tokenx"
 	"obs/util"
 )
@@ -34,7 +33,7 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 	if err := tx.Create(bucket).Error; err != nil {
 		tx.Rollback()
 		logger.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
-		return response.Errors(http.StatusInternalServerError, err)
+		return e.New(e.Unknown, err.Error())
 	}
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))
 	if err != nil {
