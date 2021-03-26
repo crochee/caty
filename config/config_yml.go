@@ -19,7 +19,7 @@ func (y Yml) Decode() (*ServiceConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer file.Close() // #nosec G307
 	var config ServiceConfig
 	if err = yaml.NewDecoder(file).Decode(&config); err != nil {
 		return nil, err
@@ -32,6 +32,6 @@ func (y Yml) Encode(c *ServiceConfig) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer file.Close() // #nosec G307
 	return yaml.NewEncoder(file).Encode(c)
 }

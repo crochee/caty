@@ -11,16 +11,14 @@ import (
 	"obs/logger"
 )
 
-const RequestTraceId = "trace_id"
-
 // TraceId add trace_id
 func TraceId(ctx *gin.Context) {
-	tracedId := ctx.Request.Header.Get(RequestTraceId)
+	tracedId := ctx.Request.Header.Get("trace_id")
 	if tracedId != "" {
 		log := logger.FromContext(ctx.Request.Context())
 		if log != nil {
-			log.Logger = log.Logger.With(zap.String(RequestTraceId, tracedId))
-			log.LoggerSugar = log.LoggerSugar.With(RequestTraceId, tracedId)
+			log.Logger = log.Logger.With(zap.String("trace_id", tracedId))
+			log.LoggerSugar = log.LoggerSugar.With("trace_id", tracedId)
 			logger.With(ctx.Request.Context(), log)
 		}
 	}

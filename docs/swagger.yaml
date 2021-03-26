@@ -63,7 +63,6 @@ definitions:
 info:
   contact: {}
   description: This is a obs server.
-  license: {}
   title: obs Swagger API
   version: "1.0"
 paths:
@@ -82,7 +81,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201": {}
+        "201":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -114,7 +114,8 @@ paths:
       produces:
       - application/json
       responses:
-        "204": {}
+        "204":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -193,7 +194,8 @@ paths:
       produces:
       - application/json
       responses:
-        "204": {}
+        "204":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -230,7 +232,8 @@ paths:
       produces:
       - application/json
       responses:
-        "204": {}
+        "204":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -270,7 +273,8 @@ paths:
       produces:
       - application/octet-stream
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -373,8 +377,10 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
-        "304": {}
+        "200":
+          description: ""
+        "304":
+          description: ""
         "400":
           description: Bad Request
           schema:
@@ -405,7 +411,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200": {}
+        "200":
+          description: ""
         "400":
           description: Bad Request
           schema:

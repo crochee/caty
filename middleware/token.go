@@ -14,11 +14,6 @@ import (
 	"obs/service/tokenx"
 )
 
-const (
-	XAuthToken = "X-Auth-Token"
-	Signature  = "sign"
-)
-
 // Token add trace_id
 func Token(ctx *gin.Context) {
 	xAuthToken, err := queryToken(ctx)
@@ -38,7 +33,7 @@ func Token(ctx *gin.Context) {
 }
 
 func queryToken(ctx *gin.Context) (string, error) {
-	sign := ctx.Query(Signature)
+	sign := ctx.Query("sign")
 	if sign != "" {
 		signImpl, err := tokenx.ParseSign(sign)
 		if err != nil {
@@ -46,7 +41,7 @@ func queryToken(ctx *gin.Context) (string, error) {
 		}
 		return string(*signImpl), nil
 	}
-	xAuthToken := ctx.Request.Header.Get(XAuthToken)
+	xAuthToken := ctx.Request.Header.Get("X-Auth-Token")
 	if xAuthToken == "" {
 		return "", errors.New("missing token")
 	}

@@ -20,9 +20,6 @@ import (
 	"obs/router"
 )
 
-//go:generate go install github.com/swaggo/swag
-//go:generate swag i -g router/router.go
-//go:generate go build
 // todo mock解除测试对数据库等中间件的依赖
 func main() {
 	// 初始化

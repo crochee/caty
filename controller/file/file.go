@@ -15,7 +15,6 @@ import (
 
 	"obs/config"
 	"obs/logger"
-	"obs/middleware"
 	"obs/model/db"
 	"obs/response"
 	"obs/service/bucket"
@@ -141,7 +140,7 @@ func SignFile(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, fmt.Sprintf("/v1/bucket/%s/file/%s?%s=%s",
-		target.BucketName, target.FileName, middleware.Signature, sign))
+		target.BucketName, target.FileName, "sign", sign))
 }
 
 // DownloadFile godoc
