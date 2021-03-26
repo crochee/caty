@@ -47,7 +47,7 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, fil
 		logger.FromContext(ctx).Errorf("open %s file failed.Error:%v", file.Filename, err)
 		return response.Errors(http.StatusInternalServerError, err)
 	}
-	defer srcFile.Close()
+	defer srcFile.Close() // #nosec G307
 
 	if _, err = io.Copy(dstFile, srcFile); err != nil {
 		tx.Rollback()

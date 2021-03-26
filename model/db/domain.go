@@ -6,20 +6,17 @@ package db
 
 import "time"
 
-type User struct {
-	User string `gorm:"primary_key:user;type:varchar(50);not null"`
+type Domain struct {
+	Domain string `gorm:"primary_key:domain;type:varchar(50);not null"`
 
-	Domain string `gorm:"column:domain;type:varchar(50);not null"`
-
+	Email    string `gorm:"type:varchar(50);not null;unique_index:email"`
 	Nick     string `gorm:"type:varchar(50);not null;column:nick"`
 	PassWord string `gorm:"type:varchar(20);not null;column:pass_word"`
 
 	Permission string `gorm:"type:text;not null;column:permission"`
 
+	Verify bool `gorm:"column:verify"`
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-func (u *User) TableName() string {
-	return "user"
 }

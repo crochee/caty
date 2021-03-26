@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"obs/config"
 	"obs/logger"

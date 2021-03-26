@@ -13,7 +13,3 @@ type Bucket struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
-
-func (b *Bucket) TableName() string {
-	return "bucket_domain"
-}

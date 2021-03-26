@@ -17,7 +17,3 @@ type BucketFile struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
-
-func (b *BucketFile) TableName() string {
-	return "bucket_file"
-}
