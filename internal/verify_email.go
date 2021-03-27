@@ -2,7 +2,7 @@
 // Author: crochee
 // Date: 2021/3/14
 
-package util
+package internal
 
 import "regexp"
 

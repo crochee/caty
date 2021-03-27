@@ -6,15 +6,15 @@ package userx
 
 import (
 	"context"
-	"net/http"
-	"obs/e"
+	"errors"
 	"time"
 
 	"github.com/json-iterator/go"
+	"gorm.io/gorm"
 
+	"obs/e"
 	"obs/logger"
 	"obs/model/db"
-	"obs/response"
 	"obs/service/tokenx"
 )
 
@@ -22,16 +22,19 @@ import (
 func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	domain := &db.Domain{}
 	if err := db.NewDB().Model(domain).Where("email =?", email).Find(domain).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", e.New(e.NotFound, "not found record")
+		}
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", e.New(e.OperateDbFail, err.Error())
 	}
 	if domain.PassWord != passWord {
-		return "", e.Error(http.StatusForbidden, "wrong password")
+		return "", e.New(e.Forbidden, "wrong password")
 	}
 	var permission map[string]tokenx.Action
 	if err := jsoniter.ConfigFastest.UnmarshalFromString(domain.Permission, &permission); err != nil {
 		logger.FromContext(ctx).Errorf("Unmarshal permission failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", e.New(e.UnmarshalFail, err.Error())
 	}
 	token := &tokenx.TokenClaims{
 		Now: time.Now(),
@@ -44,7 +47,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	tokenStr, err := tokenx.CreateToken(token)
 	if err != nil {
 		logger.FromContext(ctx).Errorf("Create token failed.Error:%v", err)
-		return "", response.Errors(http.StatusInternalServerError, err)
+		return "", e.New(e.GenerateTokenFail, err.Error())
 	}
 	return tokenStr, nil
 }
@@ -52,16 +55,17 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 // ModifyUser 修改用户信息
 func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick string) error {
 	tx := db.NewDB().Begin()
-	defer tx.Commit()
+	defer tx.Rollback()
 	domain := &db.Domain{}
 	if err := tx.Model(domain).Where("email =?", email).Find(domain).Error; err != nil {
-		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return e.New(e.NotFound, "not found record")
+		}
 		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return response.Errors(http.StatusInternalServerError, err)
+		return e.New(e.OperateDbFail, err.Error())
 	}
 	if domain.PassWord != oldPassWord {
-		tx.Rollback()
-		return e.Error(http.StatusForbidden, "wrong password")
+		return e.New(e.Forbidden, "wrong password")
 	}
 	var columnList = make([]interface{}, 0, 2)
 	if newPassWord != "" && domain.PassWord != newPassWord {
@@ -77,14 +81,14 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 	case 0:
 		return nil
 	case 1:
-		err = tx.Model(domain).Select(columnList[0]).Update(domain).Error
+		err = tx.Model(domain).Select(columnList[0]).UpdateColumns(domain).Error
 	default:
-		err = tx.Model(domain).Select(columnList[0], columnList[1:]...).Update(domain).Error
+		err = tx.Model(domain).Select(columnList[0], columnList[1:]...).UpdateColumns(domain).Error
 	}
 	if err != nil {
-		tx.Rollback()
 		logger.FromContext(ctx).Errorf("update db failed.Error:%v", err)
-		return response.Errors(http.StatusInternalServerError, err)
+		return e.New(e.OperateDbFail, err.Error())
 	}
+	tx.Commit()
 	return nil
 }

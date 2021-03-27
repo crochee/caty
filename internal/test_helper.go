@@ -3,8 +3,8 @@
 // Author: l30002214
 // Create: 2020/12/22
 
-// Package util
-package util
+// Package internal
+package internal
 
 import (
 	"io"

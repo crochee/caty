@@ -6,13 +6,15 @@ package user
 
 import (
 	"bytes"
-	"github.com/gin-gonic/gin"
-	jsoniter "github.com/json-iterator/go"
 	"net/http"
-	"obs/config"
-	"obs/model/db"
-	"obs/util"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/json-iterator/go"
+
+	"obs/config"
+	"obs/internal"
+	"obs/model/db"
 )
 
 func TestRegister(t *testing.T) {
@@ -31,7 +33,7 @@ func TestRegister(t *testing.T) {
 	}
 	router := gin.New()
 	router.POST("/v1/user/register", Register)
-	w := util.PerformRequest(router, http.MethodPost, "/v1/user/register", body, nil)
+	w := internal.PerformRequest(router, http.MethodPost, "/v1/user/register", body, nil)
 	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
 }
 
@@ -48,7 +50,7 @@ func TestLogin(t *testing.T) {
 	}
 	router := gin.New()
 	router.POST("/v1/user/login", Login)
-	w := util.PerformRequest(router, http.MethodPost, "/v1/user/login", body, nil)
+	w := internal.PerformRequest(router, http.MethodPost, "/v1/user/login", body, nil)
 	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
 }
 
@@ -67,6 +69,6 @@ func TestModify(t *testing.T) {
 	}
 	router := gin.New()
 	router.POST("/v1/user/modify", Modify)
-	w := util.PerformRequest(router, http.MethodPost, "/v1/user/modify", body, nil)
+	w := internal.PerformRequest(router, http.MethodPost, "/v1/user/modify", body, nil)
 	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
 }

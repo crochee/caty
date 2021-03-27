@@ -2,7 +2,7 @@
 // Author: OnlyOneFace
 // Date: 2020/12/8
 
-package util
+package internal
 
 import (
 	"errors"

@@ -10,19 +10,21 @@ definitions:
       size:
         type: integer
     type: object
+  e.ErrorResponse:
+    properties:
+      code:
+        type: string
+      extra:
+        type: string
+      message:
+        type: string
+    type: object
   file.Name:
     properties:
       bucket_name:
         type: string
     required:
     - bucket_name
-    type: object
-  response.ErrorResponse:
-    properties:
-      code:
-        type: integer
-      message:
-        type: string
     type: object
   user.Domain:
     properties:
@@ -86,15 +88,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: CreateBucket
@@ -119,15 +121,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: DeleteBucket
@@ -153,23 +155,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: GetBucket
@@ -199,15 +201,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: UploadFile
@@ -237,15 +239,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: DeleteFile
@@ -278,15 +280,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: DownloadFile
@@ -318,15 +320,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: SignFile
@@ -354,11 +356,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       summary: Login
       tags:
       - user
@@ -384,15 +386,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       summary: Modify
       tags:
       - user
@@ -416,11 +418,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/response.ErrorResponse'
+            $ref: '#/definitions/e.ErrorResponse'
       summary: register
       tags:
       - user

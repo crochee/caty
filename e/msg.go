@@ -8,4 +8,20 @@ var (
 	ParsePayloadFailed = payload{}
 	Forbidden          = forbidden{}
 	Unknown            = unknown{}
+	GetTokenFail       = getTokenFail{}
+	GetAbsPathFail     = absPath{}
+	MkPathFail         = mkPath{}
+	NotFound           = notFound{}
+	OperateDbFail      = operateDb{}
+	StatisticsFileFail = statisticsFile{}
+	ParseUrlFail       = parseUrl{}
+	DeleteBucketFail   = deleteBucket{}
+	OpenFileFail       = openFile{}
+	DeleteFileFail     = deleteFile{}
+	GenerateTokenFail  = generateToken{}
+	GenerateSignFail   = generateSign{}
+	Recovery           = recovery{}
+	InvalidEmail       = invalidEmail{}
+	MarshalFail        = marshal{}
+	UnmarshalFail      = unmarshal{}
 )

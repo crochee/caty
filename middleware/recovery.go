@@ -10,15 +10,14 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"net/http"
 	"net/http/httputil"
-	"obs/e"
 	"os"
 	"runtime/debug"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
+	"obs/e"
 	"obs/logger"
 )
 
@@ -36,14 +35,35 @@ func Recovery(ctx *gin.Context) {
 			}
 			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
 			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s", httpRequest, r, debug.Stack())
-			if brokenPipe {
-				ctx.AbortWithStatusJSON(http.StatusInternalServerError,
-					e.Error(http.StatusInternalServerError,
-						fmt.Sprintf("broken pipe or connection reset by peer;%v", r)))
+			if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
+				if brokenPipe {
+					ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
+						Code:    e.Recovery.String(),
+						Message: e.Recovery.Chinese(),
+						Extra:   fmt.Sprintf("broken pipe or connection reset by peer;%v", r),
+					})
+					return
+				}
+				ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
+					Code:    e.Recovery.String(),
+					Message: e.Recovery.Chinese(),
+					Extra:   fmt.Sprint(r),
+				})
 				return
 			}
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError,
-				e.Error(http.StatusInternalServerError, fmt.Sprint(r)))
+			if brokenPipe {
+				ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
+					Code:    e.Recovery.String(),
+					Message: e.Recovery.English(),
+					Extra:   fmt.Sprintf("broken pipe or connection reset by peer;%v", r),
+				})
+				return
+			}
+			ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
+				Code:    e.Recovery.String(),
+				Message: e.Recovery.English(),
+				Extra:   fmt.Sprint(r),
+			})
 		}
 	}()
 	ctx.Next()
