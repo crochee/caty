@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 
 	"obs/config"
 	loggers "obs/logger"
@@ -65,6 +67,27 @@ func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
 		conn *gorm.DB
 		err  error
 	)
+	l := logger.Warn
+	if cf.Debug { // 开启debug 日志模式 conn = conn.Debug()
+		l = logger.Info
+	}
+	gormConfig := &gorm.Config{
+		SkipDefaultTransaction: false,
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   "obs_",
+			SingularTable: true,
+		},
+		NowFunc: func() time.Time {
+			return time.Now().UTC()
+		},
+		Logger: logger.New(
+			log.New(writer, "\r\n", log.LstdFlags),
+			logger.Config{
+				SlowThreshold: 200 * time.Millisecond,
+				LogLevel:      l,
+				Colorful:      writer == os.Stdout,
+			}),
+	}
 	switch cf.Type {
 	case "mysql":
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true&loc=Local",
@@ -74,7 +97,7 @@ func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
 			cf.Port,
 			cf.Database,
 			cf.Charset)
-		if conn, err = gorm.Open(mysql.Open(dsn), &gorm.Config{}); err != nil {
+		if conn, err = gorm.Open(mysql.Open(dsn), gormConfig); err != nil {
 			return nil, err
 		}
 	case "postgres":
@@ -84,20 +107,11 @@ func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
 			cf.User,
 			cf.Database,
 			cf.Password)
-		if conn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{}); err != nil {
+		if conn, err = gorm.Open(postgres.Open(dsn), gormConfig); err != nil {
 			return nil, err
 		}
 	default:
 		return nil, fmt.Errorf("unsuport type %s", cf.Type)
-	}
-	if cf.Debug {
-		conn = conn.Session(&gorm.Session{Logger: logger.New(
-			log.New(writer, "\r\n", log.LstdFlags),
-			logger.Config{
-				SlowThreshold: 200 * time.Millisecond,
-				LogLevel:      logger.Warn,
-				Colorful:      true,
-			})}) // 开启debug 日志模式 conn = conn.Debug()
 	}
 	return conn, nil
 }

@@ -1,6 +1,7 @@
 service_info:
     mode: debug
-    log_path: mongodb://admin:1234567@192.168.31.62:27017
+    #log_path: mongodb://admin:1234567@192.168.31.62:27017
+    log_path:
     log_level: debug
     storage_path: /obs/
 list:
@@ -12,3 +13,4 @@ list:
         port: 3307
         database: obs
         charset: utf8
+        debug: true

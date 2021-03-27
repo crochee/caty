@@ -4,7 +4,11 @@
 
 package db
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
 	User string `gorm:"primary_key:user;type:varchar(50);not null"`
@@ -18,4 +22,5 @@ type User struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }

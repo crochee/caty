@@ -4,7 +4,11 @@
 
 package db
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type BucketFile struct {
 	File string `gorm:"primary_key:file"`
@@ -16,4 +20,5 @@ type BucketFile struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }

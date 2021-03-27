@@ -4,7 +4,11 @@
 
 package db
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Domain struct {
 	Domain string `gorm:"primary_key:domain;type:varchar(50);not null"`
@@ -19,4 +23,5 @@ type Domain struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }

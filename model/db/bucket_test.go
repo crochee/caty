@@ -17,6 +17,7 @@ func TestBucket_TableName(t *testing.T) {
 		Domain: "123",
 		Bucket: "bucket12",
 	}
+	//var list []*Bucket
 	tx := NewDB().Begin()
 	defer tx.Commit()
 	// 级联插入

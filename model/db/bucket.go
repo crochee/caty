@@ -4,7 +4,11 @@
 
 package db
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Bucket struct {
 	Bucket string `json:"bucket" gorm:"primary_key:bucket;type:varchar(50);not null;"`
@@ -12,4 +16,5 @@ type Bucket struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
