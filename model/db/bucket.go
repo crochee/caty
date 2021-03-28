@@ -11,7 +11,7 @@ import (
 )
 
 type Bucket struct {
-	Bucket string `json:"bucket" gorm:"primary_key:bucket;type:varchar(50);not null;"`
+	Bucket string `json:"bucket" gorm:"primary_key:bucket;type:varchar(50);not null"`
 	Domain string `json:"domain" gorm:"column:domain;type:varchar(50);not null"`
 
 	CreatedAt time.Time
