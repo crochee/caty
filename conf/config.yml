@@ -1,7 +1,7 @@
 service_info:
     mode: debug
     #log_path: mongodb://admin:1234567@192.168.31.62:27017
-    log_path:
+    log_path: ./log/obs.log
     log_level: debug
     storage_path: /obs/
 list:

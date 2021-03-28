@@ -112,7 +112,6 @@ func generateGormConfig(path string, debug bool) *gorm.Config {
 	return &gorm.Config{
 		SkipDefaultTransaction: false,
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   "obs_",
 			SingularTable: true,
 		},
 		NowFunc: func() time.Time {
