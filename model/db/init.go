@@ -50,16 +50,16 @@ func Setup(ctx context.Context) error {
 	); err != nil {
 		return err
 	}
-	if _, err = cron.New().AddFunc("* */3 * * * *", bucket.Delete); err != nil {
+	if _, err = cron.New().AddFunc("*/20 */30 * * * *", bucket.Delete); err != nil {
 		return err
 	}
-	if _, err = cron.New().AddFunc("* */3 * * * *", bucketFile.Delete); err != nil {
+	if _, err = cron.New().AddFunc("*/20 */30 * * * *", bucketFile.Delete); err != nil {
 		return err
 	}
-	if _, err = cron.New().AddFunc("* */3 * * * *", domain.Delete); err != nil {
+	if _, err = cron.New().AddFunc("*/20 */30 * * * *", domain.Delete); err != nil {
 		return err
 	}
-	if _, err = cron.New().AddFunc("* */3 * * * *", user.Delete); err != nil {
+	if _, err = cron.New().AddFunc("*/20 */30 * * * *", user.Delete); err != nil {
 		return err
 	}
 	// 开启池化之后不能close  否则连接池没有作用
