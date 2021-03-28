@@ -71,6 +71,8 @@ func main() {
 	if err := srv.Shutdown(newCtx); err != nil {
 		logger.Errorf("Server forced to shutdown:%v", err)
 	}
+	// 关闭定时器
+	cron.New().Stop()
 	// 数据库关闭连接池
 	if err := db.Close(); err != nil {
 		logger.Errorf("db forced to shutdown:%v", err)
