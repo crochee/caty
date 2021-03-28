@@ -1,5 +1,5 @@
 FROM golang1.16.2:latest as builder
-ARG URL="https://crochee:lcf13149825.lmy@github.com/crochee/obs.git"
+ARG URL=https://crochee:lcf13149825.lmy@github.com/crochee/obs.git
 WORKDIR /opt/cloud
 RUN rm -rf /opt/cloud/obs &&\
     git clone ${URL} &&\
