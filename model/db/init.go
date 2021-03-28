@@ -160,6 +160,7 @@ func createPool(cf *config.SqlConfig, gormConfig *gorm.Config) (*gorm.DB, error)
 	return conn, nil
 }
 
+// AnyTime mock time
 type AnyTime struct{}
 
 // Match satisfies sqlmock.Argument interface
@@ -168,6 +169,7 @@ func (a AnyTime) Match(v driver.Value) bool {
 	return ok
 }
 
+// NewMock new a mock todo mock解除测试对数据库等中间件的依赖
 func NewMock() (sqlmock.Sqlmock, error) {
 	// 创建sqlmock
 	slqDb, mock, err := sqlmock.New()

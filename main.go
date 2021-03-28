@@ -21,7 +21,6 @@ import (
 	"obs/router"
 )
 
-// todo mock解除测试对数据库等中间件的依赖
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel() // 全局取消
