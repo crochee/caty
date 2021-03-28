@@ -178,7 +178,7 @@ func DownloadFile(ctx *gin.Context) {
 	conn := db.NewDB()
 	b := new(db.Bucket)
 	if err = conn.Model(b).Where("bucket =? AND domain= ?",
-		target.BucketName, token.Domain).Find(b).Error; err != nil {
+		target.BucketName, token.Domain).First(b).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e.Error(ctx, e.NotFound)
 			return
@@ -189,7 +189,7 @@ func DownloadFile(ctx *gin.Context) {
 	}
 	bucketFile := &db.BucketFile{}
 	if err = conn.Model(bucketFile).Where("file =? AND bucket= ?",
-		target.FileName, b.Bucket).Find(bucketFile).Error; err != nil {
+		target.FileName, b.Bucket).First(bucketFile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e.Error(ctx, e.NotFound)
 			return
