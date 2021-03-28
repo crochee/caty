@@ -25,3 +25,12 @@ type Domain struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+func (d *Domain) Delete() {
+	tx := NewDB().Begin()
+	defer tx.Rollback()
+	if err := tx.Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
+		return
+	}
+	tx.Commit()
+}

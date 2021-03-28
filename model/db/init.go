@@ -5,15 +5,17 @@
 package db
 
 import (
+	"context"
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"io"
 	"log"
 	"os"
-
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -21,40 +23,60 @@ import (
 	"gorm.io/gorm/schema"
 
 	"obs/config"
-	loggers "obs/logger"
+	"obs/cron"
 )
 
 var db *gorm.DB
 
 // Setup init mysql db
-func Setup() {
+func Setup(ctx context.Context) error {
 	var err error
 	if db, err = createPool(config.Cfg.ServiceConfig.List.Mysql,
-		loggers.SetLoggerWriter(config.Cfg.ServiceConfig.ServiceInfo.LogPath)); err != nil {
-		loggers.Fatal(err.Error())
-		return
+		generateGormConfig(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
+			config.Cfg.ServiceConfig.List.Mysql.Debug)); err != nil {
+		return err
+	}
+	db = db.WithContext(ctx)
+	// 自动建表或者自适应表字段
+	bucket := new(Bucket)
+	bucketFile := new(BucketFile)
+	domain := new(Domain)
+	user := new(User)
+	if err = db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").AutoMigrate(
+		bucket,
+		bucketFile,
+		domain,
+		user,
+	); err != nil {
+		return err
+	}
+	if _, err = cron.New().AddFunc("* */3 * * * *", bucket.Delete); err != nil {
+		return err
+	}
+	if _, err = cron.New().AddFunc("* */3 * * * *", bucketFile.Delete); err != nil {
+		return err
+	}
+	if _, err = cron.New().AddFunc("* */3 * * * *", domain.Delete); err != nil {
+		return err
+	}
+	if _, err = cron.New().AddFunc("* */3 * * * *", user.Delete); err != nil {
+		return err
 	}
 	// 开启池化之后不能close  否则连接池没有作用
 	// 设置数据库连接池最大连接数maxOpenConns
 	// 设置数据库连接池最大允许的空闲连接数，如果没有sql任务需要执行的连接数大于maxIdleConns，超过的连接会被连接池关闭
 	var sqlDb *sql.DB
 	if sqlDb, err = db.DB(); err != nil {
-		loggers.Fatal(err.Error())
-		return
+		return err
 	}
 	if err = sqlDb.Ping(); err != nil {
 		_ = sqlDb.Close()
-		loggers.Fatal(err.Error())
-		return
+		return err
 	}
 	sqlDb.SetMaxIdleConns(10)                   // 设置空闲连接池中连接的最大数量
 	sqlDb.SetMaxOpenConns(30)                   // 设置打开数据库连接的最大数量
 	sqlDb.SetConnMaxLifetime(time.Second * 300) // 设置了连接可复用的最大时间
-
-	if err = db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").
-		AutoMigrate(new(Bucket), new(BucketFile), new(Domain), new(User)); err != nil {
-		loggers.Fatal(err.Error())
-	}
+	return nil
 }
 
 // NewDB get gorm.DB
@@ -62,16 +84,32 @@ func NewDB() *gorm.DB {
 	return db
 }
 
-func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
-	var (
-		conn *gorm.DB
-		err  error
-	)
+// Close close db pool
+func Close() error {
+	sqlDb, err := db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDb.Close()
+}
+
+func generateGormConfig(path string, debug bool) *gorm.Config {
+	var writer io.Writer = os.Stdout
+	if path != "" {
+		writer = &lumberjack.Logger{
+			Filename:   path,
+			MaxSize:    50,    //单个日志文件最大MaxSize*M大小 // megabytes
+			MaxAge:     30,    //days
+			MaxBackups: 10,    //备份数量
+			Compress:   false, //不压缩
+			LocalTime:  true,  //备份名采用本地时间
+		}
+	}
 	l := logger.Warn
-	if cf.Debug { // 开启debug 日志模式 conn = conn.Debug()
+	if debug { // 开启debug 日志模式 conn = conn.Debug()
 		l = logger.Info
 	}
-	gormConfig := &gorm.Config{
+	return &gorm.Config{
 		SkipDefaultTransaction: false,
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   "obs_",
@@ -85,9 +123,16 @@ func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
 			logger.Config{
 				SlowThreshold: 200 * time.Millisecond,
 				LogLevel:      l,
-				Colorful:      writer == os.Stdout,
+				Colorful:      path == "",
 			}),
 	}
+}
+
+func createPool(cf *config.SqlConfig, gormConfig *gorm.Config) (*gorm.DB, error) {
+	var (
+		conn *gorm.DB
+		err  error
+	)
 	switch cf.Type {
 	case "mysql":
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true&loc=Local",
@@ -116,23 +161,26 @@ func createPool(cf *config.SqlConfig, writer io.Writer) (*gorm.DB, error) {
 	return conn, nil
 }
 
-var Mock sqlmock.Sqlmock
+type AnyTime struct{}
 
-func SetUpMock() {
+// Match satisfies sqlmock.Argument interface
+func (a AnyTime) Match(v driver.Value) bool {
+	_, ok := v.(time.Time)
+	return ok
+}
+
+func NewMock() (sqlmock.Sqlmock, error) {
 	// 创建sqlmock
-	var (
-		slqDb *sql.DB
-		err   error
-	)
-	if slqDb, Mock, err = sqlmock.New(); err != nil {
-		loggers.Fatal(err.Error())
-		return
+	slqDb, mock, err := sqlmock.New()
+	if err != nil {
+		return nil, err
 	}
 	// 结合gorm、sqlmock
 	if db, err = gorm.Open(mysql.New(mysql.Config{
 		SkipInitializeWithVersion: true,
 		Conn:                      slqDb,
-	}), &gorm.Config{}); err != nil {
-		loggers.Fatal(err.Error())
+	}), generateGormConfig("", true)); err != nil {
+		return nil, err
 	}
+	return mock, err
 }

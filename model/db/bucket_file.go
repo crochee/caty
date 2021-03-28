@@ -22,3 +22,12 @@ type BucketFile struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+func (b *BucketFile) Delete() {
+	tx := NewDB().Begin()
+	defer tx.Rollback()
+	if err := tx.Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
+		return
+	}
+	tx.Commit()
+}

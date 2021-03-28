@@ -24,3 +24,12 @@ type User struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+func (u *User) Delete() {
+	tx := NewDB().Begin()
+	defer tx.Rollback()
+	if err := tx.Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
+		return
+	}
+	tx.Commit()
+}
