@@ -14,10 +14,11 @@ import (
 
 // CrossDomain skip the cross-domain phase
 func CrossDomain(ctx *gin.Context) {
-	if ctx.Request.Method == http.MethodOptions {
+	if ctx.Request.Method == http.MethodOptions &&
+		ctx.GetHeader("Access-Control-Request-Method") != "" {
 		ctx.Header("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,HEAD,PATCH,OPTIONS")
 		ctx.Header("Access-Control-Allow-Headers", "Content-Type,X-Auth-Token")
-		ctx.Header("Access-Control-Allow-Origin", ctx.GetHeader("Origin")) // todo fix allow
+		ctx.Header("Access-Control-Allow-Origin", "*")
 		ctx.AbortWithStatus(http.StatusNoContent)
 		return
 	}
