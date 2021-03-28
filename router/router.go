@@ -20,7 +20,7 @@ import (
 // @version 1.0
 // @description This is a obs server.
 
-// @host http://localhost:8150
+// @host localhost:8150
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

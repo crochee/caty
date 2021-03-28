@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "http://localhost:8150",
+    "host": "localhost:8150",
     "paths": {
         "/v1/bucket": {
             "post": {

@@ -62,7 +62,7 @@ definitions:
     required:
     - email
     type: object
-host: http://localhost:8150
+host: localhost:8150
 info:
   contact: {}
   description: This is a obs server.
