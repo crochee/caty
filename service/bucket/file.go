@@ -149,9 +149,9 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 	}
 	var (
 		sign      string
-		tokenSign = tokenx.Signature(signString)
+		tokenSign = &tokenx.Signature{signString}
 	)
-	if sign, err = tokenx.CreateSign(&tokenSign); err != nil {
+	if sign, err = tokenx.CreateSign(tokenSign); err != nil {
 		logger.FromContext(ctx).Errorf("create sian failed.Error:%v", err)
 		return "", e.New(e.GenerateSignFail, err.Error())
 	}

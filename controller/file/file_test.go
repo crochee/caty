@@ -6,6 +6,7 @@ package file
 
 import (
 	"bytes"
+	"context"
 	"mime/multipart"
 	"net/http"
 	"testing"
@@ -20,7 +21,9 @@ import (
 
 func TestUploadFile(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	body := new(bytes.Buffer)
 	mw := multipart.NewWriter(body)
 	f, _ := mw.CreateFormFile("file", "lcf.txt")
@@ -38,7 +41,9 @@ func TestUploadFile(t *testing.T) {
 
 func TestDeleteFile(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	router := gin.New()
 	router.Use(middleware.Token)
 	router.DELETE("/v1/bucket/:bucket_name/file/:file_name", DeleteFile)
@@ -50,7 +55,9 @@ func TestDeleteFile(t *testing.T) {
 
 func TestSignFile(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	router := gin.New()
 	router.Use(middleware.Token)
 	router.GET("/v1/bucket/:bucket_name/file/:file_name", SignFile)
@@ -62,7 +69,9 @@ func TestSignFile(t *testing.T) {
 
 func TestDownloadFile(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	router := gin.New()
 	router.Use(middleware.Token)
 	router.GET("/v1/bucket/:bucket_name/file/:file_name", DownloadFile)

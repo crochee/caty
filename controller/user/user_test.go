@@ -6,6 +6,7 @@ package user
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"testing"
 
@@ -19,7 +20,9 @@ import (
 
 func TestRegister(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	body := new(bytes.Buffer)
 	r := &Domain{
 		Nick: "nick",
@@ -39,7 +42,9 @@ func TestRegister(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	body := new(bytes.Buffer)
 	r := &LoginInfo{
 		Email:    "13522570308@139.com",
@@ -56,7 +61,9 @@ func TestLogin(t *testing.T) {
 
 func TestModify(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	body := new(bytes.Buffer)
 	r := &ModifyInfo{
 		Email:       "13522570308@139.com",

@@ -86,7 +86,9 @@ func ParseToken(tokenString string) (*TokenClaims, error) {
 }
 
 // Signature jwt.Claims的签名实现
-type Signature string
+type Signature struct {
+	Sign string
+}
 
 func (s *Signature) Valid() error {
 	return nil

@@ -8,6 +8,7 @@ package file
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"testing"
 
@@ -22,7 +23,9 @@ import (
 
 func TestCreateBucket(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	body := new(bytes.Buffer)
 	r := &Name{BucketName: "test"}
 	if err := jsoniter.ConfigFastest.NewEncoder(body).Encode(r); err != nil {
@@ -39,7 +42,9 @@ func TestCreateBucket(t *testing.T) {
 
 func TestHeadBucket(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	router := gin.New()
 	router.Use(middleware.Token)
 	router.GET("/v1/bucket/:bucket_name", GetBucket)
@@ -51,7 +56,9 @@ func TestHeadBucket(t *testing.T) {
 
 func TestDeleteBucket(t *testing.T) {
 	config.InitConfig("../../conf/config.yml")
-	db.Setup()
+	if err := db.Setup(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	router := gin.New()
 	router.Use(middleware.Token)
 	router.DELETE("/v1/bucket/:bucket_name", DeleteBucket)
