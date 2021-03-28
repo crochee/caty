@@ -29,7 +29,7 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, fil
 	defer tx.Rollback()
 	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("bucket =? AND domain= ?",
-		bucketName, token.Domain).Find(bucket).Error; err != nil {
+		bucketName, token.Domain).First(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
@@ -79,7 +79,8 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName s
 	tx := db.NewDB().Begin()
 	defer tx.Rollback()
 	bucket := &db.Bucket{}
-	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).Find(bucket).Error; err != nil {
+	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).
+		First(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
@@ -88,7 +89,7 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName s
 	}
 	bucketFile := &db.BucketFile{}
 	if err := tx.Model(bucketFile).Where("file =? AND bucket= ?", fileName, bucket.Bucket).
-		Find(bucketFile).Error; err != nil {
+		First(bucketFile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
@@ -115,7 +116,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 	defer tx.Rollback()
 	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("bucket =? AND domain= ?",
-		bucketName, token.Domain).Find(bucket).Error; err != nil {
+		bucketName, token.Domain).First(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}
@@ -124,7 +125,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 	}
 	bucketFile := &db.BucketFile{}
 	if err := tx.Model(bucketFile).Where("file =? AND bucket= ?",
-		fileName, bucket.Bucket).Find(bucketFile).Error; err != nil {
+		fileName, bucket.Bucket).First(bucketFile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}

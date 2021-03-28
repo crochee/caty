@@ -53,7 +53,7 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*Info, error) {
 	conn := db.NewDB()
 	bucket := &db.Bucket{Bucket: bucketName}
-	if err := conn.Find(bucket).Error; err != nil {
+	if err := conn.First(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.Errorf(e.NotFound, "not found bucket %s", bucket.Bucket)
 		}
@@ -97,7 +97,8 @@ func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 	defer tx.Rollback()
 
 	bucket := &db.Bucket{}
-	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).Find(bucket).Error; err != nil {
+	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).
+		First(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.Errorf(e.NotFound, "not found bucket %s", bucket.Bucket)
 		}

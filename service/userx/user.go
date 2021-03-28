@@ -21,7 +21,7 @@ import (
 // UserLogin 登录生成token信息
 func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	domain := &db.Domain{}
-	if err := db.NewDB().Model(domain).Where("email =?", email).Find(domain).Error; err != nil {
+	if err := db.NewDB().Model(domain).Where("email =?", email).First(domain).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}
@@ -57,7 +57,7 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 	tx := db.NewDB().Begin()
 	defer tx.Rollback()
 	domain := &db.Domain{}
-	if err := tx.Model(domain).Where("email =?", email).Find(domain).Error; err != nil {
+	if err := tx.Model(domain).Where("email =?", email).First(domain).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
@@ -67,25 +67,17 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 	if domain.PassWord != oldPassWord {
 		return e.New(e.Forbidden, "wrong password")
 	}
-	var columnList = make([]interface{}, 0, 2)
+	var columnMap = make(map[string]interface{}, 2)
 	if newPassWord != "" && domain.PassWord != newPassWord {
-		domain.PassWord = newPassWord
-		columnList = append(columnList, "pass_word")
+		columnMap["pass_word"] = newPassWord
 	}
 	if nick != "" && domain.Nick != nick {
-		domain.Nick = nick
-		columnList = append(columnList, "nick")
+		columnMap["nick"] = nick
 	}
-	var err error
-	switch len(columnList) {
-	case 0:
+	if len(columnMap) == 0 {
 		return nil
-	case 1:
-		err = tx.Model(domain).Select(columnList[0]).UpdateColumns(domain).Error
-	default:
-		err = tx.Model(domain).Select(columnList[0], columnList[1:]...).UpdateColumns(domain).Error
 	}
-	if err != nil {
+	if err := tx.Model(domain).UpdateColumns(columnMap).Error; err != nil {
 		logger.FromContext(ctx).Errorf("update db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
