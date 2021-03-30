@@ -19,3 +19,5 @@ package main
 // https://github.com/fagongzi/manba
 // https://github.com/eolinker/goku-api-gateway
 // https://github.com/TykTechnologies/tyk
+
+// 去除调试信息编译 go build -ldflags="-s -w" -o server main.go
