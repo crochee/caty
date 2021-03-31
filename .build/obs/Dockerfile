@@ -4,7 +4,7 @@ WORKDIR /opt/cloud
 RUN git clone ${URL} &&\
     cd obs &&\
     go mod tidy &&\
-    go build -o obs -tags jsoniter &&\
+    go build -ldflags="-s -w" -o obs -tags jsoniter &&\
     rm -rf ./docs/docs.go
 
 FROM centos:latest
