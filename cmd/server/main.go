@@ -38,7 +38,7 @@ func main() {
 		micro.Context(ctx),
 		micro.Name(cmd.ServiceName),
 		micro.Version(cmd.Version),
-		micro.Address(""),
+		micro.Address(":8160"),
 		micro.HandleSignal(true),
 		micro.Profile(pprof.NewPprof("", "")),
 		micro.BeforeStart(func() error {
@@ -94,6 +94,7 @@ func main() {
 			return nil
 		}),
 	)
+	service.Server().Handle()
 	if err := service.Server().Init(); err != nil {
 		logger.Fatal(err.Error())
 	}
