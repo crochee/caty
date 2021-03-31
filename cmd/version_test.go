@@ -2,9 +2,11 @@
 // Author: crochee
 // Date: 2021/3/24
 
-package version
+package cmd
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCompareVersion(t *testing.T) {
 	list := []struct {

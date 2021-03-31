@@ -9,12 +9,15 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+
+	"obs/cmd"
 )
 
 // todo build cli
 func main() {
 	rootCmd := &cobra.Command{
-		Use:     "root",
+		Version: cmd.Version,
+		Use:     cmd.ServiceName,
 		Aliases: []string{"run"},
 		Short:   "run cmd",
 		Run: func(cmd *cobra.Command, args []string) {

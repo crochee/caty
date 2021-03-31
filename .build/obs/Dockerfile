@@ -4,7 +4,7 @@ WORKDIR /opt/cloud
 RUN git clone ${URL} &&\
     cd obs &&\
     go mod tidy &&\
-    go build -ldflags="-s -w" -o obs -tags jsoniter &&\
+    go build -ldflags="-s -w" -o obs -tags jsoniter cmd/server &&\
     rm -rf ./docs/docs.go
 
 FROM centos:latest
@@ -21,5 +21,7 @@ RUN chmod +x ./obs && chmod +x ./entrypoint.sh
 VOLUME /obs
 
 EXPOSE 8150
+STOPSIGNAL 2
+
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["./obs"]

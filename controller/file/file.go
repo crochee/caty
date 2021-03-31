@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"gorm.io/gorm"
 
+	"obs/cmd"
 	"obs/config"
 	"obs/e"
 	"obs/logger"
@@ -55,7 +56,7 @@ func UploadFile(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Write); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Write); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -92,7 +93,7 @@ func DeleteFile(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Delete); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Delete); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -129,7 +130,7 @@ func SignFile(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Read); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Read); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -170,7 +171,7 @@ func DownloadFile(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Read); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Read); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}

@@ -2,7 +2,7 @@
 // Author: crochee
 // Date: 2021/3/3
 
-package version
+package cmd
 
 import "strconv"
 

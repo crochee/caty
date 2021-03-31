@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"obs/cmd"
 	"obs/logger"
 )
 
@@ -65,7 +66,9 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 		param.Latency = param.Latency - param.Latency%time.Second
 	}
 	var buf strings.Builder
-	buf.WriteString("[OBS] ")
+	buf.WriteByte('[')
+	buf.WriteString(cmd.ServiceName)
+	buf.WriteString("] ")
 	buf.WriteString(param.TimeStamp.Format("2006/01/02 - 15:04:05"))
 	buf.WriteString(" |")
 	buf.WriteString(statusColor)

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
+	"obs/cmd"
 	"obs/e"
 	"obs/logger"
 	"obs/service/bucket"
@@ -42,7 +43,7 @@ func CreateBucket(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Write); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Write); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -81,7 +82,7 @@ func GetBucket(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Read); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Read); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -119,7 +120,7 @@ func DeleteBucket(ctx *gin.Context) {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, "OBS", tokenx.Delete); err != nil {
+	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Delete); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
