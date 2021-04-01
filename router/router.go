@@ -10,8 +10,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"obs/controller/file"
-	"obs/controller/user"
+	"obs/api/file"
+	"obs/api/user"
 	_ "obs/docs"
 	"obs/middleware"
 )
@@ -28,6 +28,8 @@ import (
 func GinRun() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.CrossDomain)
+	router.NoRoute(middleware.NoRoute)
+	router.NoMethod(middleware.NoMethod)
 	if gin.Mode() != gin.ReleaseMode {
 		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")

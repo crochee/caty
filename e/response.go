@@ -19,52 +19,46 @@ type ErrorResponse struct {
 
 // ErrorWith gin response with with Code and message
 func ErrorWith(ctx *gin.Context, code Code, message string) {
-	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
-		ctx.JSON(code.Status(), &ErrorResponse{
-			Code:    code.String(),
-			Message: code.Chinese(),
-			Extra:   message,
-		})
-		return
-	}
-	ctx.JSON(code.Status(), &ErrorResponse{
+	resp := &ErrorResponse{
 		Code:    code.String(),
 		Message: code.English(),
 		Extra:   message,
-	})
+	}
+	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
+		resp.Message = code.Chinese()
+	}
+	ctx.JSON(code.Status(), resp)
 }
 
 // Error gin response with Code
 func Error(ctx *gin.Context, code Code) {
-	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
-		ctx.JSON(code.Status(), &ErrorResponse{
-			Code:    code.String(),
-			Message: code.Chinese(),
-		})
-		return
-	}
-	ctx.JSON(code.Status(), &ErrorResponse{
+	resp := &ErrorResponse{
 		Code:    code.String(),
 		Message: code.English(),
-	})
+	}
+	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
+		resp.Message = code.Chinese()
+	}
+	ctx.JSON(code.Status(), resp)
 }
 
 // Errors gin response with error
 func Errors(ctx *gin.Context, err error) {
 	var errorCode *ErrorCode
 	if errors.As(err, &errorCode) {
+		if errorCode.message == "" {
+			Error(ctx, errorCode.code)
+			return
+		}
 		ErrorWith(ctx, errorCode.code, errorCode.message)
 		return
 	}
-	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
-		ctx.JSON(Unknown.Status(), &ErrorResponse{
-			Code:    Unknown.String(),
-			Message: Unknown.Chinese(),
-		})
-		return
-	}
-	ctx.JSON(Unknown.Status(), &ErrorResponse{
+	resp := &ErrorResponse{
 		Code:    Unknown.String(),
 		Message: Unknown.English(),
-	})
+	}
+	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
+		resp.Message = Unknown.Chinese()
+	}
+	ctx.JSON(Unknown.Status(), resp)
 }

@@ -17,8 +17,10 @@ type ErrorCode struct {
 func (e *ErrorCode) Error() string {
 	var buf bytes.Buffer
 	buf.WriteString(e.code.English())
-	buf.WriteString(".In addition,")
-	buf.WriteString(e.message)
+	if e.message != "" {
+		buf.WriteString(".In addition,")
+		buf.WriteString(e.message)
+	}
 	return buf.String()
 }
 
@@ -33,5 +35,11 @@ func Errorf(code Code, format string, a ...interface{}) *ErrorCode {
 	return &ErrorCode{
 		code:    code,
 		message: fmt.Sprintf(format, a...),
+	}
+}
+
+func NewCode(code Code) *ErrorCode {
+	return &ErrorCode{
+		code: code,
 	}
 }

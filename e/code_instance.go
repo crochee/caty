@@ -24,4 +24,5 @@ var (
 	InvalidEmail       = invalidEmail{}
 	MarshalFail        = marshal{}
 	UnmarshalFail      = unmarshal{}
+	MethodNotAllow     = notAllow{}
 )

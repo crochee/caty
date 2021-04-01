@@ -35,35 +35,18 @@ func Recovery(ctx *gin.Context) {
 			}
 			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
 			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s", httpRequest, r, debug.Stack())
-			if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
-				if brokenPipe {
-					ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
-						Code:    e.Recovery.String(),
-						Message: e.Recovery.Chinese(),
-						Extra:   fmt.Sprintf("broken pipe or connection reset by peer;%v", r),
-					})
-					return
-				}
-				ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
-					Code:    e.Recovery.String(),
-					Message: e.Recovery.Chinese(),
-					Extra:   fmt.Sprint(r),
-				})
-				return
-			}
-			if brokenPipe {
-				ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
-					Code:    e.Recovery.String(),
-					Message: e.Recovery.English(),
-					Extra:   fmt.Sprintf("broken pipe or connection reset by peer;%v", r),
-				})
-				return
-			}
-			ctx.AbortWithStatusJSON(e.Recovery.Status(), &e.ErrorResponse{
+			resp := &e.ErrorResponse{
 				Code:    e.Recovery.String(),
 				Message: e.Recovery.English(),
 				Extra:   fmt.Sprint(r),
-			})
+			}
+			if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
+				resp.Message = e.Recovery.Chinese()
+			}
+			if brokenPipe {
+				resp.Extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", r)
+			}
+			ctx.AbortWithStatusJSON(e.Recovery.Status(), resp)
 		}
 	}()
 	ctx.Next()

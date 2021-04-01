@@ -354,3 +354,21 @@ func (u unmarshal) English() string {
 func (u unmarshal) Chinese() string {
 	return "反序列化失败"
 }
+
+type notAllow struct{}
+
+func (n notAllow) String() string {
+	return "OBS.00020"
+}
+
+func (n notAllow) Status() int {
+	return http.StatusMethodNotAllowed
+}
+
+func (n notAllow) English() string {
+	return "Method Not Allowed"
+}
+
+func (n notAllow) Chinese() string {
+	return "不允许该方法"
+}
