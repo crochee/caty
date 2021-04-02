@@ -18,6 +18,15 @@ import (
 	"obs/model/mongox"
 )
 
+type Builder interface {
+	Debugf(format string, v ...interface{})
+	Debug(message string)
+	Infof(format string, v ...interface{})
+	Info(message string)
+	Errorf(format string, v ...interface{})
+	Error(message string)
+}
+
 const (
 	DefaultLogSizeM int = 20
 	DefaultMaxZip   int = 50

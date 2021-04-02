@@ -6,13 +6,12 @@ package config
 
 import (
 	"fmt"
+	"obs/internal/host"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-
-	"obs/internal"
 )
 
 // Cfg 全局配置参数
@@ -31,8 +30,8 @@ func InitConfig(path string) {
 
 	Cfg.ServiceConfig = config
 
-	Cfg.Pid = os.Getpid()                                // pid获取
-	if Cfg.IP, err = internal.ExternalIP(); err != nil { // ip获取
+	Cfg.Pid = os.Getpid()                            // pid获取
+	if Cfg.IP, err = host.ExternalIP(); err != nil { // ip获取
 		panic(err)
 	}
 }

@@ -6,74 +6,88 @@ package main
 
 import (
 	"context"
-	"errors"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
+	"flag"
 	"syscall"
 	"time"
 
+	"github.com/crochee/uid"
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"go.uber.org/zap/zapgrpc"
+
+	"obs/cmd"
 	"obs/config"
 	"obs/cron"
 	"obs/logger"
 	"obs/model/db"
+	"obs/model/etcdx"
 	"obs/router"
+	"obs/transport/httpx"
 )
 
-// todo 集成微服务框架
+var configFile = flag.String("f", "./conf/config.yml", "the config file")
+
 func main() {
+	flag.Parse()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel() // 全局取消
 	// 初始化配置
-	config.InitConfig(os.Getenv("config"))
+	config.InitConfig(*configFile)
 	// 初始化系统日志
 	logger.InitSystemLogger(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
 		config.Cfg.ServiceConfig.ServiceInfo.LogLevel)
-	// cron 初始化
-	cron.Setup()
-	// 数据库初始化
-	if err := db.Setup(ctx); err != nil {
-		logger.Fatalf(err.Error())
-	}
 	// 初始化请求日志
 	requestLog := logger.NewLogger(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
 		config.Cfg.ServiceConfig.ServiceInfo.LogLevel)
-	// http服务对象
-	srv := &http.Server{
-		Addr:    ":8150",
-		Handler: router.GinRun(),
-		ConnContext: func(ctx context.Context, c net.Conn) context.Context {
-			return logger.With(ctx, requestLog)
-		},
-		BaseContext: func(listener net.Listener) context.Context {
-			return ctx
-		},
-	}
+	httpSrv := httpx.New(":8150",
+		httpx.WithContext(ctx),
+		httpx.WithLog(requestLog),
+		httpx.WithHandler(router.GinRun()),
+		httpx.WithBeforeStart(
+			func(ctx context.Context) {
+				cron.Setup() // cron 初始化
+			},
+			func(ctx context.Context) {
+				if err := db.Setup(ctx); err != nil {
+					logger.Fatalf(err.Error())
+				}
+			}),
+		httpx.WithAfterStop(
+			func(ctx context.Context) {
+				cron.New().Stop() // 关闭定时器
+			},
+			func(ctx context.Context) {
+				// 数据库关闭连接池
+				if err := db.Close(); err != nil {
+					logger.Errorf("db forced to shutdown:%v", err)
+				}
+			},
+		),
+	)
+	grpcSrv := grpc.NewServer(
+		grpc.Address(":9000"),
+		grpc.Logger(zapgrpc.NewLogger(requestLog.Logger)),
+		grpc.Timeout(30*time.Second),
+	)
 
-	go func() {
-		logger.Info("obs running...")
-		if err := srv.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
-			logger.Errorf(err.Error())
-		}
-	}()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGKILL)
-	<-quit
-
-	newCtx, newCancel := context.WithTimeout(ctx, 15*time.Second)
-	defer newCancel()
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
-	if err := srv.Shutdown(newCtx); err != nil {
-		logger.Errorf("Server forced to shutdown:%v", err)
+	etcd, err := etcdx.NewEtcdRegistry()
+	if err != nil {
+		logger.Fatal(err.Error())
 	}
-	// 关闭定时器
-	cron.New().Stop()
-	// 数据库关闭连接池
-	if err := db.Close(); err != nil {
-		logger.Errorf("db forced to shutdown:%v", err)
+	//grpcClient,err:=grpc.Dial(
+	//	ctx,
+	//	grpc.WithDiscovery(etcd),
+	//)
+	app := kratos.New(
+		kratos.ID(uid.New().String()),
+		kratos.Name(cmd.ServiceName),
+		kratos.Version(cmd.Version),
+		kratos.Server(httpSrv, grpcSrv),
+		kratos.Signal(syscall.SIGINT),
+		kratos.Registrar(etcd),
+	)
+	if err := app.Run(); err != nil {
+		logger.Fatal(err.Error())
 	}
-	logger.Exit("obs server exit!")
 }
