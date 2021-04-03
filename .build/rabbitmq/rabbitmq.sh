@@ -69,7 +69,7 @@ echo "${id}"
 #docker exec -it ${RABBITMQ_NAME_1} bash
 #rabbitmqctl stop_app
 #rabbitmqctl reset
-#rabbitmqctl join_cluster --ram rabbit@${RABBITMQ_NAME_0} #参数“--ram”表示设置为内存节点，忽略次参数默认为磁盘节点
+#rabbitmqctl join_cluster --ram rabbit@${RABBITMQ_NAME_0}_host #参数“--ram”表示设置为内存节点，忽略次参数默认为磁盘节点
 #rabbitmqctl start_app
 #exit
 
@@ -77,9 +77,12 @@ echo "${id}"
 #docker exec -it ${RABBITMQ_NAME_2} bash
 #rabbitmqctl stop_app
 #rabbitmqctl reset
-#rabbitmqctl join_cluster --ram rabbit@${RABBITMQ_NAME_0} #参数“--ram”表示设置为内存节点，忽略次参数默认为磁盘节点
+#rabbitmqctl join_cluster --ram rabbit@${RABBITMQ_NAME_0}_host #参数“--ram”表示设置为内存节点，忽略次参数默认为磁盘节点
 #rabbitmqctl start_app
 #exit
+
+#账户名：admin
+#密码：1234567
 
 #15672：控制台端口号
 #5672：应用访问端口号
