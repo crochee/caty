@@ -12,7 +12,6 @@ RABBITMQ_NAME_1=rabbitmq_node_1
 RABBITMQ_NAME_2=rabbitmq_node_2
 # node_0
 docker run -itd \
---net host \
 --hostname ${RABBITMQ_NAME_0}_host \
 --name ${RABBITMQ_NAME_0} \
 --log-opt max-size=10m \
@@ -27,7 +26,6 @@ ${image}
 
 # node_1
 docker run -itd \
---net host \
 --hostname ${RABBITMQ_NAME_1}_host \
 --name ${RABBITMQ_NAME_1} \
 --log-opt max-size=10m \
@@ -42,7 +40,6 @@ ${image}
 
 # node_2
 docker run -itd \
---net host \
 --hostname ${RABBITMQ_NAME_2}_host \
 --name ${RABBITMQ_NAME_2} \
 --log-opt max-size=10m \
