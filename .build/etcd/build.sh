@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 # 官网地址 https://github.com/etcd-io/etcd/releases
-image=
-if [ -n "$(docker images -q quay.io/coreos/etcd:v3.2.32)" ]; then
-  docker pull quay.io/coreos/etcd:v3.2.32
+
+image=quay.io/coreos/etcd:v3.2.32
+if [ -n "$(docker images -q ${image})" ]; then
+  docker pull ${image}
 fi
 
 TOKEN=etcd-cluster-k8s-micro-token
@@ -19,7 +20,7 @@ docker run \
 -p 2380:2380 \
 --mount type=bind,source=/home/lcf/cloud/etcd/tmp/etcd-data.tmp,destination=/etcd-data \
 --name etcd-gcr-v3.2.32 \
-quay.io/coreos/etcd:v3.2.32 \
+${image} \
 /usr/local/bin/etcd \
 --name ${NAME_1} \
 --data-dir /etcd-data \
