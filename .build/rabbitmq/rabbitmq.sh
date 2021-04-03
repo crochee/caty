@@ -6,31 +6,83 @@ if [ -n "$(docker images -q ${image})" ]; then
   docker pull ${image}
 fi
 
-RABBITMQ_NAME=rabbitmq_node_0
-RABBITMQ_DIR=/home/lcf/cloud/rabbitmq
-rm -rf ${RABBITMQ_DIR} && mkdir -p ${RABBITMQ_DIR}
-docker run -d \
+# 构建容器集群
+RABBITMQ_NAME_0=rabbitmq_node_0
+RABBITMQ_NAME_1=rabbitmq_node_1
+RABBITMQ_NAME_2=rabbitmq_node_2
+# node_0
+docker run -itd \
 --net host \
---hostname ${RABBITMQ_NAME} \
---name ${RABBITMQ_NAME} \
+--hostname ${RABBITMQ_NAME_0}_host \
+--name ${RABBITMQ_NAME_0} \
 --log-opt max-size=10m \
 --log-opt max-file=3 \
--v ${RABBITMQ_DIR}:/var/lib/rabbitmq:z \
--v ${RABBITMQ_DIR}/hosts:/etc/hosts \
 -e RABBITMQ_DEFAULT_USER=admin \
 -e RABBITMQ_DEFAULT_PASS='1234567' \
--e RABBITMQ_ERLANG_COOKIE='secret cookie here' \
+-e RABBITMQ_ERLANG_COOKIE='crochee secret cookie here' \
 -p 15672:15672 \
 -p 5672:5672 \
 --restart=always \
 ${image}
 
-#开启控制台
-id=$(docker ps | grep ${RABBITMQ_NAME} | awk '{print $1}')
-echo "${id}"
-#docker exec -it ${id} /bin/bash && rabbitmq-plugins enable rabbitmq_management && exit
+# node_1
+docker run -itd \
+--net host \
+--hostname ${RABBITMQ_NAME_1}_host \
+--name ${RABBITMQ_NAME_1} \
+--log-opt max-size=10m \
+--log-opt max-file=3 \
+-e RABBITMQ_DEFAULT_USER=admin \
+-e RABBITMQ_DEFAULT_PASS='1234567' \
+-e RABBITMQ_ERLANG_COOKIE='crochee secret cookie here' \
+-p 5673:5672 \
+--restart=always \
+--link ${RABBITMQ_NAME_0}:${RABBITMQ_NAME_0}_host \
+${image}
 
-#docker run -d --hostname my-rabbit --name rabbit-test -p 8080:15672 rabbitmq
+# node_2
+docker run -itd \
+--net host \
+--hostname ${RABBITMQ_NAME_2}_host \
+--name ${RABBITMQ_NAME_2} \
+--log-opt max-size=10m \
+--log-opt max-file=3 \
+-e RABBITMQ_DEFAULT_USER=admin \
+-e RABBITMQ_DEFAULT_PASS='1234567' \
+-e RABBITMQ_ERLANG_COOKIE='crochee secret cookie here' \
+-p 5674:5672 \
+--restart=always \
+--link ${RABBITMQ_NAME_0}:${RABBITMQ_NAME_0}_host \
+--link ${RABBITMQ_NAME_1}:${RABBITMQ_NAME_1}_host \
+${image}
+#多个容器之间使用“--link”连接，此属性不能少；
+id=$(docker ps | grep ${RABBITMQ_NAME_0} | awk '{print $1}')
+echo "${id}"
+#开启控制台 并加入集群
+
+# node_0
+#docker exec -it ${RABBITMQ_NAME_0} bash
+#rabbitmqctl stop_app
+#rabbitmqctl reset
+#rabbitmq-plugins enable rabbitmq_management 开启管理ui
+#rabbitmqctl start_app
+#exit
+
+# node_1
+#docker exec -it ${RABBITMQ_NAME_1} bash
+#rabbitmqctl stop_app
+#rabbitmqctl reset
+#rabbitmqctl join_cluster --ram rabbit@${RABBITMQ_NAME_0} #参数“--ram”表示设置为内存节点，忽略次参数默认为磁盘节点
+#rabbitmqctl start_app
+#exit
+
+# node_2
+#docker exec -it ${RABBITMQ_NAME_2} bash
+#rabbitmqctl stop_app
+#rabbitmqctl reset
+#rabbitmqctl join_cluster --ram rabbit@${RABBITMQ_NAME_0} #参数“--ram”表示设置为内存节点，忽略次参数默认为磁盘节点
+#rabbitmqctl start_app
+#exit
 
 #15672：控制台端口号
 #5672：应用访问端口号
