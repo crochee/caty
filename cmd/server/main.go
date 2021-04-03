@@ -19,6 +19,7 @@ import (
 	"obs/config"
 	"obs/cron"
 	"obs/logger"
+	"obs/message"
 	"obs/model/db"
 	"obs/model/etcdx"
 	"obs/router"
@@ -70,7 +71,9 @@ func main() {
 		grpc.Logger(zapgrpc.NewLogger(requestLog.Logger)),
 		grpc.Timeout(30*time.Second),
 	)
-
+	if err := message.Setup(ctx); err != nil {
+		logger.Fatal(err.Error())
+	}
 	etcd, err := etcdx.NewEtcdRegistry()
 	if err != nil {
 		logger.Fatal(err.Error())

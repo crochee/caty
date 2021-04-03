@@ -17,11 +17,11 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 )
 
-func Setup() {
-	logger := watermill.NewStdLogger(false, false)
+func Setup(ctx context.Context) error {
+	logger := watermill.NewStdLogger(true, true)
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// SignalsHandler will gracefully shutdown Router when SIGTERM is received.
@@ -49,13 +49,15 @@ func Setup() {
 	// For simplicity, we are using the gochannel Pub/Sub here,
 	// You can replace it with any Pub/Sub implementation, it will work the same.
 	//pubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
-	publisher, err := amqp.NewPublisher(amqp.NewNonDurableQueueConfig("amqp://guest:guest@localhost:5672/"), logger)
-	if err != nil {
-		panic(err)
+	var publisher *amqp.Publisher
+	if publisher, err = amqp.NewPublisher(amqp.NewNonDurableQueueConfig(
+		"amqp://admin:1234567@192.168.31.62:5672/"), logger); err != nil {
+		return err
 	}
-	subscriber, err := amqp.NewSubscriber(amqp.NewNonDurableQueueConfig("amqp://guest:guest@localhost:5672/"), logger)
-	if err != nil {
-		panic(err)
+	var subscriber *amqp.Subscriber
+	if subscriber, err = amqp.NewSubscriber(amqp.NewNonDurableQueueConfig(
+		"amqp://admin:1234567@192.168.31.62:5672/"), logger); err != nil {
+		return err
 	}
 	// Producing some incoming messages in background
 	go publishMessages(publisher)
@@ -67,7 +69,7 @@ func Setup() {
 		subscriber,
 		"outgoing_messages_topic", // topic to which we will publish events
 		publisher,
-		structHandler{}.Handler,
+		HandlerFunc,
 	)
 
 	// Handler level middleware is only executed for a specific handler
@@ -75,7 +77,6 @@ func Setup() {
 	handler.AddMiddleware(func(h message.HandlerFunc) message.HandlerFunc {
 		return func(message *message.Message) ([]*message.Message, error) {
 			log.Println("executing handler specific middleware for ", message.UUID)
-
 			return h(message)
 		}
 	})
@@ -98,10 +99,7 @@ func Setup() {
 
 	// Now that all handlers are registered, we're running the Router.
 	// Run is blocking while the router is running.
-	ctx := context.Background()
-	if err := router.Run(ctx); err != nil {
-		panic(err)
-	}
+	return router.Run(ctx)
 }
 
 func publishMessages(publisher message.Publisher) {
@@ -112,7 +110,7 @@ func publishMessages(publisher message.Publisher) {
 		log.Printf("sending message %s, correlation id: %s\n", msg.UUID, middleware.MessageCorrelationID(msg))
 
 		if err := publisher.Publish("incoming_messages_topic", msg); err != nil {
-			panic(err)
+			return
 		}
 
 		time.Sleep(time.Second)
@@ -127,11 +125,7 @@ func printMessages(msg *message.Message) error {
 	return nil
 }
 
-type structHandler struct {
-	// we can add some dependencies here
-}
-
-func (s structHandler) Handler(msg *message.Message) ([]*message.Message, error) {
+func HandlerFunc(msg *message.Message) ([]*message.Message, error) {
 	log.Println("structHandler received message", msg.UUID)
 
 	msg = message.NewMessage(watermill.NewUUID(), []byte("message produced by structHandler"))
