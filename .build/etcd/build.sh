@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 # 官网地址 https://github.com/etcd-io/etcd/releases
-
-if [ ! -z $(docker images -q quay.io/coreos/etcd:v3.2.32) ]; then
+image=
+if [ -n "$(docker images -q quay.io/coreos/etcd:v3.2.32)" ]; then
   docker pull quay.io/coreos/etcd:v3.2.32
 fi
 

@@ -7,7 +7,6 @@ package etcdx
 import (
 	"context"
 	"crypto/tls"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"hash/fnv"
@@ -42,7 +41,7 @@ func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 		Option:   Option{},
 		register: make(map[string]uint64),
 		leases:   make(map[string]clientv3.LeaseID),
-		prefix:   "/crochee/micro/registry/",
+		prefix:   "/micro/registry/",
 	}
 	cf := clientv3.Config{
 		Endpoints: []string{"127.0.0.1:2379"},
@@ -97,7 +96,6 @@ func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 	return e, nil
 }
 
-// todo 集成etcd 服务注册 服务发现
 type etcdRegistry struct {
 	client *clientv3.Client
 	Option
@@ -196,10 +194,10 @@ func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceIn
 		if err != nil {
 			return err
 		}
+		e.client.GetLogger().Debug(fmt.Sprintf("Registering %s id %s with lease %v and leaseID %v and ttl %v",
+			service.Name, service.ID, lgr, lgr.ID, e.Option.TTl))
 	}
 
-	e.client.GetLogger().Debug(fmt.Sprintf("Registering %s id %s with lease %v and leaseID %v and ttl %v",
-		service.Name, service.ID, lgr, lgr.ID, e.Option.TTl))
 	// create an entry for the node
 	if lgr != nil {
 		_, err = e.client.Put(newCtx, e.nodePath(service.Name, service.ID),
@@ -268,8 +266,12 @@ func decode(ds []byte) *registry.ServiceInstance {
 }
 
 func Hash(value interface{}) (uint64, error) {
+	data, err := jsoniter.Marshal(value)
+	if err != nil {
+		return 0, err
+	}
 	w := fnv.New64()
-	if err := binary.Write(w, binary.LittleEndian, value); err != nil {
+	if _, err = w.Write(data); err != nil {
 		return 0, err
 	}
 	return w.Sum64(), nil

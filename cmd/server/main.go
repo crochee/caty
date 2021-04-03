@@ -86,6 +86,7 @@ func main() {
 		kratos.Server(httpSrv, grpcSrv),
 		kratos.Signal(syscall.SIGINT),
 		kratos.Registrar(etcd),
+		kratos.Logger(zapgrpc.NewLogger(requestLog.Logger)),
 	)
 	if err := app.Run(); err != nil {
 		logger.Fatal(err.Error())
