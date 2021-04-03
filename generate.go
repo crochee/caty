@@ -14,6 +14,7 @@ package main
 //go:generate golangci-lint run .\... -c golangci-lint.yml --tests=false –-out-format=json > golangci-lint.json 2>&1
 
 // todo 部署nginx
+// todo 集成es
 
 // API GATEWAY
 // https://github.com/fagongzi/manba

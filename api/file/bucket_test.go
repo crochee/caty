@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/json-iterator/go"
+	"github.com/stretchr/testify/assert"
 
 	"obs/config"
 	"obs/internal"
@@ -37,7 +38,11 @@ func TestCreateBucket(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Auth-Token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzX2F0IjoiMjAyMS0wMy0xNFQxNToxMToyMy42NDA3MDk1KzA4OjAwIiwidG9rZW4iOnsiZG9tYWluIjoiMTIzIiwidXNlciI6InRlc3QxMjMiLCJhY3Rpb25fbWFwIjp7Ik9CUyI6M319fQ.ZOX-KpOVeDhOV9qN4SWw5DWPDsl4LY1NrrXHv1yqNSU")
 	w := internal.PerformRequest(router, http.MethodPost, "/v1/bucket", body, header)
+
 	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
+
+	assert.Equal(t, w.Code, 200)
+
 }
 
 func TestHeadBucket(t *testing.T) {
