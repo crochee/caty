@@ -16,6 +16,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 )
 
+// todo self done
 func Setup(ctx context.Context) error {
 	logger := watermill.NewStdLogger(true, true)
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
@@ -65,6 +66,17 @@ func Setup(ctx context.Context) error {
 			},
 			Type: "fanout",
 		},
+		QueueBind: amqp.QueueBindConfig{
+			GenerateRoutingKey: func(topic string) string {
+				return ""
+			},
+		},
+		Publish: amqp.PublishConfig{
+			GenerateRoutingKey: func(topic string) string {
+				return ""
+			},
+		},
+		TopologyBuilder: &amqp.DefaultTopologyBuilder{},
 	}, logger); err != nil {
 		return err
 	}
@@ -85,6 +97,11 @@ func Setup(ctx context.Context) error {
 			},
 			Type: "fanout",
 		},
+		QueueBind: amqp.QueueBindConfig{
+			GenerateRoutingKey: func(topic string) string {
+				return ""
+			},
+		},
 		Queue: amqp.QueueConfig{
 			GenerateName: func(topic string) string {
 				return topic
@@ -95,6 +112,7 @@ func Setup(ctx context.Context) error {
 				PrefetchCount: 1,
 			},
 		},
+		TopologyBuilder: &amqp.DefaultTopologyBuilder{},
 	}, logger); err != nil {
 		return err
 	}
@@ -127,12 +145,15 @@ func Setup(ctx context.Context) error {
 	//	subscriber,
 	//	printMessages,
 	//)
-	var receiveChan <-chan *message.Message
-	if receiveChan, err = subscriber.Subscribe(ctx, "micro_topic"); err != nil {
-		return err
-	}
+
 	go func() {
-		for msg := range receiveChan {
+		for {
+			receiveChan, err := subscriber.Subscribe(ctx, "micro_topic")
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			msg := <-receiveChan
 			fmt.Printf(
 				"\n> Received message: %s\n> %s\n> metadata: %v\n\n",
 				msg.UUID, string(msg.Payload), msg.Metadata,
