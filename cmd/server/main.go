@@ -46,23 +46,21 @@ func main() {
 		httpx.WithLog(requestLog),
 		httpx.WithHandler(router.GinRun()),
 		httpx.WithBeforeStart(
-			func(ctx context.Context) {
+			func(ctx context.Context) error {
 				cron.Setup() // cron 初始化
+				return nil
 			},
-			func(ctx context.Context) {
-				if err := db.Setup(ctx); err != nil {
-					logger.Fatalf(err.Error())
-				}
+			func(ctx context.Context) error {
+				return db.Setup(ctx)
 			}),
 		httpx.WithAfterStop(
-			func(ctx context.Context) {
+			func(ctx context.Context) error {
 				cron.New().Stop() // 关闭定时器
+				return nil
 			},
-			func(ctx context.Context) {
+			func(ctx context.Context) error {
 				// 数据库关闭连接池
-				if err := db.Close(); err != nil {
-					logger.Errorf("db forced to shutdown:%v", err)
-				}
+				return db.Close()
 			},
 		),
 	)
@@ -74,7 +72,9 @@ func main() {
 	if err := message.Setup(ctx); err != nil {
 		logger.Fatal(err.Error())
 	}
-	etcd, err := etcdx.NewEtcdRegistry()
+	etcd, err := etcdx.NewEtcdRegistry(func(option *etcdx.Option) {
+		option.Context = ctx
+	})
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -87,7 +87,7 @@ func main() {
 		kratos.Name(cmd.ServiceName),
 		kratos.Version(cmd.Version),
 		kratos.Server(httpSrv, grpcSrv),
-		kratos.Signal(syscall.SIGINT),
+		kratos.Signal(syscall.SIGINT, syscall.SIGTERM),
 		kratos.Registrar(etcd),
 		kratos.Logger(zapgrpc.NewLogger(requestLog.Logger)),
 	)

@@ -24,7 +24,7 @@ import (
 )
 
 type Option struct {
-	pre       string
+	Prefix    string
 	AddrList  []string
 	Timeout   time.Duration
 	Secure    bool
@@ -38,10 +38,12 @@ type Option struct {
 
 func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 	e := &etcdRegistry{
-		Option:   Option{},
+		Option: Option{
+			Prefix:  "/micro/registry/",
+			Context: context.Background(),
+		},
 		register: make(map[string]uint64),
 		leases:   make(map[string]clientv3.LeaseID),
-		prefix:   "/micro/registry/",
 	}
 	cf := clientv3.Config{
 		Endpoints: []string{"127.0.0.1:2379"},
@@ -50,6 +52,7 @@ func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 	for _, opt := range opts {
 		opt(&e.Option)
 	}
+	cf.Context = e.Option.Context
 
 	if e.Option.Timeout == 0 {
 		e.Option.Timeout = 5 * time.Second
@@ -102,7 +105,6 @@ type etcdRegistry struct {
 	sync.RWMutex
 	register map[string]uint64
 	leases   map[string]clientv3.LeaseID
-	prefix   string
 }
 
 func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceInstance) error {
@@ -148,7 +150,6 @@ func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceIn
 				e.leases[service.Name+service.ID] = leaseID
 				e.register[service.Name+service.ID] = h
 				e.Unlock()
-
 				break
 			}
 		}
@@ -247,11 +248,11 @@ func (e *etcdRegistry) Deregister(ctx context.Context, service *registry.Service
 func (e *etcdRegistry) nodePath(s, id string) string {
 	service := strings.Replace(s, "/", "-", -1)
 	node := strings.Replace(id, "/", "-", -1)
-	return path.Join(e.prefix, service, node)
+	return path.Join(e.Option.Prefix, service, node)
 }
 
 func (e *etcdRegistry) servicePath(s string) string {
-	return path.Join(e.prefix, strings.Replace(s, "/", "-", -1))
+	return path.Join(e.Option.Prefix, strings.Replace(s, "/", "-", -1))
 }
 
 func encode(s *registry.ServiceInstance) string {

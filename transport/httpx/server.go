@@ -24,8 +24,8 @@ type (
 		ctx         context.Context
 		logger      logger.Builder
 		handler     http.Handler
-		beforeStart []func(ctx context.Context)
-		afterStop   []func(ctx context.Context)
+		beforeStart []func(ctx context.Context) error
+		afterStop   []func(ctx context.Context) error
 
 		shutdownDelayTimeout time.Duration
 		readTimeout          time.Duration
@@ -40,8 +40,8 @@ type (
 		ctx                  context.Context
 		logger               logger.Builder
 		sigList              []os.Signal
-		beforeStart          []func(ctx context.Context)
-		afterStop            []func(ctx context.Context)
+		beforeStart          []func(ctx context.Context) error
+		afterStop            []func(ctx context.Context) error
 		shutdownDelayTimeout time.Duration
 	}
 )
@@ -70,13 +70,13 @@ func WithShutdownDelayTimeout(t time.Duration) func(*Option) {
 	}
 }
 
-func WithBeforeStart(beforeStart ...func(ctx context.Context)) func(*Option) {
+func WithBeforeStart(beforeStart ...func(ctx context.Context) error) func(*Option) {
 	return func(opt *Option) {
 		opt.beforeStart = beforeStart
 	}
 }
 
-func WithAfterStop(afterStop ...func(ctx context.Context)) func(*Option) {
+func WithAfterStop(afterStop ...func(ctx context.Context) error) func(*Option) {
 	return func(opt *Option) {
 		opt.afterStop = afterStop
 	}
@@ -130,7 +130,9 @@ func (s *Server) Endpoint() (string, error) {
 
 func (s *Server) Start() error {
 	for _, f := range s.beforeStart {
-		f(s.ctx)
+		if err := f(s.ctx); err != nil {
+			return err
+		}
 	}
 	go func() {
 		s.logger.Info("http server running...")
@@ -148,9 +150,10 @@ func (s *Server) Stop() error {
 	)
 	if s.shutdownDelayTimeout != 0 {
 		ctx, cancel = context.WithTimeout(s.ctx, s.shutdownDelayTimeout)
-		defer cancel()
+	} else {
+		ctx, cancel = context.WithCancel(s.ctx)
 	}
-
+	defer cancel()
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
 	if err := s.Server.Shutdown(ctx); err != nil {
@@ -158,7 +161,9 @@ func (s *Server) Stop() error {
 	}
 
 	for _, f := range s.afterStop {
-		f(ctx)
+		if err := f(ctx); err != nil {
+			s.logger.Errorf(err.Error())
+		}
 	}
 	return nil
 }
