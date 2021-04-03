@@ -14,7 +14,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 )
 
 func Setup(ctx context.Context) error {
@@ -26,7 +25,7 @@ func Setup(ctx context.Context) error {
 
 	// SignalsHandler will gracefully shutdown Router when SIGTERM is received.
 	// You can also close the router by just calling `r.Close()`.
-	router.AddPlugin(plugin.SignalsHandler)
+	//router.AddPlugin(plugin.SignalsHandler)
 
 	// Router level middleware are executed for every message sent to the router
 	router.AddMiddleware(
@@ -50,52 +49,103 @@ func Setup(ctx context.Context) error {
 	// You can replace it with any Pub/Sub implementation, it will work the same.
 	//pubSub := gochannel.NewGoChannel(gochannel.Config{}, logger)
 	var publisher *amqp.Publisher
-	if publisher, err = amqp.NewPublisher(amqp.NewNonDurableQueueConfig(
-		"amqp://admin:1234567@192.168.31.62:5672/"), logger); err != nil {
+	if publisher, err = amqp.NewPublisher(amqp.Config{
+		Connection: amqp.ConnectionConfig{
+			AmqpURI: "amqp://admin:1234567@192.168.31.62:5672/",
+		},
+		Marshaler: amqp.DefaultMarshaler{NotPersistentDeliveryMode: true},
+		Exchange: amqp.ExchangeConfig{
+			GenerateName: func(topic string) string {
+				switch topic {
+				case "micro_topic":
+					return "micro"
+				default:
+					return ""
+				}
+			},
+			Type: "fanout",
+		},
+	}, logger); err != nil {
 		return err
 	}
 	var subscriber *amqp.Subscriber
-	if subscriber, err = amqp.NewSubscriber(amqp.NewNonDurableQueueConfig(
-		"amqp://admin:1234567@192.168.31.62:5672/"), logger); err != nil {
+	if subscriber, err = amqp.NewSubscriber(amqp.Config{
+		Connection: amqp.ConnectionConfig{
+			AmqpURI: "amqp://admin:1234567@192.168.31.62:5672/",
+		},
+		Marshaler: amqp.DefaultMarshaler{NotPersistentDeliveryMode: true},
+		Exchange: amqp.ExchangeConfig{
+			GenerateName: func(topic string) string {
+				switch topic {
+				case "micro_topic":
+					return "micro"
+				default:
+					return ""
+				}
+			},
+			Type: "fanout",
+		},
+		Queue: amqp.QueueConfig{
+			GenerateName: func(topic string) string {
+				return topic
+			},
+		},
+		Consume: amqp.ConsumeConfig{
+			Qos: amqp.QosConfig{
+				PrefetchCount: 1,
+			},
+		},
+	}, logger); err != nil {
 		return err
 	}
 	// Producing some incoming messages in background
 	go publishMessages(publisher)
 
 	// AddHandler returns a handler which can be used to add handler level middleware
-	handler := router.AddHandler(
-		"struct_handler",          // handler name, must be unique
-		"incoming_messages_topic", // topic from which we will read events
-		subscriber,
-		"outgoing_messages_topic", // topic to which we will publish events
-		publisher,
-		HandlerFunc,
-	)
+	//handler := router.AddHandler(
+	//	"handler",        // handler name, must be unique
+	//	"sub_read_topic", // topic from which we will read events
+	//	subscriber,
+	//	"pub_write_topic", // topic to which we will publish events
+	//	publisher,
+	//	HandlerFunc,
+	//)
 
 	// Handler level middleware is only executed for a specific handler
 	// Such middleware can be added the same way the router level ones
-	handler.AddMiddleware(func(h message.HandlerFunc) message.HandlerFunc {
-		return func(message *message.Message) ([]*message.Message, error) {
-			log.Println("executing handler specific middleware for ", message.UUID)
-			return h(message)
-		}
-	})
+	//handler.AddMiddleware(func(h message.HandlerFunc) message.HandlerFunc {
+	//	return func(message *message.Message) ([]*message.Message, error) {
+	//		log.Println("executing handler specific middleware for ", message.UUID)
+	//		return h(message)
+	//	}
+	//})
 
 	// just for debug, we are printing all messages received on `incoming_messages_topic`
-	router.AddNoPublisherHandler(
-		"print_incoming_messages",
-		"incoming_messages_topic",
-		subscriber,
-		printMessages,
-	)
-
+	//router.AddNoPublisherHandler(
+	//	"print_incoming_messages",
+	//	"incoming_messages_topic",
+	//	subscriber,
+	//	printMessages,
+	//)
+	var receiveChan <-chan *message.Message
+	if receiveChan, err = subscriber.Subscribe(ctx, "micro_topic"); err != nil {
+		return err
+	}
+	go func() {
+		for msg := range receiveChan {
+			fmt.Printf(
+				"\n> Received message: %s\n> %s\n> metadata: %v\n\n",
+				msg.UUID, string(msg.Payload), msg.Metadata,
+			)
+		}
+	}()
 	// just for debug, we are printing all events sent to `outgoing_messages_topic`
-	router.AddNoPublisherHandler(
-		"print_outgoing_messages",
-		"outgoing_messages_topic",
-		subscriber,
-		printMessages,
-	)
+	//router.AddNoPublisherHandler(
+	//	"print_outgoing_messages",
+	//	"outgoing_messages_topic",
+	//	subscriber,
+	//	printMessages,
+	//)
 
 	// Now that all handlers are registered, we're running the Router.
 	// Run is blocking while the router is running.
@@ -109,7 +159,7 @@ func publishMessages(publisher message.Publisher) {
 
 		log.Printf("sending message %s, correlation id: %s\n", msg.UUID, middleware.MessageCorrelationID(msg))
 
-		if err := publisher.Publish("incoming_messages_topic", msg); err != nil {
+		if err := publisher.Publish("micro_topic", msg); err != nil {
 			return
 		}
 

@@ -39,20 +39,22 @@ type Option struct {
 func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 	e := &etcdRegistry{
 		Option: Option{
-			Prefix:  "/micro/registry/",
-			Context: context.Background(),
+			Prefix: "/micro/registry/",
 		},
 		register: make(map[string]uint64),
 		leases:   make(map[string]clientv3.LeaseID),
 	}
 	cf := clientv3.Config{
 		Endpoints: []string{"127.0.0.1:2379"},
+		Context:   context.Background(),
 	}
 
 	for _, opt := range opts {
 		opt(&e.Option)
 	}
-	cf.Context = e.Option.Context
+	if e.Option.Context != nil {
+		cf.Context = e.Option.Context
+	}
 
 	if e.Option.Timeout == 0 {
 		e.Option.Timeout = 5 * time.Second
