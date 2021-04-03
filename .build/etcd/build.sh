@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 # 官网地址 https://github.com/etcd-io/etcd/releases
+
+if [ ! -z $(docker images -q quay.io/coreos/etcd:v3.2.32) ]; then
+  docker pull quay.io/coreos/etcd:v3.2.32
+fi
+
 TOKEN=etcd-cluster-k8s-micro-token
 CLUSTER_STATE=new
 NAME_1=etcd_node0
@@ -8,7 +13,6 @@ HOST_1=0.0.0.0
 CLUSTER=${NAME_1}=http://${HOST_1}:2380
 
 rm -rf /home/lcf/cloud/etcd/tmp/etcd-data.tmp && mkdir -p /home/lcf/cloud/etcd/tmp/etcd-data.tmp && \
-docker rmi quay.io/coreos/etcd:v3.2.32 || true && \
 docker run \
 -itd \
 -p 2379:2379 \
