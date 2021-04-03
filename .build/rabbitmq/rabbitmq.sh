@@ -8,7 +8,7 @@ fi
 
 RABBITMQ_NAME=rabbitmq_node_0
 RABBITMQ_DIR=/home/lcf/cloud/rabbitmq
-rm -rf ${RABBITMQ_DIR} && mkdir -p ${RABBITMQ_DIR}/hosts
+rm -rf ${RABBITMQ_DIR} && mkdir -p ${RABBITMQ_DIR}
 docker run -d \
 --net host \
 --hostname ${RABBITMQ_NAME} \
