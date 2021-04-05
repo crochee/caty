@@ -18,15 +18,6 @@ import (
 	"obs/model/mongox"
 )
 
-type Builder interface {
-	Debugf(format string, v ...interface{})
-	Debug(message string)
-	Infof(format string, v ...interface{})
-	Info(message string)
-	Errorf(format string, v ...interface{})
-	Error(message string)
-}
-
 const (
 	DefaultLogSizeM int = 20
 	DefaultMaxZip   int = 50
@@ -77,9 +68,6 @@ type Logger struct {
 // @param: format 格式信息
 // @param: v 参数信息
 func (l *Logger) Debugf(format string, v ...interface{}) {
-	if l == nil {
-		return
-	}
 	l.LoggerSugar.Debugf(format, v...)
 }
 
@@ -87,9 +75,6 @@ func (l *Logger) Debugf(format string, v ...interface{}) {
 //
 // @param: message 格式信息
 func (l *Logger) Debug(message string) {
-	if l == nil {
-		return
-	}
 	l.Logger.Debug(message)
 }
 
@@ -98,9 +83,6 @@ func (l *Logger) Debug(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func (l *Logger) Infof(format string, v ...interface{}) {
-	if l == nil {
-		return
-	}
 	l.LoggerSugar.Infof(format, v...)
 }
 
@@ -108,9 +90,6 @@ func (l *Logger) Infof(format string, v ...interface{}) {
 //
 // @param: message 格式信息
 func (l *Logger) Info(message string) {
-	if l == nil {
-		return
-	}
 	l.Logger.Info(message)
 }
 
@@ -119,9 +98,6 @@ func (l *Logger) Info(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func (l *Logger) Errorf(format string, v ...interface{}) {
-	if l == nil {
-		return
-	}
 	l.LoggerSugar.Errorf(format, v...)
 }
 
@@ -129,8 +105,5 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 //
 // @param: message 信息
 func (l *Logger) Error(message string) {
-	if l == nil {
-		return
-	}
 	l.Logger.Error(message)
 }

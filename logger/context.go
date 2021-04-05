@@ -17,7 +17,7 @@ func With(ctx context.Context, log Builder) context.Context {
 func FromContext(ctx context.Context) Builder {
 	l, ok := ctx.Value(loggerKey{}).(Builder)
 	if !ok {
-		return nil
+		return NopLogger{}
 	}
 	return l
 }
