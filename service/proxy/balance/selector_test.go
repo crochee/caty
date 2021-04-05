@@ -37,3 +37,32 @@ func TestWeightRoundRobin_Next(t *testing.T) {
 		t.Logf("%+v", node)
 	}
 }
+
+func BenchmarkWeightRoundRobin_Next(b *testing.B) {
+	wr := &WeightRoundRobin{
+		list: []*WeightNode{
+			{
+				Node: &Node{
+					Endpoints: "1",
+					Weight:    3,
+				},
+			},
+			{
+				Node: &Node{
+					Endpoints: "2",
+					Weight:    1,
+				},
+			},
+			{
+				Node: &Node{
+					Endpoints: "3",
+					Weight:    1,
+				},
+			},
+		},
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		wr.Next()
+	}
+}

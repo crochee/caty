@@ -23,7 +23,7 @@ import (
 	"obs/model/db"
 	"obs/model/etcdx"
 	"obs/router"
-	"obs/transport/httpx"
+	"obs/service/transport/httpx"
 )
 
 var configFile = flag.String("f", "./conf/config.yml", "the config file")
