@@ -16,10 +16,12 @@ import (
 type etcdWatcher struct {
 	watchChan clientv3.WatchChan
 	cancel    context.CancelFunc
+	ctx       context.Context
 }
 
 func (e *etcdWatcher) Next() ([]*registry.ServiceInstance, error) {
-	for resp := range e.watchChan {
+	select {
+	case resp := <-e.watchChan: // todo 优化
 		if resp.Err() != nil {
 			return nil, resp.Err()
 		}
@@ -49,8 +51,10 @@ func (e *etcdWatcher) Next() ([]*registry.ServiceInstance, error) {
 			}
 			serviceList = append(serviceList, service)
 		}
+		return serviceList, nil
+	case <-e.ctx.Done():
+		return nil, e.ctx.Err()
 	}
-	return nil, errors.New("could not get next")
 }
 
 func (e *etcdWatcher) Stop() error {
@@ -62,6 +66,7 @@ func newEtcdWatcher(ctx context.Context, r *etcdRegistry, key string) registry.W
 	newCtx, cancel := context.WithCancel(ctx)
 	return &etcdWatcher{
 		cancel:    cancel,
+		ctx:       newCtx,
 		watchChan: r.client.Watch(newCtx, key, clientv3.WithPrefix(), clientv3.WithPrevKV()),
 	}
 }
