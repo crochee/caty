@@ -18,7 +18,7 @@ import (
 	"obs/internal"
 	"obs/logger"
 	"obs/model/db"
-	"obs/service/tokenx"
+	"obs/service/business/tokenx"
 )
 
 // CreateBucket 创建桶

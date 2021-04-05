@@ -20,7 +20,7 @@ import (
 	"obs/e"
 	"obs/logger"
 	"obs/model/db"
-	"obs/service/tokenx"
+	"obs/service/business/tokenx"
 )
 
 // UploadFile 上传文件

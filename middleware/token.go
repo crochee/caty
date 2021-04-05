@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"obs/logger"
-	"obs/service/tokenx"
+	"obs/service/business/tokenx"
 )
 
 // Token add trace_id

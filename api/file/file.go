@@ -20,8 +20,8 @@ import (
 	"obs/e"
 	"obs/logger"
 	"obs/model/db"
-	"obs/service/bucket"
-	"obs/service/tokenx"
+	"obs/service/business/bucket"
+	"obs/service/business/tokenx"
 )
 
 // UploadFile godoc

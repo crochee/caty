@@ -15,7 +15,7 @@ import (
 	"obs/e"
 	"obs/logger"
 	"obs/model/db"
-	"obs/service/tokenx"
+	"obs/service/business/tokenx"
 )
 
 // UserLogin 登录生成token信息

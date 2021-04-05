@@ -16,8 +16,8 @@ import (
 	"obs/internal"
 	"obs/logger"
 	"obs/model/db"
-	"obs/service/tokenx"
-	"obs/service/userx"
+	"obs/service/business/tokenx"
+	"obs/service/business/userx"
 )
 
 // Register godoc
