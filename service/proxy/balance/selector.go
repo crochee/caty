@@ -54,3 +54,29 @@ func (r *RoundRobin) Next() (*Node, error) {
 	r.randIndex++
 	return node, nil
 }
+
+type WeightNode struct {
+	*Node
+	currentWeight int //当前权重
+}
+
+type WeightRoundRobin struct {
+	list []*WeightNode
+}
+
+func (w *WeightRoundRobin) Next() (*Node, error) {
+	var best *WeightNode
+	var total int
+	for _, node := range w.list {
+		node.currentWeight += node.Weight // 将当前权重与有效权重相加
+		total += node.Weight              //累加总权重
+		if best == nil || node.currentWeight > best.currentWeight {
+			best = node
+		}
+	}
+	if best == nil {
+		return nil, ErrNoneAvailable
+	}
+	best.currentWeight -= total //将当前权重改为当前权重-总权重
+	return best.Node, nil
+}

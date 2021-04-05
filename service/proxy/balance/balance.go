@@ -11,7 +11,7 @@ type Node struct {
 	Version   string            `json:"version"`
 	Metadata  map[string]string `json:"metadata"`
 	Endpoints string            `json:"endpoint"`
-	Weight    float64           `json:"weight"`
+	Weight    int               `json:"weight"`
 }
 
 // Selector strategy algorithm
