@@ -5,11 +5,13 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"math"
 	"net/http"
-	"obs/internal"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"obs/internal"
 )
 
 const abortIndex int8 = math.MaxInt8 / 2 // 中间件最大数+1

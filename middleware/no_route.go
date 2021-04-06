@@ -5,9 +5,11 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"obs/e"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"obs/e"
 )
 
 // NoRoute 404
