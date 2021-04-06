@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-// todo 加权轮询
-
 var ErrNoneAvailable = errors.New("none available")
 
 func init() {
