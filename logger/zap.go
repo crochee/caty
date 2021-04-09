@@ -14,16 +14,16 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type Encoder func(zapcore.EncoderConfig) zapcore.Encoder
+type encoder func(zapcore.EncoderConfig) zapcore.Encoder
 
-func NewZap(level string, encoderFunc Encoder, w io.Writer, fields ...zap.Field) *zap.Logger {
+func newZap(level string, encoderFunc encoder, skip int, w io.Writer, fields ...zap.Field) *zap.Logger {
 	core := zapcore.NewCore(
 		encoderFunc(newEncoderConfig()),
 		zap.CombineWriteSyncers(zapcore.AddSync(w)),
 		newLevel(level),
-	).With(fields) //自带node 信息
-	//大于error增加堆栈信息
-	return zap.New(core).WithOptions(zap.AddCaller(), zap.AddCallerSkip(1),
+	).With(fields) // 自带node 信息
+	// 大于error增加堆栈信息
+	return zap.New(core).WithOptions(zap.AddCaller(), zap.AddCallerSkip(skip),
 		zap.AddStacktrace(zapcore.DPanicLevel))
 }
 

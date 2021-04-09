@@ -46,21 +46,43 @@ func SetLoggerWriter(path string) io.Writer {
 	}
 }
 
+type Option struct {
+	Path  string
+	Level string
+	Skip  int
+}
+
 // NewLogger 初始化日志对象
 //
 // @param: path 日志路径
 // @param: level 日志等级
-func NewLogger(path, level string) *Logger {
-	logger := &Logger{
-		Logger: NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path)),
+func NewLogger(opts ...func(*Option)) *Logger {
+	l := &Logger{
+		Option: Option{
+			Path:  "",
+			Level: "INFO",
+			Skip:  1,
+		},
 	}
-	logger.LoggerSugar = logger.Logger.Sugar()
-	return logger
+	for _, opt := range opts {
+		opt(&l.Option)
+	}
+	var encode encoder
+	if l.Option.Path == "" {
+		encode = zapcore.NewConsoleEncoder
+	} else {
+		encode = zapcore.NewJSONEncoder
+	}
+	l.Logger = newZap(l.Option.Level, encode, l.Option.Skip, SetLoggerWriter(l.Option.Path))
+	l.LoggerSugar = l.Logger.Sugar()
+
+	return l
 }
 
 type Logger struct {
 	Logger      *zap.Logger
 	LoggerSugar *zap.SugaredLogger
+	Option
 }
 
 // Debugf 打印Debug信息
@@ -106,4 +128,28 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 // @param: message 信息
 func (l *Logger) Error(message string) {
 	l.Logger.Error(message)
+}
+
+// Fatalf 打印Fatalf信息
+//
+// @param: format 格式信息
+// @param: v 参数信息
+func (l *Logger) Fatalf(format string, v ...interface{}) {
+	l.LoggerSugar.Errorf(format, v...)
+}
+
+// Fatal 打印Fatal信息
+//
+// @param: message 信息
+func (l *Logger) Fatal(message string) {
+	l.Logger.Error(message)
+}
+
+func (l *Logger) Sync() error {
+	err := l.Logger.Sync()
+	err1 := l.LoggerSugar.Sync()
+	if err1 != nil {
+		err = err1
+	}
+	return err
 }

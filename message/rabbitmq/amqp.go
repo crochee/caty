@@ -30,7 +30,7 @@ type RabbitMq struct {
 func NewMq(opts ...func(*Option)) (*RabbitMq, error) {
 	r := &RabbitMq{
 		Option: Option{
-			Logger:  logger.NopLogger{},
+			Logger:  logger.NoLogger{},
 			AmqpURI: "amqp://guest:guest@localhost:5672/",
 		},
 	}

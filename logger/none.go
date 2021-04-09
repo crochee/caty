@@ -11,25 +11,38 @@ type Builder interface {
 	Info(message string)
 	Errorf(format string, v ...interface{})
 	Error(message string)
+	Fatalf(format string, v ...interface{})
+	Fatal(message string)
+	Sync() error
 }
 
-type NopLogger struct {
+type NoLogger struct {
 }
 
-func (n NopLogger) Debugf(format string, v ...interface{}) {
+func (n NoLogger) Debugf(string, ...interface{}) {
 }
 
-func (n NopLogger) Debug(message string) {
+func (n NoLogger) Debug(string) {
 }
 
-func (n NopLogger) Infof(format string, v ...interface{}) {
+func (n NoLogger) Infof(string, ...interface{}) {
 }
 
-func (n NopLogger) Info(message string) {
+func (n NoLogger) Info(string) {
 }
 
-func (n NopLogger) Errorf(format string, v ...interface{}) {
+func (n NoLogger) Errorf(string, ...interface{}) {
 }
 
-func (n NopLogger) Error(message string) {
+func (n NoLogger) Error(string) {
+}
+
+func (n NoLogger) Fatalf(string, ...interface{}) {
+}
+
+func (n NoLogger) Fatal(string) {
+}
+
+func (n NoLogger) Sync() error {
+	return nil
 }

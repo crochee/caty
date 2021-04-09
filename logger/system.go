@@ -4,23 +4,19 @@
 
 package logger
 
-import (
-	"os"
+import "os"
 
-	"go.uber.org/zap/zapcore"
-)
-
-var systemLogger *Logger
+var systemLogger Builder = NoLogger{}
 
 // InitSystemLogger 初始化系统级日志对象
 //
 // @param: path 日志路径
 // @param: level 日志等级
-func InitSystemLogger(path, level string) {
-	systemLogger = &Logger{
-		Logger: NewZap(level, zapcore.NewJSONEncoder, SetLoggerWriter(path)),
-	}
-	systemLogger.LoggerSugar = systemLogger.Logger.Sugar()
+func InitSystemLogger(opts ...func(*Option)) {
+	opts = append(opts, func(option *Option) {
+		option.Skip = 2
+	})
+	systemLogger = NewLogger(opts...)
 }
 
 // Debugf 打印Debug信息
@@ -28,18 +24,14 @@ func InitSystemLogger(path, level string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func Debugf(format string, v ...interface{}) {
-	if systemLogger != nil {
-		systemLogger.LoggerSugar.Debugf(format, v...)
-	}
+	systemLogger.Debugf(format, v...)
 }
 
 // Debug 打印Debug信息
 //
 // @param: message 信息
 func Debug(message string) {
-	if systemLogger != nil {
-		systemLogger.Logger.Debug(message)
-	}
+	systemLogger.Debug(message)
 }
 
 // Infof 打印Info信息
@@ -47,18 +39,15 @@ func Debug(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func Infof(format string, v ...interface{}) {
-	if systemLogger != nil {
-		systemLogger.LoggerSugar.Infof(format, v...)
-	}
+	systemLogger.Infof(format, v...)
+
 }
 
 // Info 打印Info信息
 //
 // @param: message 信息
 func Info(message string) {
-	if systemLogger != nil {
-		systemLogger.Logger.Info(message)
-	}
+	systemLogger.Info(message)
 }
 
 // Errorf 打印Error信息
@@ -66,18 +55,14 @@ func Info(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func Errorf(format string, v ...interface{}) {
-	if systemLogger != nil {
-		systemLogger.LoggerSugar.Errorf(format, v...)
-	}
+	systemLogger.Errorf(format, v...)
 }
 
 // Error 打印Error信息
 //
 // @param: message 信息
 func Error(message string) {
-	if systemLogger != nil {
-		systemLogger.Logger.Error(message)
-	}
+	systemLogger.Error(message)
 }
 
 // Fatalf 打印Fatal信息
@@ -85,28 +70,21 @@ func Error(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func Fatalf(format string, v ...interface{}) {
-	if systemLogger != nil {
-		systemLogger.LoggerSugar.Fatalf(format, v...)
-	}
+	systemLogger.Fatalf(format, v...)
 }
 
 // Fatal 打印Fatal信息
 //
 // @param: message 信息
 func Fatal(message string) {
-	if systemLogger != nil {
-		systemLogger.Logger.Fatal(message)
-	}
+	systemLogger.Fatal(message)
 }
 
 // Exit 打印系统退出信息
 //
 // @param: message 信息
 func Exit(message string) {
-	if systemLogger != nil {
-		systemLogger.Logger.Info(message)
-		_ = systemLogger.Logger.Sync()
-		_ = systemLogger.LoggerSugar.Sync()
-	}
+	systemLogger.Info(message)
+	_ = systemLogger.Sync()
 	os.Exit(1)
 }

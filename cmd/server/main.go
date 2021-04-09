@@ -36,11 +36,15 @@ func main() {
 	// 初始化配置
 	config.InitConfig(*configFile)
 	// 初始化系统日志
-	logger.InitSystemLogger(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
-		config.Cfg.ServiceConfig.ServiceInfo.LogLevel)
+	pathFunc := func(option *logger.Option) {
+		option.Path = config.Cfg.ServiceConfig.ServiceInfo.LogPath
+	}
+	levelFunc := func(option *logger.Option) {
+		option.Path = config.Cfg.ServiceConfig.ServiceInfo.LogLevel
+	}
+	logger.InitSystemLogger(pathFunc, levelFunc)
 	// 初始化请求日志
-	requestLog := logger.NewLogger(config.Cfg.ServiceConfig.ServiceInfo.LogPath,
-		config.Cfg.ServiceConfig.ServiceInfo.LogLevel)
+	requestLog := logger.NewLogger(pathFunc, levelFunc)
 	httpSrv := httpx.New(":8150",
 		httpx.WithContext(ctx),
 		httpx.WithLog(requestLog),
