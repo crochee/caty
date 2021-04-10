@@ -28,7 +28,7 @@ func Setup(ctx context.Context) error {
 	conn, err := rabbitmq.NewMq(func(option *rabbitmq.Option) {
 		option.AmqpURI = "amqp://admin:1234567@192.168.31.62:5672/"
 	}, func(option *rabbitmq.Option) {
-		option.Logger = logger.NewLogger("", "DEBUG")
+		option.Logger = logger.NewLogger()
 	})
 	if err != nil {
 		return err

@@ -9,7 +9,7 @@ require (
 	github.com/crochee/uid v1.0.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/pprof v1.3.0
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.1
 	github.com/go-kratos/kratos/v2 v2.0.0-beta3
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/json-iterator/go v1.1.10
