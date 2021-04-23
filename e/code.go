@@ -372,3 +372,21 @@ func (n notAllow) English() string {
 func (n notAllow) Chinese() string {
 	return "不允许该方法"
 }
+
+type success struct{}
+
+func (s success) String() string {
+	return "OBS.00021"
+}
+
+func (s success) Status() int {
+	return http.StatusOK
+}
+
+func (s success) English() string {
+	return "success"
+}
+
+func (s success) Chinese() string {
+	return "成功"
+}

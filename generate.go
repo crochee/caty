@@ -11,8 +11,8 @@ package main
 //go:generate gosec -fmt=json -out=results.json .\...
 
 //go:generate go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0
-//go:generate golangci-lint run .\... -c golangci-lint.yml --tests=false –-out-format=json > golangci-lint.json 2>&1
 
+//go:generate go test -cover .\...
 // todo 部署nginx
 // todo 集成es
 

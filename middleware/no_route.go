@@ -5,8 +5,6 @@
 package middleware
 
 import (
-	"strings"
-
 	"github.com/gin-gonic/gin"
 
 	"obs/e"
@@ -14,13 +12,5 @@ import (
 
 // NoRoute 404
 func NoRoute(ctx *gin.Context) {
-	resp := &e.ErrorResponse{
-		Code:    e.NotFound.String(),
-		Message: e.NotFound.English(),
-		Extra:   "not route",
-	}
-	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
-		resp.Message = e.NotFound.Chinese()
-	}
-	ctx.JSON(e.NotFound.Status(), resp)
+	e.Error(ctx, e.NotFound)
 }

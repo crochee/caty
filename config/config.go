@@ -6,12 +6,13 @@ package config
 
 import (
 	"fmt"
-	"obs/internal/host"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
+	"obs/internal/host"
 )
 
 // Cfg 全局配置参数

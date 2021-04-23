@@ -25,4 +25,5 @@ var (
 	MarshalFail        = marshal{}
 	UnmarshalFail      = unmarshal{}
 	MethodNotAllow     = notAllow{}
+	Success            = success{}
 )

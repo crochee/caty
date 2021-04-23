@@ -7,17 +7,17 @@
 package middleware
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"net/http/httputil"
 	"os"
-	"runtime/debug"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 
 	"obs/e"
+	"obs/internal"
 	"obs/logger"
 )
 
@@ -33,20 +33,26 @@ func Recovery(ctx *gin.Context) {
 						strings.Contains(strings.ToLower(se.Error()), "connection reset by peer")
 				}
 			}
-			httpRequest, _ := httputil.DumpRequest(ctx.Request, false)
-			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s", httpRequest, r, debug.Stack())
-			resp := &e.ErrorResponse{
-				Code:    e.Recovery.String(),
-				Message: e.Recovery.English(),
-				Extra:   fmt.Sprint(r),
+			newCtx := ctx.Request.Context()
+			httpRequest, err := httputil.DumpRequest(ctx.Request, false)
+			if err != nil {
+				logger.FromContext(newCtx).Error(err.Error())
 			}
-			if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
-				resp.Message = e.Recovery.Chinese()
+			headers := strings.Split(string(httpRequest), "\r\n")
+			for idx, header := range headers {
+				current := strings.Split(header, ":")
+				if current[0] == "Authorization" { // 数据脱敏
+					headers[idx] = current[0] + ": *"
+				}
 			}
+			headersToStr := strings.Join(headers, "\r\n")
+			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s",
+				headersToStr, r, internal.Stack(3))
+			extra := fmt.Sprint(err)
 			if brokenPipe {
-				resp.Extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", r)
+				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", err)
 			}
-			ctx.AbortWithStatusJSON(e.Recovery.Status(), resp)
+			e.AbortWith(ctx, e.Recovery, extra)
 		}
 	}()
 	ctx.Next()
