@@ -8,13 +8,13 @@ import "context"
 
 type loggerKey struct{}
 
-// With Adds fields.
-func With(ctx context.Context, log Builder) context.Context {
+// NewContext Adds fields.
+func NewContext(ctx context.Context, log Builder) context.Context {
 	return context.WithValue(ctx, loggerKey{}, log)
 }
 
-// FromContext Gets the logger from context.
-func FromContext(ctx context.Context) Builder {
+// WithContext Gets the logger from context.
+func WithContext(ctx context.Context) Builder {
 	l, ok := ctx.Value(loggerKey{}).(Builder)
 	if !ok {
 		return NoLogger{}

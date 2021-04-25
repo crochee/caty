@@ -107,7 +107,7 @@ func New(addr string, opts ...func(*Option)) *Server {
 			if option.logger == nil {
 				return option.ctx
 			}
-			return logger.With(ctx, option.logger)
+			return logger.NewContext(ctx, option.logger)
 		},
 	}
 	return &Server{

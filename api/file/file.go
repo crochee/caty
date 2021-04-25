@@ -41,13 +41,13 @@ import (
 func UploadFile(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logger.WithContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
 	var fileInfo Info
 	if err := ctx.ShouldBindWith(&fileInfo, binding.FormMultipart); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		logger.WithContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
@@ -84,7 +84,7 @@ func UploadFile(ctx *gin.Context) {
 func DeleteFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logger.WithContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -121,7 +121,7 @@ func DeleteFile(ctx *gin.Context) {
 func SignFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logger.WithContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -161,7 +161,7 @@ func SignFile(ctx *gin.Context) {
 func DownloadFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logger.WithContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -184,7 +184,7 @@ func DownloadFile(ctx *gin.Context) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}
@@ -195,7 +195,7 @@ func DownloadFile(ctx *gin.Context) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}

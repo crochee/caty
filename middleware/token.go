@@ -18,13 +18,13 @@ import (
 func Token(ctx *gin.Context) {
 	xAuthToken, err := queryToken(ctx)
 	if err != nil { // 缺少token 禁止访问
-		logger.FromContext(ctx.Request.Context()).Error(err.Error())
+		logger.WithContext(ctx.Request.Context()).Error(err.Error())
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	var claims *tokenx.TokenClaims
 	if claims, err = tokenx.ParseToken(xAuthToken); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("parse token failed.Error:%v", err)
+		logger.WithContext(ctx.Request.Context()).Errorf("parse token failed.Error:%v", err)
 		ctx.AbortWithStatus(http.StatusForbidden)
 		return
 	}

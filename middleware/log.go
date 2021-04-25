@@ -50,7 +50,7 @@ func Log(ctx *gin.Context) {
 		path = buf.String()
 	}
 	param.Path = path
-	logger.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
+	logger.WithContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
 }
 
 // defaultLogFormatter is the default log format function Logger middleware uses.

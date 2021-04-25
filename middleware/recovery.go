@@ -36,7 +36,7 @@ func Recovery(ctx *gin.Context) {
 			newCtx := ctx.Request.Context()
 			httpRequest, err := httputil.DumpRequest(ctx.Request, false)
 			if err != nil {
-				logger.FromContext(newCtx).Error(err.Error())
+				logger.WithContext(newCtx).Error(err.Error())
 			}
 			headers := strings.Split(string(httpRequest), "\r\n")
 			for idx, header := range headers {
@@ -46,7 +46,7 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			headersToStr := strings.Join(headers, "\r\n")
-			logger.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s",
+			logger.WithContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s",
 				headersToStr, r, internal.Stack(3))
 			extra := fmt.Sprint(err)
 			if brokenPipe {

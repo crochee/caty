@@ -61,7 +61,7 @@ func NewProxyBuilder() http.Handler {
 					}
 				}
 			}
-			log := logger.FromContext(request.Context())
+			log := logger.WithContext(request.Context())
 			text := status.StatusText(statusCode)
 			log.Errorf("%+v '%d %s' caused by: %v", request.URL, statusCode, text, err)
 			writer.WriteHeader(statusCode)
