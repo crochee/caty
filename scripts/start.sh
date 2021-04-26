@@ -10,4 +10,4 @@ export CGO_LDFLAGS="-Wl,-z,relro,-z,now"
 go build -trimpath -ldflags="-s -w" -buildmode=pie -o=obs -tags=jsoniter ./cmd/server
 
 chmod +x ./obs
-./obs >>console.txt 2 & 1 &
+./obs >>console.txt 2>&1 &
