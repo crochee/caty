@@ -7,12 +7,13 @@ package httpx
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"obs/internal/host"
 	"obs/logger"
@@ -142,7 +143,14 @@ func (s *Server) Start() error {
 	}
 	go func() {
 		s.logger.Info("http server running...")
-		if err := s.Server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
+		if s.Server.TLSConfig == nil {
+			if err := s.Server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
+				s.logger.Errorf(err.Error())
+			}
+			return
+		}
+		if err := s.Server.ListenAndServeTLS("", ""); err != nil &&
+			errors.Is(err, http.ErrServerClosed) {
 			s.logger.Errorf(err.Error())
 		}
 	}()

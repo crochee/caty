@@ -9,6 +9,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
+	"os"
 	"syscall"
 	"time"
 
@@ -104,35 +105,32 @@ func main() {
 }
 
 func tlsConfig() *tls.Config {
+	caPem, err := os.ReadFile("ca.pem")
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+	var certPem []byte
+	if certPem, err = os.ReadFile("server.pem"); err != nil {
+		logger.Fatal(err.Error())
+	}
+	var keyPem []byte
+	if keyPem, err = os.ReadFile("server-key.pem"); err != nil {
+		logger.Fatal(err.Error())
+	}
 	caPool := x509.NewCertPool()
-	caPool.AppendCertsFromPEM(caPEMBlock)
+	caPool.AppendCertsFromPEM(caPem)
+
+	var certificate tls.Certificate
+	if certificate, err = tls.X509KeyPair(certPem, keyPem); err != nil {
+		logger.Fatalf("unable to decode tls private key data: %v", err)
+	}
 
 	return &tls.Config{
-		Rand:                        nil,
-		Time:                        nil,
-		Certificates:                nil,
-		NameToCertificate:           nil,
-		GetCertificate:              nil,
-		GetClientCertificate:        nil,
-		GetConfigForClient:          nil,
-		VerifyPeerCertificate:       nil,
-		VerifyConnection:            nil,
-		RootCAs:                     nil,
-		NextProtos:                  nil,
-		ServerName:                  "",
-		ClientAuth:                  tls.RequireAndVerifyClientCert,
-		ClientCAs:                   nil,
-		InsecureSkipVerify:          false,
-		CipherSuites:                nil,
-		PreferServerCipherSuites:    false,
-		SessionTicketsDisabled:      false,
-		SessionTicketKey:            [32]byte{},
-		ClientSessionCache:          nil,
-		MinVersion:                  0,
-		MaxVersion:                  0,
-		CurvePreferences:            nil,
-		DynamicRecordSizingDisabled: false,
-		Renegotiation:               0,
-		KeyLogWriter:                nil,
+		Certificates:           []tls.Certificate{certificate},
+		ClientAuth:             tls.RequireAndVerifyClientCert,
+		ClientCAs:              caPool,
+		CipherSuites:           []uint16{tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256},
+		SessionTicketsDisabled: true,
+		MinVersion:             tls.VersionTLS12,
 	}
 }

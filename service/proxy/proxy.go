@@ -6,10 +6,14 @@ package proxy
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"os"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -18,7 +22,25 @@ import (
 	"obs/logger"
 )
 
-func NewProxyBuilder() http.Handler {
+func NewProxyBuilder() (http.Handler, error) {
+	caPem, err := os.ReadFile("ca.pem")
+	if err != nil {
+		return nil, err
+	}
+	var certPem []byte
+	if certPem, err = os.ReadFile("client.pem"); err != nil {
+		return nil, err
+	}
+	var keyPem []byte
+	if keyPem, err = os.ReadFile("client-key.pem"); err != nil {
+		return nil, err
+	}
+	caPool := x509.NewCertPool()
+	caPool.AppendCertsFromPEM(caPem)
+	var certificate tls.Certificate
+	if certificate, err = tls.X509KeyPair(certPem, keyPem); err != nil {
+		return nil, err
+	}
 	return &httputil.ReverseProxy{
 		Director: func(request *http.Request) {
 			request.RequestURI = "" // Outgoing request should not have RequestURI
@@ -42,7 +64,25 @@ func NewProxyBuilder() http.Handler {
 			delete(request.Header, "Sec-Websocket-Protocol")
 			delete(request.Header, "Sec-Websocket-Version")
 		},
-		Transport:  http.DefaultTransport,
+		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			TLSClientConfig: &tls.Config{
+				Certificates:           []tls.Certificate{certificate},
+				RootCAs:                caPool,
+				CipherSuites:           []uint16{tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256},
+				SessionTicketsDisabled: true,
+				MinVersion:             tls.VersionTLS12,
+			},
+			ForceAttemptHTTP2:     true,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+		},
 		BufferPool: internal.BufPool,
 		ErrorHandler: func(writer http.ResponseWriter, request *http.Request, err error) {
 			statusCode := http.StatusInternalServerError
@@ -69,5 +109,5 @@ func NewProxyBuilder() http.Handler {
 				log.Errorf("Error %v while writing status code", err)
 			}
 		},
-	}
+	}, nil
 }
