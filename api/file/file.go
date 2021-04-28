@@ -34,9 +34,9 @@ import (
 // @Param bucket_name path string true "bucket name"
 // @Param file formData file true "file"
 // @Success 204
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket/{bucket_name}/file [post]
 func UploadFile(ctx *gin.Context) {
 	var name Name
@@ -77,9 +77,9 @@ func UploadFile(ctx *gin.Context) {
 // @Param bucket_name path string true "bucket name"
 // @Param file_name path string true "file name"
 // @Success 204
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket/{bucket_name}/file/{file_name} [delete]
 func DeleteFile(ctx *gin.Context) {
 	var target Target
@@ -114,9 +114,9 @@ func DeleteFile(ctx *gin.Context) {
 // @Param bucket_name path string true "bucket name"
 // @Param file_name path string true "file name"
 // @Success 200 {string} string "file link"
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket/{bucket_name}/file/{file_name}/sign [get]
 func SignFile(ctx *gin.Context) {
 	var target Target
@@ -154,9 +154,9 @@ func SignFile(ctx *gin.Context) {
 // @Param file_name path string true "file name"
 // @Param sign query string false "sign"
 // @Success 200
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket/{bucket_name}/file/{file_name} [get]
 func DownloadFile(ctx *gin.Context) {
 	var target Target

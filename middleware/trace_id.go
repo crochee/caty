@@ -15,11 +15,12 @@ import (
 func TraceId(ctx *gin.Context) {
 	tracedId := ctx.Request.Header.Get("trace_id")
 	if tracedId != "" {
-		builder := logger.WithContext(ctx.Request.Context())
-		if log, ok := builder.(*logger.Logger); ok {
-			log.Logger = log.Logger.With(zap.String("trace_id", tracedId))
-			log.LoggerSugar = log.LoggerSugar.With("trace_id", tracedId)
-			logger.NewContext(ctx.Request.Context(), log)
+		if log, ok := logger.WithContext(ctx.Request.Context()).(*logger.Logger); ok {
+			tempLog := log.Logger.With(zap.String("trace_id", tracedId))
+			ctx.Request = ctx.Request.Clone(logger.NewContext(ctx.Request.Context(), &logger.Logger{
+				Logger:      tempLog,
+				LoggerSugar: tempLog.Sugar(),
+			}))
 		}
 	}
 	ctx.Next()

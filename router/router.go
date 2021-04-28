@@ -30,7 +30,7 @@ func GinRun() *gin.Engine {
 	router.Use(middleware.CrossDomain)
 	router.NoRoute(middleware.NoRoute)
 	router.NoMethod(middleware.NoMethod)
-	if gin.Mode() != gin.ReleaseMode {
+	if gin.Mode() == gin.DebugMode {
 		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

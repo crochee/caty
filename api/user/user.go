@@ -28,8 +28,8 @@ import (
 // @Produce application/json
 // @Param request body Domain true "register request's content"
 // @Success 200
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/user/register [post]
 func Register(ctx *gin.Context) {
 	var domainInfo Domain
@@ -74,8 +74,8 @@ func Register(ctx *gin.Context) {
 // @Produce application/json
 // @Param request body LoginInfo true "login request's content"
 // @Success 200 {string} string
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/user/login [post]
 func Login(ctx *gin.Context) {
 	var loginInfo LoginInfo
@@ -106,9 +106,9 @@ func Login(ctx *gin.Context) {
 // @Param request body ModifyInfo true "request's content"
 // @Success 200
 // @Success 304
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/user/modify [put]
 func Modify(ctx *gin.Context) {
 	var modifyInfo ModifyInfo

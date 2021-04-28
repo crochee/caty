@@ -26,9 +26,9 @@ import (
 // @Produce application/json
 // @Param request body Name true "bucket name"
 // @Success 201
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket [post]
 func CreateBucket(ctx *gin.Context) {
 	var name Name
@@ -63,11 +63,11 @@ func CreateBucket(ctx *gin.Context) {
 // @Produce application/json
 // @Param bucket_name path string true "bucket name"
 // @Success 200 {object} bucket.Info "bucket info"
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 401 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 404 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 401 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 404 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket/{bucket_name} [get]
 func GetBucket(ctx *gin.Context) {
 	var name Name
@@ -103,9 +103,9 @@ func GetBucket(ctx *gin.Context) {
 // @Produce application/json
 // @Param bucket_name path string true "bucket name"
 // @Success 204
-// @Failure 400 {object} e.ErrorResponse
-// @Failure 403 {object} e.ErrorResponse
-// @Failure 500 {object} e.ErrorResponse
+// @Failure 400 {object} e.Response
+// @Failure 403 {object} e.Response
+// @Failure 500 {object} e.Response
 // @Router /v1/bucket/{bucket_name} [delete]
 func DeleteBucket(ctx *gin.Context) {
 	var name Name
