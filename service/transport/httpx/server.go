@@ -46,6 +46,12 @@ type (
 	}
 )
 
+func WithTls(tls *tls.Config) func(*Option) {
+	return func(opt *Option) {
+		opt.tls = tls
+	}
+}
+
 func WithContext(ctx context.Context) func(*Option) {
 	return func(opt *Option) {
 		opt.ctx = ctx

@@ -6,6 +6,8 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"syscall"
 	"time"
@@ -47,6 +49,7 @@ func main() {
 	requestLog := logger.NewLogger(pathFunc, levelFunc)
 	httpSrv := httpx.New(":8150",
 		httpx.WithContext(ctx),
+		httpx.WithTls(tlsConfig()),
 		httpx.WithLog(requestLog),
 		httpx.WithHandler(router.GinRun()),
 		httpx.WithBeforeStart(
@@ -97,5 +100,39 @@ func main() {
 	)
 	if err := app.Run(); err != nil {
 		logger.Fatal(err.Error())
+	}
+}
+
+func tlsConfig() *tls.Config {
+	caPool := x509.NewCertPool()
+	caPool.AppendCertsFromPEM(caPEMBlock)
+
+	return &tls.Config{
+		Rand:                        nil,
+		Time:                        nil,
+		Certificates:                nil,
+		NameToCertificate:           nil,
+		GetCertificate:              nil,
+		GetClientCertificate:        nil,
+		GetConfigForClient:          nil,
+		VerifyPeerCertificate:       nil,
+		VerifyConnection:            nil,
+		RootCAs:                     nil,
+		NextProtos:                  nil,
+		ServerName:                  "",
+		ClientAuth:                  tls.RequireAndVerifyClientCert,
+		ClientCAs:                   nil,
+		InsecureSkipVerify:          false,
+		CipherSuites:                nil,
+		PreferServerCipherSuites:    false,
+		SessionTicketsDisabled:      false,
+		SessionTicketKey:            [32]byte{},
+		ClientSessionCache:          nil,
+		MinVersion:                  0,
+		MaxVersion:                  0,
+		CurvePreferences:            nil,
+		DynamicRecordSizingDisabled: false,
+		Renegotiation:               0,
+		KeyLogWriter:                nil,
 	}
 }
