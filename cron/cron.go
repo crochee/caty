@@ -15,8 +15,8 @@ import (
 
 var timeCron *cron.Cron
 
-// New return cron.Cron
-func New() *cron.Cron {
+// Cron return cron.Cron
+func Cron() *cron.Cron {
 	return timeCron
 }
 

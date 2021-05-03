@@ -6,7 +6,10 @@ package cmd
 
 import "strconv"
 
-const Version = "v1.0.1"
+const (
+	ServiceName = "OBS"
+	Version     = "v1.0.1"
+)
 
 func getNextChunk(version string, n, p int) (int, int, error) {
 	if p > n-1 {

@@ -43,7 +43,7 @@ func main() {
 		option.Path = config.Cfg.ServiceConfig.ServiceInfo.LogPath
 	}
 	levelFunc := func(option *logger.Option) {
-		option.Path = config.Cfg.ServiceConfig.ServiceInfo.LogLevel
+		option.Level = config.Cfg.ServiceConfig.ServiceInfo.LogLevel
 	}
 	logger.InitSystemLogger(pathFunc, levelFunc)
 	// 初始化请求日志
@@ -63,7 +63,7 @@ func main() {
 			}),
 		httpx.WithAfterStop(
 			func(ctx context.Context) error {
-				cron.New().Stop() // 关闭定时器
+				cron.Cron().Stop() // 关闭定时器
 				return nil
 			},
 			func(ctx context.Context) error {
@@ -99,7 +99,7 @@ func main() {
 		kratos.Registrar(etcd),
 		kratos.Logger(zapgrpc.NewLogger(requestLog.Logger)),
 	)
-	if err := app.Run(); err != nil {
+	if err = app.Run(); err != nil {
 		logger.Fatal(err.Error())
 	}
 }
