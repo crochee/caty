@@ -58,7 +58,7 @@ func Register(ctx *gin.Context) {
 		PassWord:   domainInfo.PassWord,
 		Permission: permission,
 	}
-	if err = db.NewDB().Create(domain).Error; err != nil {
+	if err = db.NewDBWithContext(ctx).Create(domain).Error; err != nil {
 		logger.FromContext(ctx.Request.Context()).Errorf("insert domain failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return

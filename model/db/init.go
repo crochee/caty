@@ -26,7 +26,7 @@ import (
 
 	"obs/config"
 	"obs/cron"
-	loggerx "obs/logger"
+	loggers "obs/logger"
 )
 
 var db *gorm.DB
@@ -82,23 +82,30 @@ func Setup(ctx context.Context) error {
 	return nil
 }
 
-// NewDB get gorm.DB
-func NewDB(ctx context.Context) *gorm.DB {
-	fromContextLog := loggerx.FromContext(ctx)
+var gLevel = func() logger.LogLevel {
+	level := logger.Warn
+	if gin.Mode() != gin.ReleaseMode {
+		level = logger.Info
+	}
+	return level
+}()
+
+// NewDBWithContext get gorm.DB
+func NewDBWithContext(ctx context.Context) *gorm.DB {
+	fromContextLog := loggers.FromContext(ctx)
 	return db.Session(&gorm.Session{
 		Context: ctx,
 		Logger: newMysqlLog(fromContextLog, logger.Config{
 			SlowThreshold: 10 * time.Second,
 			Colorful:      fromContextLog.Opt().Path == "",
-			LogLevel: func() logger.LogLevel {
-				l := logger.Warn
-				if gin.Mode() != gin.ReleaseMode {
-					l = logger.Info
-				}
-				return l
-			}(),
+			LogLevel:      gLevel,
 		}),
 	})
+}
+
+// NewDB get gorm.DB
+func NewDB() *gorm.DB {
+	return db
 }
 
 // Close close db pool
@@ -203,7 +210,7 @@ func NewMock() (sqlmock.Sqlmock, error) {
 	return mock, err
 }
 
-func newMysqlLog(l loggerx.Builder, cfg logger.Config) logger.Interface {
+func newMysqlLog(l loggers.Builder, cfg logger.Config) logger.Interface {
 	var (
 		infoStr      = "%s\n[info] "
 		warnStr      = "%s\n[warn] "
@@ -234,7 +241,7 @@ func newMysqlLog(l loggerx.Builder, cfg logger.Config) logger.Interface {
 }
 
 type mysqlLog struct {
-	loggerx.Builder
+	loggers.Builder
 	logger.Config
 	infoStr, warnStr, errStr            string
 	traceStr, traceErrStr, traceWarnStr string

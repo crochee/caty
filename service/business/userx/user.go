@@ -21,7 +21,7 @@ import (
 // UserLogin 登录生成token信息
 func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	domain := &db.Domain{}
-	if err := db.NewDB().Model(domain).Where("email =?", email).First(domain).Error; err != nil {
+	if err := db.NewDBWithContext(ctx).Model(domain).Where("email =?", email).First(domain).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}
@@ -54,7 +54,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 
 // ModifyUser 修改用户信息
 func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick string) error {
-	tx := db.NewDB().Begin()
+	tx := db.NewDBWithContext(ctx).Begin()
 	defer tx.Rollback()
 	domain := &db.Domain{}
 	if err := tx.Model(domain).Where("email =?", email).First(domain).Error; err != nil {

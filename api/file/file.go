@@ -176,7 +176,7 @@ func DownloadFile(ctx *gin.Context) {
 		return
 	}
 
-	conn := db.NewDB()
+	conn := db.NewDBWithContext(ctx)
 	b := new(db.Bucket)
 	if err = conn.Model(b).Where("bucket =? AND domain= ?",
 		target.BucketName, token.Domain).First(b).Error; err != nil {

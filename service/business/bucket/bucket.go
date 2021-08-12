@@ -23,7 +23,7 @@ import (
 
 // CreateBucket 创建桶
 func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) error {
-	tx := db.NewDB().Begin()
+	tx := db.NewDBWithContext(ctx).Begin()
 	defer tx.Rollback()
 	bucket := &db.Bucket{
 		Bucket: bucketName,
@@ -51,7 +51,7 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 
 // HeadBucket 查询桶信息 Info
 func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*Info, error) {
-	conn := db.NewDB()
+	conn := db.NewDBWithContext(ctx)
 	bucket := &db.Bucket{Bucket: bucketName}
 	if err := conn.First(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -93,7 +93,7 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*I
 
 // DeleteBucket 删除桶
 func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketName string) error {
-	tx := db.NewDB().Begin()
+	tx := db.NewDBWithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	bucket := &db.Bucket{}

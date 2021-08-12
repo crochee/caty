@@ -25,7 +25,7 @@ import (
 
 // UploadFile 上传文件
 func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, file *multipart.FileHeader) error {
-	tx := db.NewDB().Begin()
+	tx := db.NewDBWithContext(ctx).Begin()
 	defer tx.Rollback()
 	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("bucket =? AND domain= ?",
@@ -76,7 +76,7 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, fil
 
 // DeleteFile 删除文件
 func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName string) error {
-	tx := db.NewDB().Begin()
+	tx := db.NewDBWithContext(ctx).Begin()
 	defer tx.Rollback()
 	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("bucket =? AND domain= ?", bucketName, token.Domain).
@@ -112,7 +112,7 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName s
 
 // SignFile 文件签名
 func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName string) (string, error) {
-	tx := db.NewDB().Begin()
+	tx := db.NewDBWithContext(ctx).Begin()
 	defer tx.Rollback()
 	bucket := &db.Bucket{}
 	if err := tx.Model(bucket).Where("bucket =? AND domain= ?",
