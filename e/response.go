@@ -29,7 +29,7 @@ func ErrorWith(ctx *gin.Context, code Code, message string) {
 	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
 		resp.Message = code.Chinese()
 	}
-	logger.WithContext(ctx.Request.Context()).Errorf("[ERROR] error_code:%s,message:%s,extra:%s",
+	logger.FromContext(ctx.Request.Context()).Errorf("[ERROR] error_code:%s,message:%s,extra:%s",
 		resp.Code, resp.Message, resp.Extra)
 	ctx.JSON(code.Status(), resp)
 }
@@ -43,7 +43,7 @@ func Error(ctx *gin.Context, code Code) {
 	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
 		resp.Message = code.Chinese()
 	}
-	logger.WithContext(ctx.Request.Context()).Errorf("[ERROR] error_code:%s,message:%s,extra:%s",
+	logger.FromContext(ctx.Request.Context()).Errorf("[ERROR] error_code:%s,message:%s,extra:%s",
 		resp.Code, resp.Message, resp.Extra)
 	ctx.JSON(code.Status(), resp)
 }
@@ -73,7 +73,7 @@ func AbortWith(ctx *gin.Context, code Code, message string) {
 	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
 		resp.Message = code.Chinese()
 	}
-	logger.WithContext(ctx.Request.Context()).Errorf("[ABORT] error_code:%s,message:%s,extra:%s",
+	logger.FromContext(ctx.Request.Context()).Errorf("[ABORT] error_code:%s,message:%s,extra:%s",
 		resp.Code, resp.Message, resp.Extra)
 	ctx.AbortWithStatusJSON(code.Status(), resp)
 }
@@ -87,7 +87,7 @@ func Abort(ctx *gin.Context, code Code) {
 	if strings.Contains(ctx.Request.Header.Get("accept-language"), "zh") {
 		resp.Message = code.Chinese()
 	}
-	logger.WithContext(ctx.Request.Context()).Errorf("[ABORT] error_code:%s,message:%s,extra:%s",
+	logger.FromContext(ctx.Request.Context()).Errorf("[ABORT] error_code:%s,message:%s,extra:%s",
 		resp.Code, resp.Message, resp.Extra)
 	ctx.AbortWithStatusJSON(code.Status(), resp)
 }

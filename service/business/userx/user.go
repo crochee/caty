@@ -25,7 +25,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return "", e.New(e.OperateDbFail, err.Error())
 	}
 	if domain.PassWord != passWord {
@@ -33,7 +33,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	}
 	var permission map[string]tokenx.Action
 	if err := jsoniter.ConfigFastest.UnmarshalFromString(domain.Permission, &permission); err != nil {
-		logger.WithContext(ctx).Errorf("Unmarshal permission failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("Unmarshal permission failed.Error:%v", err)
 		return "", e.New(e.UnmarshalFail, err.Error())
 	}
 	token := &tokenx.TokenClaims{
@@ -46,7 +46,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	}
 	tokenStr, err := tokenx.CreateToken(token)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Create token failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("Create token failed.Error:%v", err)
 		return "", e.New(e.GenerateTokenFail, err.Error())
 	}
 	return tokenStr, nil
@@ -61,7 +61,7 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	if domain.PassWord != oldPassWord {
@@ -78,7 +78,7 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 		return nil
 	}
 	if err := tx.Model(domain).UpdateColumns(columnMap).Error; err != nil {
-		logger.WithContext(ctx).Errorf("update db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("update db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	tx.Commit()

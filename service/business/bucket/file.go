@@ -33,31 +33,31 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, fil
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("insert db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	path := filepath.Clean(fmt.Sprintf("%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		bucket.Bucket, file.Filename))
 	dstFile, err := os.Create(path)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("create file %s failed.Error:%v", path, err)
+		logger.FromContext(ctx).Errorf("create file %s failed.Error:%v", path, err)
 		return e.New(e.GetAbsPathFail, "clear bucket failed")
 	}
 	defer dstFile.Close() // #nosec G307
 	var srcFile multipart.File
 	if srcFile, err = file.Open(); err != nil {
-		logger.WithContext(ctx).Errorf("open %s file failed.Error:%v", file.Filename, err)
+		logger.FromContext(ctx).Errorf("open %s file failed.Error:%v", file.Filename, err)
 		return e.New(e.OpenFileFail, err.Error())
 	}
 	defer srcFile.Close() // #nosec G307
 
 	if _, err = io.Copy(dstFile, srcFile); err != nil {
-		logger.WithContext(ctx).Errorf("copy %s file failed.Error:%v", file.Filename, err)
+		logger.FromContext(ctx).Errorf("copy %s file failed.Error:%v", file.Filename, err)
 		return e.New(e.OpenFileFail, err.Error())
 	}
 	var stat os.FileInfo
 	if stat, err = dstFile.Stat(); err != nil {
-		logger.WithContext(ctx).Errorf("get %s file stat failed.Error:%v", dstFile.Name(), err)
+		logger.FromContext(ctx).Errorf("get %s file stat failed.Error:%v", dstFile.Name(), err)
 		return e.New(e.OpenFileFail, err.Error())
 	}
 	bucketFile := &db.BucketFile{
@@ -67,7 +67,7 @@ func UploadFile(ctx context.Context, token *tokenx.Token, bucketName string, fil
 		ModTime: stat.ModTime(),
 	}
 	if err = tx.Create(bucketFile).Error; err != nil {
-		logger.WithContext(ctx).Errorf("insert file failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("insert file failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	tx.Commit()
@@ -84,7 +84,7 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName s
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	bucketFile := &db.BucketFile{}
@@ -93,17 +93,17 @@ func DeleteFile(ctx context.Context, token *tokenx.Token, bucketName, fileName s
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	path := filepath.Clean(fmt.Sprintf("%s/%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath,
 		bucket.Bucket, bucketFile.File))
 	if err := os.Remove(path); err != nil {
-		logger.WithContext(ctx).Errorf("remove file %s failed.Error:%v", path, err)
+		logger.FromContext(ctx).Errorf("remove file %s failed.Error:%v", path, err)
 		return e.New(e.DeleteFileFail, err.Error())
 	}
 	if err := tx.Delete(bucketFile).Error; err != nil {
-		logger.WithContext(ctx).Errorf("remove file %s failed.Error:%v", path, err)
+		logger.FromContext(ctx).Errorf("remove file %s failed.Error:%v", path, err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	tx.Commit()
@@ -120,7 +120,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return "", e.New(e.OperateDbFail, err.Error())
 	}
 	bucketFile := &db.BucketFile{}
@@ -129,7 +129,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return "", e.New(e.OperateDbFail, err.Error())
 	}
 	xToken := &tokenx.TokenClaims{
@@ -144,7 +144,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 	}
 	signString, err := tokenx.CreateToken(xToken)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("create token failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("create token failed.Error:%v", err)
 		return "", e.New(e.GenerateTokenFail, err.Error())
 	}
 	var (
@@ -152,7 +152,7 @@ func SignFile(ctx context.Context, token *tokenx.Token, bucketName, fileName str
 		tokenSign = &tokenx.Signature{signString}
 	)
 	if sign, err = tokenx.CreateSign(tokenSign); err != nil {
-		logger.WithContext(ctx).Errorf("create sian failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("create sian failed.Error:%v", err)
 		return "", e.New(e.GenerateSignFail, err.Error())
 	}
 	tx.Commit()

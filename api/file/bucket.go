@@ -33,13 +33,13 @@ import (
 func CreateBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindBodyWith(&name, binding.JSON); err != nil {
-		logger.WithContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.WithContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
@@ -72,13 +72,13 @@ func CreateBucket(ctx *gin.Context) {
 func GetBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
-		logger.WithContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.WithContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
@@ -110,13 +110,13 @@ func GetBucket(ctx *gin.Context) {
 func DeleteBucket(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
-		logger.WithContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("bind uri failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParseUrlFail, "bucket_name is nil")
 		return
 	}
 	token, err := tokenx.QueryToken(ctx)
 	if err != nil {
-		logger.WithContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
+		logger.FromContext(ctx.Request.Context()).Errorf("query token failed.Error:%v", err)
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}

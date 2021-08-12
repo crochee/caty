@@ -12,9 +12,7 @@ require (
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-kratos/kratos/v2 v2.0.0-beta3
-	github.com/google/pprof v0.0.0-20210506205249-923b5ab0fc1a // indirect
 	github.com/hashicorp/go-multierror v1.0.0
-	github.com/ianlancetaylor/demangle v0.0.0-20210406231658-61c622dd7d50 // indirect
 	github.com/json-iterator/go v1.1.10
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1

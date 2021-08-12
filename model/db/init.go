@@ -15,15 +15,18 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/gin-gonic/gin"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"gorm.io/gorm/utils"
 
 	"obs/config"
 	"obs/cron"
+	loggerx "obs/logger"
 )
 
 var db *gorm.DB
@@ -80,8 +83,22 @@ func Setup(ctx context.Context) error {
 }
 
 // NewDB get gorm.DB
-func NewDB() *gorm.DB {
-	return db
+func NewDB(ctx context.Context) *gorm.DB {
+	fromContextLog := loggerx.FromContext(ctx)
+	return db.Session(&gorm.Session{
+		Context: ctx,
+		Logger: newMysqlLog(fromContextLog, logger.Config{
+			SlowThreshold: 10 * time.Second,
+			Colorful:      fromContextLog.Opt().Path == "",
+			LogLevel: func() logger.LogLevel {
+				l := logger.Warn
+				if gin.Mode() != gin.ReleaseMode {
+					l = logger.Info
+				}
+				return l
+			}(),
+		}),
+	})
 }
 
 // Close close db pool
@@ -184,4 +201,94 @@ func NewMock() (sqlmock.Sqlmock, error) {
 		return nil, err
 	}
 	return mock, err
+}
+
+func newMysqlLog(l loggerx.Builder, cfg logger.Config) logger.Interface {
+	var (
+		infoStr      = "%s\n[info] "
+		warnStr      = "%s\n[warn] "
+		errStr       = "%s\n[error] "
+		traceStr     = "%s\n[%.3fms] [rows:%v] %s"
+		traceWarnStr = "%s %s\n[%.3fms] [rows:%v] %s"
+		traceErrStr  = "%s %s\n[%.3fms] [rows:%v] %s"
+	)
+
+	if cfg.Colorful {
+		infoStr = logger.Green + "%s\n" + logger.Reset + logger.Green + "[info] " + logger.Reset
+		warnStr = logger.BlueBold + "%s\n" + logger.Reset + logger.Magenta + "[warn] " + logger.Reset
+		errStr = logger.Magenta + "%s\n" + logger.Reset + logger.Red + "[error] " + logger.Reset
+		traceStr = logger.Green + "%s\n" + logger.Reset + logger.Yellow + "[%.3fms] " + logger.BlueBold + "[rows:%v]" + logger.Reset + " %s"
+		traceWarnStr = logger.Green + "%s " + logger.Yellow + "%s\n" + logger.Reset + logger.RedBold + "[%.3fms] " + logger.Yellow + "[rows:%v]" + logger.Magenta + " %s" + logger.Reset
+		traceErrStr = logger.RedBold + "%s " + logger.MagentaBold + "%s\n" + logger.Reset + logger.Yellow + "[%.3fms] " + logger.BlueBold + "[rows:%v]" + logger.Reset + " %s"
+	}
+	return &mysqlLog{
+		Builder:      l,
+		Config:       cfg,
+		infoStr:      infoStr,
+		warnStr:      warnStr,
+		errStr:       errStr,
+		traceStr:     traceStr,
+		traceWarnStr: traceWarnStr,
+		traceErrStr:  traceErrStr,
+	}
+}
+
+type mysqlLog struct {
+	loggerx.Builder
+	logger.Config
+	infoStr, warnStr, errStr            string
+	traceStr, traceErrStr, traceWarnStr string
+}
+
+func (m *mysqlLog) LogMode(level logger.LogLevel) logger.Interface {
+	m.LogLevel = level
+	return m
+}
+
+func (m *mysqlLog) Info(ctx context.Context, msg string, data ...interface{}) {
+	if m.LogLevel >= logger.Info {
+		m.Builder.Infof(m.infoStr+msg, append([]interface{}{utils.FileWithLineNum()}, data...)...)
+	}
+}
+
+func (m *mysqlLog) Warn(ctx context.Context, msg string, data ...interface{}) {
+	if m.LogLevel >= logger.Warn {
+		m.Builder.Warnf(m.infoStr+msg, append([]interface{}{utils.FileWithLineNum()}, data...)...)
+	}
+}
+
+func (m mysqlLog) Error(ctx context.Context, msg string, data ...interface{}) {
+	if m.LogLevel >= logger.Error {
+		m.Builder.Errorf(m.infoStr+msg, append([]interface{}{utils.FileWithLineNum()}, data...)...)
+	}
+}
+
+func (m *mysqlLog) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+	if m.LogLevel > logger.Silent {
+		elapsed := time.Since(begin)
+		switch {
+		case err != nil && m.LogLevel >= logger.Error:
+			s, rows := fc()
+			if rows == -1 {
+				m.Builder.Errorf(m.traceErrStr, utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, "-", s)
+			} else {
+				m.Builder.Errorf(m.traceErrStr, utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, rows, s)
+			}
+		case elapsed > m.SlowThreshold && m.SlowThreshold != 0 && m.LogLevel >= logger.Warn:
+			s, rows := fc()
+			slowLog := fmt.Sprintf("SLOW SQL >= %v", m.SlowThreshold)
+			if rows == -1 {
+				m.Builder.Warnf(m.traceWarnStr, utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, "-", s)
+			} else {
+				m.Builder.Warnf(m.traceWarnStr, utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, rows, s)
+			}
+		case m.LogLevel == logger.Info:
+			s, rows := fc()
+			if rows == -1 {
+				m.Builder.Infof(m.traceStr, utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, "-", s)
+			} else {
+				m.Builder.Infof(m.traceStr, utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, rows, s)
+			}
+		}
+	}
 }

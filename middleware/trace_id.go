@@ -6,7 +6,6 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 
 	"obs/logger"
 )
@@ -15,13 +14,8 @@ import (
 func TraceId(ctx *gin.Context) {
 	tracedId := ctx.Request.Header.Get("trace_id")
 	if tracedId != "" {
-		if log, ok := logger.WithContext(ctx.Request.Context()).(*logger.Logger); ok {
-			tempLog := log.Logger.With(zap.String("trace_id", tracedId))
-			ctx.Request = ctx.Request.Clone(logger.NewContext(ctx.Request.Context(), &logger.Logger{
-				Logger:      tempLog,
-				LoggerSugar: tempLog.Sugar(),
-			}))
-		}
+		log := logger.FromContext(ctx.Request.Context()).With("trace_id", tracedId)
+		ctx.Request = ctx.Request.WithContext(logger.WithContext(ctx.Request.Context(), log))
 	}
 	ctx.Next()
 }

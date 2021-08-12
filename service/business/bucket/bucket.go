@@ -33,16 +33,16 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
-		logger.WithContext(ctx).Errorf("insert db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))
 	if err != nil {
-		logger.WithContext(ctx).Errorf("get path abs failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("get path abs failed.Error:%v", err)
 		return e.New(e.GetAbsPathFail, "clear bucket failed")
 	}
 	if err = os.MkdirAll(filepath.Clean(path), os.ModePerm); err != nil {
-		logger.WithContext(ctx).Errorf("create bucket failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("create bucket failed.Error:%v", err)
 		return e.New(e.MkPathFail, "create bucket failed")
 	}
 	tx.Commit()
@@ -57,7 +57,7 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*I
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.Errorf(e.NotFound, "not found bucket %s", bucket.Bucket)
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return nil, e.New(e.OperateDbFail, err.Error())
 	}
 	if bucket.Domain != token.Domain {
@@ -67,17 +67,17 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*I
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s",
 		config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))
 	if err != nil {
-		logger.WithContext(ctx).Errorf("get path abs failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("get path abs failed.Error:%v", err)
 		return nil, e.New(e.GetAbsPathFail, "clear bucket failed")
 	}
 
 	var fileInfo os.FileInfo
 	if fileInfo, err = os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
-			logger.WithContext(ctx).Errorf("not find bucket %s failed.Error:%v", bucket.Bucket, err)
+			logger.FromContext(ctx).Errorf("not find bucket %s failed.Error:%v", bucket.Bucket, err)
 			return nil, e.Errorf(e.NotFound, "not found bucket %s", bucket.Bucket)
 		}
-		logger.WithContext(ctx).Errorf("find path(%s) failed.Error:%v", path, err)
+		logger.FromContext(ctx).Errorf("find path(%s) failed.Error:%v", path, err)
 		return nil, e.New(e.OperateDbFail, err.Error())
 	}
 	var info = &Info{
@@ -85,7 +85,7 @@ func HeadBucket(ctx context.Context, token *tokenx.Token, bucketName string) (*I
 		Name:         fileInfo.Name(),
 	}
 	if info.Size, info.Count, err = internal.DirSize(path); err != nil {
-		logger.WithContext(ctx).Errorf("lookup path %s failed.Error:%v", path, err)
+		logger.FromContext(ctx).Errorf("lookup path %s failed.Error:%v", path, err)
 		return nil, e.New(e.StatisticsFileFail, err.Error())
 	}
 	return info, nil
@@ -102,23 +102,23 @@ func DeleteBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.Errorf(e.NotFound, "not found bucket %s", bucket.Bucket)
 		}
-		logger.WithContext(ctx).Errorf("query db failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	if err := tx.Delete(bucket).Error; err != nil {
-		logger.WithContext(ctx).Errorf("delete bucket failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("delete bucket failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s",
 		config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))
 	if err != nil {
-		logger.WithContext(ctx).Errorf("get path abs failed.Error:%v", err)
+		logger.FromContext(ctx).Errorf("get path abs failed.Error:%v", err)
 		return e.New(e.GetAbsPathFail, "clear bucket failed")
 	}
 	path = filepath.Clean(path)
 	if err = os.RemoveAll(path); err != nil {
-		logger.WithContext(ctx).Errorf("remove %s failed.Error:%v", path, err)
+		logger.FromContext(ctx).Errorf("remove %s failed.Error:%v", path, err)
 		return e.New(e.DeleteBucketFail, "delete bucket failed")
 	}
 	tx.Commit()
