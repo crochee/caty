@@ -9,6 +9,13 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
+
+	"obs/pkg/cron"
+	"obs/pkg/logx"
+	"obs/pkg/message"
+	"obs/pkg/model/db"
+	"obs/pkg/model/etcdx"
+	"obs/pkg/router"
 	"os"
 	"syscall"
 	"time"
@@ -20,12 +27,6 @@ import (
 
 	"obs/cmd"
 	"obs/config"
-	"obs/cron"
-	"obs/logger"
-	"obs/message"
-	"obs/model/db"
-	"obs/model/etcdx"
-	"obs/router"
 	"obs/service/transport/httpx"
 )
 
@@ -39,15 +40,15 @@ func main() {
 	// 初始化配置
 	config.InitConfig(*configFile)
 	// 初始化系统日志
-	pathFunc := func(option *logger.Option) {
+	pathFunc := func(option *logx.Option) {
 		option.Path = config.Cfg.ServiceConfig.ServiceInfo.LogPath
 	}
-	levelFunc := func(option *logger.Option) {
+	levelFunc := func(option *logx.Option) {
 		option.Level = config.Cfg.ServiceConfig.ServiceInfo.LogLevel
 	}
-	logger.InitSystemLogger(pathFunc, levelFunc)
+	logx.InitSystemLogger(pathFunc, levelFunc)
 	// 初始化请求日志
-	requestLog := logger.NewLogger(pathFunc, levelFunc)
+	requestLog := logx.NewLogger(pathFunc, levelFunc)
 	httpSrv := httpx.New(":8150",
 		httpx.WithContext(ctx),
 		httpx.WithTls(tlsConfig()),
@@ -78,13 +79,13 @@ func main() {
 		grpc.Timeout(30*time.Second),
 	)
 	if err := message.Setup(ctx); err != nil {
-		logger.Fatal(err.Error())
+		logx.Fatal(err.Error())
 	}
 	etcd, err := etcdx.NewEtcdRegistry(func(option *etcdx.Option) {
 		option.Context = ctx
 	})
 	if err != nil {
-		logger.Fatal(err.Error())
+		logx.Fatal(err.Error())
 	}
 	//grpcClient,err:=grpc.Dial(
 	//	ctx,
@@ -100,29 +101,29 @@ func main() {
 		kratos.Logger(zapgrpc.NewLogger(requestLog.Logger)),
 	)
 	if err = app.Run(); err != nil {
-		logger.Fatal(err.Error())
+		logx.Fatal(err.Error())
 	}
 }
 
 func tlsConfig() *tls.Config {
 	caPem, err := os.ReadFile("ca.pem")
 	if err != nil {
-		logger.Fatal(err.Error())
+		logx.Fatal(err.Error())
 	}
 	var certPem []byte
 	if certPem, err = os.ReadFile("server.pem"); err != nil {
-		logger.Fatal(err.Error())
+		logx.Fatal(err.Error())
 	}
 	var keyPem []byte
 	if keyPem, err = os.ReadFile("server-key.pem"); err != nil {
-		logger.Fatal(err.Error())
+		logx.Fatal(err.Error())
 	}
 	caPool := x509.NewCertPool()
 	caPool.AppendCertsFromPEM(caPem)
 
 	var certificate tls.Certificate
 	if certificate, err = tls.X509KeyPair(certPem, keyPem); err != nil {
-		logger.Fatalf("unable to decode tls private key data: %v", err)
+		logx.Fatalf("unable to decode tls private key data: %v", err)
 	}
 
 	return &tls.Config{

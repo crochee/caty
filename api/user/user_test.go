@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"net/http"
+	"obs/pkg/model/db"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,6 @@ import (
 
 	"obs/config"
 	"obs/internal"
-	"obs/model/db"
 )
 
 func TestRegister(t *testing.T) {

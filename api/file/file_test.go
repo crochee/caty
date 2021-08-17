@@ -9,14 +9,14 @@ import (
 	"context"
 	"mime/multipart"
 	"net/http"
+	"obs/pkg/middleware"
+	"obs/pkg/model/db"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 
 	"obs/config"
 	"obs/internal"
-	"obs/middleware"
-	"obs/model/db"
 )
 
 func TestUploadFile(t *testing.T) {

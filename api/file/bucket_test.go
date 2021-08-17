@@ -10,6 +10,8 @@ import (
 	"bytes"
 	"context"
 	"net/http"
+	"obs/pkg/middleware"
+	"obs/pkg/model/db"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +20,6 @@ import (
 
 	"obs/config"
 	"obs/internal"
-	"obs/middleware"
-	"obs/model/db"
 )
 
 func TestCreateBucket(t *testing.T) {

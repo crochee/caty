@@ -10,20 +10,21 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+
 	"os"
 	"time"
 
 	"github.com/pkg/errors"
 
 	"obs/internal/host"
-	"obs/logger"
+	"obs/pkg/logx"
 )
 
 type (
 	Option struct {
 		tls         *tls.Config
 		ctx         context.Context
-		logger      logger.Builder
+		logger      logx.Builder
 		handler     http.Handler
 		beforeStart []func(ctx context.Context) error
 		afterStop   []func(ctx context.Context) error
@@ -39,7 +40,7 @@ type (
 	Server struct {
 		*http.Server
 		ctx                  context.Context
-		logger               logger.Builder
+		logger               logx.Builder
 		sigList              []os.Signal
 		beforeStart          []func(ctx context.Context) error
 		afterStop            []func(ctx context.Context) error
@@ -65,7 +66,7 @@ func WithHandler(handler http.Handler) func(*Option) {
 	}
 }
 
-func WithLog(log logger.Builder) func(*Option) {
+func WithLog(log logx.Builder) func(*Option) {
 	return func(opt *Option) {
 		opt.logger = log
 	}
@@ -114,7 +115,7 @@ func New(addr string, opts ...func(*Option)) *Server {
 			if option.logger == nil {
 				return option.ctx
 			}
-			return logger.WithContext(ctx, option.logger)
+			return logx.WithContext(ctx, option.logger)
 		},
 	}
 	return &Server{

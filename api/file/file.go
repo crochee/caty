@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"obs/pkg/logx"
+	db2 "obs/pkg/model/db"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +20,6 @@ import (
 	"obs/cmd"
 	"obs/config"
 	"obs/e"
-	"obs/logger"
-	"obs/model/db"
 	"obs/service/business/bucket"
 	"obs/service/business/tokenx"
 )
@@ -41,13 +41,13 @@ import (
 func UploadFile(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
 	var fileInfo Info
 	if err := ctx.ShouldBindWith(&fileInfo, binding.FormMultipart); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
@@ -84,7 +84,7 @@ func UploadFile(ctx *gin.Context) {
 func DeleteFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -121,7 +121,7 @@ func DeleteFile(ctx *gin.Context) {
 func SignFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -161,7 +161,7 @@ func SignFile(ctx *gin.Context) {
 func DownloadFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logger.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -176,26 +176,26 @@ func DownloadFile(ctx *gin.Context) {
 		return
 	}
 
-	conn := db.NewDBWithContext(ctx)
-	b := new(db.Bucket)
+	conn := db2.NewDBWithContext(ctx)
+	b := new(db2.Bucket)
 	if err = conn.Model(b).Where("bucket =? AND domain= ?",
 		target.BucketName, token.Domain).First(b).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}
-	bucketFile := &db.BucketFile{}
+	bucketFile := &db2.BucketFile{}
 	if err = conn.Model(bucketFile).Where("file =? AND bucket= ?",
 		target.FileName, b.Bucket).First(bucketFile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		logger.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}

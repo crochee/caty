@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"obs/pkg/logx"
 	"os"
 	"time"
 
@@ -19,7 +20,6 @@ import (
 
 	"obs/internal"
 	"obs/internal/status"
-	"obs/logger"
 )
 
 func NewProxyBuilder() (http.Handler, error) {
@@ -101,7 +101,7 @@ func NewProxyBuilder() (http.Handler, error) {
 					}
 				}
 			}
-			log := logger.FromContext(request.Context())
+			log := logx.FromContext(request.Context())
 			text := status.StatusText(statusCode)
 			log.Errorf("%+v '%d %s' caused by: %v", request.URL, statusCode, text, err)
 			writer.WriteHeader(statusCode)
