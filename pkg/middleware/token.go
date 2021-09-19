@@ -7,10 +7,12 @@ package middleware
 import (
 	"errors"
 	"net/http"
-	"obs/pkg/log"
-	"obs/pkg/service/business/tokenx"
 
 	"github.com/gin-gonic/gin"
+
+	"obs/pkg/log"
+	"obs/pkg/service/business/tokenx"
+	"obs/pkg/v"
 )
 
 // Token add trace_id
@@ -40,7 +42,7 @@ func queryToken(ctx *gin.Context) (string, error) {
 		}
 		return signImpl.Sign, nil
 	}
-	xAuthToken := ctx.Request.Header.Get("X-Auth-Token")
+	xAuthToken := ctx.Request.Header.Get(v.XAuthToken)
 	if xAuthToken == "" {
 		return "", errors.New("missing token")
 	}

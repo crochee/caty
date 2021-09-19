@@ -1,10 +1,13 @@
 package log
 
-import "context"
+import (
+	"context"
+	"os"
+)
 
 type Builder interface {
 	Opt() Option
-	With(key string, value interface{}) Builder
+	With(...Field) Builder
 	Debugf(format string, v ...interface{})
 	Debug(message string)
 	Infof(format string, v ...interface{})
@@ -16,6 +19,11 @@ type Builder interface {
 	Fatalf(format string, v ...interface{})
 	Fatal(message string)
 	Sync() error
+}
+
+type Field struct {
+	Key   string
+	Value interface{}
 }
 
 type loggerKey struct{}
@@ -41,7 +49,7 @@ func (n NoLogger) Opt() Option {
 	return Option{}
 }
 
-func (n NoLogger) With(string, interface{}) Builder {
+func (n NoLogger) With(...Field) Builder {
 	return n
 }
 
@@ -70,9 +78,11 @@ func (n NoLogger) Error(string) {
 }
 
 func (n NoLogger) Fatalf(string, ...interface{}) {
+	os.Exit(1)
 }
 
 func (n NoLogger) Fatal(string) {
+	os.Exit(1)
 }
 
 func (n NoLogger) Sync() error {

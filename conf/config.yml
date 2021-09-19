@@ -1,4 +1,5 @@
 mode: debug
+port: 8120
 system-log-path: mongodb://admin:1234567@192.168.31.62:27017
 system-log_level: debug
 storage_path: /obs/

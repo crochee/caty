@@ -15,7 +15,7 @@ import (
 
 func TestCronSetup(t *testing.T) {
 	config.LoadConfig("../conf/config.yml")
-	log.InitSystemLogger("", "INFO")
+	log.InitSystemLogger()
 	Setup()
 	// 0 0/5 * * * ?
 	id, err := timeCron.AddFunc("*/20 */30 * * * *", func() {

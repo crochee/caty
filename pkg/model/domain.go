@@ -5,7 +5,8 @@
 package model
 
 import (
-	"obs/pkg/model/db"
+	"obs/pkg/db"
+	"obs/pkg/log"
 	"time"
 
 	"gorm.io/gorm"
@@ -27,11 +28,9 @@ type Domain struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-func (d *Domain) Delete() {
-	tx := db.NewDB().Begin()
-	defer tx.Rollback()
-	if err := tx.Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
-		return
+func DeleteDomain() {
+	d := new(Domain)
+	if err := db.Client().Model(d).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
+		log.Warn(err.Error())
 	}
-	tx.Commit()
 }

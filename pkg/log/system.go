@@ -88,14 +88,9 @@ func Fatalf(format string, v ...interface{}) {
 //
 // @param: message 信息
 func Fatal(message string) {
-	systemLogger.Fatal(message)
-}
-
-// Exit 打印系统退出信息
-//
-// @param: message 信息
-func Exit(message string) {
-	systemLogger.Info(message)
-	_ = systemLogger.Sync()
+	systemLogger.Error(message)
+	if err := systemLogger.Sync(); err != nil {
+		_, _ = os.Stderr.WriteString(err.Error())
+	}
 	os.Exit(1)
 }

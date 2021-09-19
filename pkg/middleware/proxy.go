@@ -42,7 +42,7 @@ func (p *ProxyMiddle) Proxy(ctx *gin.Context) {
 	ctx.Next()
 }
 
-// Chain returns a Middleware that specifies the chained handler for endpoint.
+// Use Chain returns a Middleware that specifies the chained handler for endpoint.
 func (p *ProxyMiddle) Use(middleware ...http.Handler) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		for index := 0; index < len(middleware); index++ {

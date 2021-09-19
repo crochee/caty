@@ -6,6 +6,7 @@ package host
 
 import (
 	"errors"
+	"fmt"
 	"net"
 )
 
@@ -22,8 +23,8 @@ func ExternalIP() (net.IP, error) {
 		if iFace.Flags&net.FlagLoopback != 0 {
 			continue // loopback interface
 		}
-		addrList, err := iFace.Addrs()
-		if err != nil {
+		var addrList []net.Addr
+		if addrList, err = iFace.Addrs(); err != nil {
 			return nil, err
 		}
 		for _, addr := range addrList {
@@ -55,4 +56,23 @@ func getIPFromAddr(addr net.Addr) net.IP {
 		return nil // not an ipv4 address
 	}
 	return ip
+}
+
+func GetIPByName(name string) (net.IP, error) {
+	iFace, err := net.InterfaceByName(name)
+	if err != nil {
+		return nil, err
+	}
+	var addrList []net.Addr
+	if addrList, err = iFace.Addrs(); err != nil {
+		return nil, err
+	}
+	for _, addr := range addrList {
+		ip := getIPFromAddr(addr)
+		if ip == nil {
+			continue
+		}
+		return ip, nil
+	}
+	return nil, fmt.Errorf("can't find %s ip", name)
 }

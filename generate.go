@@ -16,6 +16,9 @@ package main
 // todo 部署nginx
 // todo 集成es
 
+// mock
+//go:generate go get -u github.com/golang/mock/mockgen
+
 // API GATEWAY
 // https://github.com/fagongzi/manba
 // https://github.com/eolinker/goku-api-gateway

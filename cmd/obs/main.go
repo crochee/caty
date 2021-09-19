@@ -1,59 +1,157 @@
-// Copyright 2021, The Go Authors. All rights reserved.
-// Author: crochee
-// Date: 2021/3/28
+// Date: 2020/12/6
 
 package main
 
 import (
+	"context"
+	"crypto/tls"
+	"errors"
+	"flag"
 	"fmt"
-	"log"
-	"obs/pkg/v"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/spf13/cobra"
+	"github.com/crochee/uid"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+
+	"obs/config"
+	"obs/internal/host"
+	"obs/pkg/db"
+	"obs/pkg/etcdx"
+	"obs/pkg/log"
+	"obs/pkg/message"
+	"obs/pkg/registry"
+	"obs/pkg/router"
+	"obs/pkg/routine"
+	"obs/pkg/tlsx"
+	"obs/pkg/transport/httpx"
+	"obs/pkg/v"
+	"obs/pkg/validator"
 )
 
-//go:generate go install github.com/spf13/cobra/cobra@v1.1.3
+var configFile = flag.String("f", "./conf/config.yml", "the config file")
+
 func main() {
-	rootCmd := &cobra.Command{
-		Use:     v.ServiceName,
-		Short:   "osb service cmd",
-		Long:    "obs service cmd",
-		Example: "OBS [cmd]",
-		Args:    cobra.MinimumNArgs(1),
-		Version: v.Version,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Inside rootCmd Run with args: %v\n", args)
+	flag.Parse()
+	// 初始化配置
+	err := config.LoadConfig(*configFile)
+	if err != nil {
+		panic(err)
+	}
+	// 初始化系统日志
+	log.InitSystemLogger(func(option *log.Option) {
+		option.Path = viper.GetString("system-log-path")
+		option.Level = viper.GetString("system-log-level")
+	})
+
+	if err = run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err.Error())
+	}
+}
+
+func run() error {
+	ctx := context.Background()
+	g := routine.NewGroup(ctx)
+	srv, err := NewServer(ctx)
+	if err != nil {
+		return err
+	}
+	// 服务启动流程
+	g.Go(srv.Start)
+	// 服务关闭流程
+	g.Go(srv.Stop)
+	// 启动mq
+	g.Go(message.Setup)
+	if err = g.Wait(); err != nil && !errors.Is(err, context.Canceled) {
+		return err
+	}
+	return nil
+}
+
+func startAction(ctx context.Context) error {
+	// 初始化数据库
+	if err := db.Init(ctx); err != nil {
+		return err
+	}
+	defer db.Close()
+	if err := validator.Init(); err != nil {
+		return err
+	}
+	log.FromContext(ctx).Infof("%s run on %s", v.ServiceName, gin.Mode())
+	return nil
+}
+
+func shutdownAction(ctx context.Context) error {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	select {
+	case <-ctx.Done():
+	case <-quit:
+	}
+	message.Close()
+	log.FromContext(ctx).Info("shutting down server...")
+	return nil
+}
+
+func NewServer(ctx context.Context) (*httpx.HTTPServer, error) {
+	r, err := etcdx.NewEtcdRegistry()
+	if err != nil {
+		return nil, err
+	}
+	var ip string
+	if ip, err = createHost("WLAN"); err != nil {
+		return nil, err
+	}
+	srv := &httpx.HTTPServer{
+		Server: &http.Server{
+			Addr:    "0.0.0.0:8120",
+			Handler: router.New(),
+			BaseContext: func(_ net.Listener) context.Context {
+				return ctx
+			},
 		},
-	}
-	subCmd1 := &cobra.Command{
-		Use:   "sub1",
-		Short: "subcommand1",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Inside subCmd1 Run with args: %v\n", args)
+		Instance: &registry.ServiceInstance{
+			ID:      uid.New().String(),
+			Name:    v.ServiceName,
+			Version: v.Version,
 		},
+		Registrar:   r,
+		BeforeStart: startAction,
+		BeforeStop:  shutdownAction,
 	}
-	subCmd2 := &cobra.Command{
-		Use:   "sub2",
-		Short: "subcommand2",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Inside subCmd2 Run with args: %v\n", args)
-		},
+	var (
+		cfg *tls.Config
+		uri = &url.URL{
+			Scheme: "https",
+			Host:   fmt.Sprintf("%s:%d", ip, viper.GetInt("port")),
+		}
+	)
+	if cfg, err = tlsx.TlsConfig(tls.RequireAndVerifyClientCert, tlsx.Config{
+		Ca:   "ca.pem",
+		Cert: "server.pem",
+		Key:  "server-key.pem",
+	}); err != nil {
+		uri.Scheme = "http"
+		log.Warn(err.Error())
 	}
-	subCmd11 := &cobra.Command{
-		Use:   "sub11",
-		Short: "subcommand11",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Inside subCmd11 Run with args: %v\n", args)
-		},
+	srv.Server.TLSConfig = cfg
+	srv.Server.Addr = uri.Host
+	srv.Instance.Endpoints = []string{uri.String()}
+	return srv, nil
+}
+
+func createHost(name string) (string, error) {
+	ip, err := host.GetIPByName(name)
+	if err == nil {
+		return ip.String(), nil
 	}
-	subCmd1.AddCommand(subCmd11)
-	rootCmd.AddCommand(subCmd1, subCmd2)
-	if err := rootCmd.Execute(); err != nil {
-		log.Println(err)
-		os.Exit(1)
+	if ip, err = host.ExternalIP(); err != nil {
+		return "", err
 	}
+	return ip.String(), nil
 }

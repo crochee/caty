@@ -5,15 +5,15 @@ package validator
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	translations "github.com/go-playground/validator/v10/translations/zh"
+
+	"obs/pkg/e"
 )
 
 // Init init validator
@@ -33,19 +33,6 @@ type defaultValidator struct {
 	translator ut.Translator
 }
 
-type sliceValidateError []error
-
-func (err sliceValidateError) Error() string {
-	var errs []string
-	for i, e := range err {
-		if e == nil {
-			continue
-		}
-		errs = append(errs, fmt.Sprintf("[%d]: %s", i, e.Error()))
-	}
-	return strings.Join(errs, ";")
-}
-
 // ValidateStruct receives any kind of type, but only performed struct or pointer to struct type.
 func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 	err := v.defaultValidateStruct(obj)
@@ -56,7 +43,7 @@ func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 	if !ok {
 		return err
 	}
-	var errs sliceValidateError
+	var errs e.Errors
 	for _, s := range vErrs.Translate(v.translator) {
 		errs = append(errs, errors.New(s))
 	}
@@ -88,7 +75,7 @@ func (v *defaultValidator) defaultValidateStruct(obj interface{}) error {
 		return v.validateStruct(obj)
 	case reflect.Slice, reflect.Array:
 		count := value.Len()
-		validateRet := make(sliceValidateError, 0)
+		validateRet := make(e.Errors, 0, count)
 		for i := 0; i < count; i++ {
 			if err := v.ValidateStruct(value.Index(i).Interface()); err != nil {
 				validateRet = append(validateRet, err)

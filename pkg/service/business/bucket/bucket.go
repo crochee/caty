@@ -8,9 +8,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"obs/pkg/db"
+	"obs/pkg/e"
 	"obs/pkg/log"
 	"obs/pkg/model"
-	db2 "obs/pkg/model/db"
 	"obs/pkg/service/business/tokenx"
 	"os"
 	"path/filepath"
@@ -18,13 +19,13 @@ import (
 	"gorm.io/gorm"
 
 	"obs/config"
-	"obs/e"
+
 	"obs/internal"
 )
 
 // CreateBucket 创建桶
 func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) error {
-	tx := db2.NewDBWithContext(ctx).Begin()
+	tx := db.New(ctx).Begin()
 	defer tx.Rollback()
 	bucket := &model.Bucket{
 		Bucket: bucketName,
@@ -32,15 +33,15 @@ func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) e
 	}
 	if err := tx.Create(bucket).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return e.New(e.NotFound, "not found record")
+			return e.Wrap(e.ErrNotFound, "not found record")
 		}
 		log.FromContext(ctx).Errorf("insert db failed.Error:%v", err)
-		return e.New(e.OperateDbFail, err.Error())
+		return e.Wrap(e.OperateDbFail, err.Error())
 	}
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s", config.Cfg.ServiceConfig.ServiceInfo.StoragePath, bucket.Bucket))
 	if err != nil {
 		log.FromContext(ctx).Errorf("get path abs failed.Error:%v", err)
-		return e.New(e.GetAbsPathFail, "clear bucket failed")
+		return e.Wrap(e.GetAbsPathFail, "clear bucket failed")
 	}
 	if err = os.MkdirAll(filepath.Clean(path), os.ModePerm); err != nil {
 		log.FromContext(ctx).Errorf("create bucket failed.Error:%v", err)

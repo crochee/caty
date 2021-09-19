@@ -11,9 +11,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"obs/pkg/e"
-	"obs/pkg/log"
-	"obs/pkg/resp"
 	"os"
 	"strings"
 
@@ -21,6 +18,9 @@ import (
 	"github.com/pkg/errors"
 
 	"obs/internal"
+	"obs/pkg/e"
+	"obs/pkg/log"
+	"obs/pkg/resp"
 )
 
 // Recovery panic log
@@ -36,7 +36,7 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			c := ctx.Request.Context()
-			httpRequest, err := httputil.DumpRequest(ctx.Request, false)
+			httpRequest, err := httputil.DumpRequest(ctx.Request, true)
 			if err != nil {
 				log.FromContext(c).Error(err.Error())
 			}
@@ -48,7 +48,7 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			headersToStr := strings.Join(headers, "\r\n")
-			log.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s",
+			log.FromContext(c).Errorf("[Recovery] %s\n%v\n%s",
 				headersToStr, r, internal.Stack(3))
 			extra := fmt.Sprint(err)
 			if brokenPipe {

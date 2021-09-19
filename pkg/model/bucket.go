@@ -5,10 +5,12 @@
 package model
 
 import (
-	"obs/pkg/model/db"
 	"time"
 
 	"gorm.io/gorm"
+
+	"obs/pkg/db"
+	"obs/pkg/log"
 )
 
 type Bucket struct {
@@ -20,12 +22,9 @@ type Bucket struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-func (b *Bucket) Delete() {
-	db.NewDB().Unscoped()
-	tx := db.NewDB().Begin()
-	defer tx.Rollback()
-	if err := tx.Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
-		return
+func DeleteBucket() {
+	b := new(Bucket)
+	if err := db.Client().Model(b).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
+		log.Warn(err.Error())
 	}
-	tx.Commit()
 }

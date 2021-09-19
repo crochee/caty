@@ -5,14 +5,14 @@
 package model
 
 import (
-	"obs/pkg/model/db"
-	"time"
-
-	"gorm.io/gorm"
+	"obs/pkg/db"
+	"obs/pkg/log"
 )
 
 type User struct {
-	User string `gorm:"primary_key:user;type:varchar(50);not null"`
+	ID uint64 `json:"id" gorm:"primary_key:id"`
+
+	User string `gorm:"column:user;type:varchar(50);not null"`
 
 	Domain string `gorm:"column:domain;type:varchar(50);not null"`
 
@@ -21,17 +21,13 @@ type User struct {
 
 	Permission string `gorm:"type:text;not null;column:permission"`
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Deleted db.Deleted
+	db.Base
 }
 
-func (u *User) Delete() {
-	tx := db.NewDB().Begin()
-	defer tx.Rollback()
-	tx.Callback().Delete()
-	if err := tx.Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
-		return
+func DeleteUser() {
+	u := new(User)
+	if err := db.Client().Model(u).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
+		log.Warn(err.Error())
 	}
-	tx.Commit()
 }

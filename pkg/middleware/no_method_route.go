@@ -7,10 +7,16 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 
-	"obs/e"
+	"obs/pkg/e"
+	"obs/pkg/resp"
 )
 
 // NoRoute 404
 func NoRoute(ctx *gin.Context) {
-	e.Error(ctx, e.NotFound)
+	resp.Error(ctx, e.ErrNotFound)
+}
+
+// NoMethod 405
+func NoMethod(ctx *gin.Context) {
+	resp.Error(ctx, e.ErrMethodNotAllow)
 }

@@ -6,15 +6,21 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"obs/pkg/log"
+
+	"obs/pkg/id"
+	"obs/pkg/v"
 )
 
 // TraceId add trace_id
 func TraceId(ctx *gin.Context) {
-	tracedId := ctx.Request.Header.Get("trace_id")
+	tracedId := ctx.Request.Header.Get(v.XTraceID)
 	if tracedId != "" {
-		log := log.FromContext(ctx.Request.Context()).With("trace_id", tracedId)
-		ctx.Request = ctx.Request.WithContext(log.WithContext(ctx.Request.Context(), log))
+		tracedId = id.Uuid()
 	}
+	ctx.Request.Header.Set(v.XTraceID, tracedId)  // 请求头
+	ctx.Writer.Header().Set(v.XTraceID, tracedId) // 响应头
+
+	ctx.Request = ctx.Request.WithContext(v.SetTraceID(ctx.Request.Context(), tracedId))
+
 	ctx.Next()
 }

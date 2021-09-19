@@ -6,6 +6,8 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"obs/pkg/e"
 )
 
 const (
@@ -58,8 +60,12 @@ func (l *Logger) Opt() Option {
 	return l.Option
 }
 
-func (l *Logger) With(key string, value interface{}) Builder {
-	cpLog := l.Logger.With(zap.Any(key, value))
+func (l *Logger) With(fields ...Field) Builder {
+	fieldList := make([]zap.Field, 0, len(fields))
+	for _, field := range fields {
+		fieldList = append(fieldList, zap.Any(field.Key, field.Value))
+	}
+	cpLog := l.Logger.With(fieldList...)
 	return &Logger{
 		Logger:      cpLog,
 		LoggerSugar: cpLog.Sugar(),
@@ -132,21 +138,23 @@ func (l *Logger) Error(message string) {
 // @param: format 格式信息
 // @param: v 参数信息
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.LoggerSugar.Errorf(format, v...)
+	l.LoggerSugar.Fatalf(format, v...)
 }
 
 // Fatal 打印Fatal信息
 //
 // @param: message 信息
 func (l *Logger) Fatal(message string) {
-	l.Logger.Error(message)
+	l.Logger.Fatal(message)
 }
 
 func (l *Logger) Sync() error {
-	err := l.Logger.Sync()
-	err1 := l.LoggerSugar.Sync()
-	if err1 != nil {
-		err = err1
+	var errs e.Errors
+	if err := l.Logger.Sync(); err != nil {
+		errs = append(errs, err)
 	}
-	return err
+	if err := l.LoggerSugar.Sync(); err != nil {
+		errs = append(errs, err)
+	}
+	return errs
 }

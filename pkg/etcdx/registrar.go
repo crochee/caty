@@ -16,11 +16,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/json-iterator/go"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
+
+	"obs/pkg/registry"
 )
 
 type Option struct {

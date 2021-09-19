@@ -33,10 +33,12 @@ const (
 	ErrInvalidParam        Code = 40010000
 	ErrNotFound            Code = 40410001
 	ErrInternalServerError Code = 50010002
+	ErrMethodNotAllow      Code = 40510003
 )
 
 var codeMessageBox = map[Code]string{
 	ErrInvalidParam:        "请求参数不正确",
 	ErrNotFound:            "资源不存在",
+	ErrMethodNotAllow:      "方法不允许",
 	ErrInternalServerError: "服务器内部错误",
 }

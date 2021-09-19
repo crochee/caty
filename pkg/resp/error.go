@@ -47,3 +47,7 @@ func Errors(ctx *gin.Context, err error) {
 	}
 	ErrorWith(ctx, e.ErrInternalServerError, err.Error())
 }
+
+func ErrorParam(ctx *gin.Context, err error) {
+	ErrorWith(ctx, e.ErrInvalidParam, err.Error())
+}

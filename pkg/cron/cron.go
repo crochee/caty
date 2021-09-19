@@ -53,9 +53,9 @@ func formatString(numKeysAndValues int) string {
 	}
 	for i := 0; i < numKeysAndValues/2; i++ {
 		if i > 0 {
-			sb.WriteString(", ")
+			sb.WriteString(" ")
 		}
-		sb.WriteString("%v=%v")
+		sb.WriteString("%v:%v")
 	}
 	return sb.String()
 }

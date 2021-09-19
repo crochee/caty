@@ -9,11 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	middleware2 "obs/pkg/middleware"
 
 	"obs/api/file"
 	"obs/api/user"
 	_ "obs/docs"
+	"obs/pkg/middleware"
 )
 
 // @title obs Swagger API
@@ -24,12 +24,12 @@ import (
 // @in header
 // @name X-Auth-Token
 
-// GinRun gin router
-func GinRun() *gin.Engine {
+// New gin router
+func New() *gin.Engine {
 	router := gin.New()
-	router.Use(middleware2.CrossDomain)
-	router.NoRoute(middleware2.NoRoute)
-	router.NoMethod(middleware2.NoMethod)
+	router.Use(middleware.CrossDomain)
+	router.NoRoute(middleware.NoRoute)
+	router.NoMethod(middleware.NoMethod)
 	if gin.Mode() == gin.DebugMode {
 		// swagger
 		url := ginSwagger.URL("/swagger/doc.json")
@@ -39,7 +39,7 @@ func GinRun() *gin.Engine {
 		pprof.Register(router)
 	}
 
-	router.Use(middleware2.TraceId, middleware2.Recovery, middleware2.Log)
+	router.Use(middleware.TraceId, middleware.RequestLogger(nil), middleware.Log, middleware.Recovery)
 
 	v1Router := router.Group("/v1")
 	userRouter := v1Router.Group("/user")
@@ -48,7 +48,7 @@ func GinRun() *gin.Engine {
 		userRouter.POST("/login", user.Login)
 		userRouter.PUT("/modify", user.Modify)
 	}
-	v1Router.Use(middleware2.Token)
+	v1Router.Use(middleware.Token)
 	{
 		// bucket
 		v1Router.POST("/bucket", file.CreateBucket)
