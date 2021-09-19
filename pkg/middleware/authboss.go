@@ -6,7 +6,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/volatiletech/authboss/v3"
+	authboss "github.com/volatiletech/authboss/v3"
 	"github.com/volatiletech/authboss/v3/defaults"
 )
 

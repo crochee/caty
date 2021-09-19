@@ -238,7 +238,7 @@ linters:
     - govet
     - ineffassign
     - lll
-    - scopelint
+    - exportloopref
     - staticcheck
     - structcheck
     - unused

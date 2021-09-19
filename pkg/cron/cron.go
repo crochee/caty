@@ -5,7 +5,7 @@
 package cron
 
 import (
-	"obs/pkg/logx"
+	"obs/pkg/log"
 	"strings"
 	"time"
 
@@ -34,12 +34,12 @@ type cronLogger struct{}
 
 func (c cronLogger) Info(msg string, keysAndValues ...interface{}) {
 	keysAndValues = formatTimes(keysAndValues)
-	logx.Infof(formatString(len(keysAndValues)), append([]interface{}{msg}, keysAndValues...)...)
+	log.Infof(formatString(len(keysAndValues)), append([]interface{}{msg}, keysAndValues...)...)
 }
 
 func (c cronLogger) Error(err error, msg string, keysAndValues ...interface{}) {
 	keysAndValues = formatTimes(keysAndValues)
-	logx.Errorf(formatString(len(keysAndValues)+2),
+	log.Errorf(formatString(len(keysAndValues)+2),
 		append([]interface{}{msg, "error", err}, keysAndValues...)...)
 }
 

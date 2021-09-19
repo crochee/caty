@@ -6,8 +6,11 @@ package user
 
 import (
 	"net/http"
-	"obs/pkg/logx"
+	"obs/pkg/log"
+	"obs/pkg/model"
 	db2 "obs/pkg/model/db"
+	"obs/pkg/service/business/tokenx"
+	"obs/pkg/service/business/userx"
 
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
@@ -16,8 +19,6 @@ import (
 
 	"obs/e"
 	"obs/internal"
-	"obs/service/business/tokenx"
-	"obs/service/business/userx"
 )
 
 // Register godoc
@@ -34,7 +35,7 @@ import (
 func Register(ctx *gin.Context) {
 	var domainInfo Domain
 	if err := ctx.ShouldBindBodyWith(&domainInfo, binding.JSON); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
@@ -47,11 +48,11 @@ func Register(ctx *gin.Context) {
 		tokenx.AllService: tokenx.Admin,
 	})
 	if err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("marshal permission failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("marshal permission failed.Error:%v", err)
 		e.Error(ctx, e.MarshalFail)
 		return
 	}
-	domain := &db2.Domain{
+	domain := &model.Domain{
 		Domain:     uid.New().String(),
 		Email:      domainInfo.Email,
 		Nick:       domainInfo.Nick,
@@ -59,7 +60,7 @@ func Register(ctx *gin.Context) {
 		Permission: permission,
 	}
 	if err = db2.NewDBWithContext(ctx).Create(domain).Error; err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("insert domain failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("insert domain failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}
@@ -80,7 +81,7 @@ func Register(ctx *gin.Context) {
 func Login(ctx *gin.Context) {
 	var loginInfo LoginInfo
 	if err := ctx.ShouldBindBodyWith(&loginInfo, binding.JSON); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
@@ -113,7 +114,7 @@ func Login(ctx *gin.Context) {
 func Modify(ctx *gin.Context) {
 	var modifyInfo ModifyInfo
 	if err := ctx.ShouldBindBodyWith(&modifyInfo, binding.JSON); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}

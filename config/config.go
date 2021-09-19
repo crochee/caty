@@ -5,53 +5,25 @@
 package config
 
 import (
-	"fmt"
-	"os"
+	"errors"
 	"path/filepath"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-
-	"obs/internal/host"
+	"github.com/spf13/viper"
 )
 
-// Cfg 全局配置参数
-var (
-	Cfg Config
-)
-
-// InitConfig init Config
-func InitConfig(path string) {
-	config, err := loadConfig(path)
-	if err != nil {
-		panic(err)
+// LoadConfig init Config
+func LoadConfig(path string) error {
+	pathList := strings.Split(path, string(filepath.Separator))
+	lastIndex := len(pathList) - 1
+	index := strings.LastIndexByte(pathList[lastIndex], '.')
+	if index == -1 {
+		return errors.New("path hasn't ext")
 	}
 
-	gin.SetMode(config.ServiceInfo.Mode)
+	viper.AddConfigPath(path[:len(path)-len(pathList[lastIndex])])            // 设置配置文件路径
+	viper.SetConfigName(pathList[lastIndex][:index])                          // 设置配置文件名称
+	viper.SetConfigType(strings.TrimPrefix(pathList[lastIndex][index:], ".")) // 设置配置文件类型
 
-	Cfg.ServiceConfig = config
-
-	Cfg.Pid = os.Getpid()                            // pid获取
-	if Cfg.IP, err = host.ExternalIP(); err != nil { // ip获取
-		panic(err)
-	}
-}
-
-type DecodeEncode interface {
-	Decode() (*ServiceConfig, error)
-	Encode(config *ServiceConfig) error
-}
-
-func loadConfig(path string) (*ServiceConfig, error) {
-	var lc DecodeEncode
-	ext := filepath.Ext(path)
-	switch strings.ToLower(ext) {
-	case ".json":
-		lc = Json{path: path}
-	case ".yml", ".yaml":
-		lc = Yml{path: path}
-	default:
-		return nil, fmt.Errorf("unsupport config extension %s", ext)
-	}
-	return lc.Decode()
+	return viper.ReadInConfig()
 }

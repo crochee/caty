@@ -19,7 +19,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	config.InitConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/config.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	config.InitConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/config.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestModify(t *testing.T) {
-	config.InitConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/config.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}

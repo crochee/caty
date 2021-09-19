@@ -1,8 +1,7 @@
-service_info:
-  mode: debug
-  log_path: mongodb://admin:1234567@192.168.31.62:27017
-  log_level: debug
-  storage_path: /obs/
+mode: debug
+system-log-path: mongodb://admin:1234567@192.168.31.62:27017
+system-log_level: debug
+storage_path: /obs/
 list:
   mysql:
     type: mysql

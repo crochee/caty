@@ -9,19 +9,21 @@ package middleware
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"net/http/httputil"
-	"obs/pkg/logx"
+	"obs/pkg/e"
+	"obs/pkg/log"
+	"obs/pkg/resp"
 	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"obs/e"
 	"obs/internal"
 )
 
-// Recovery panic logx
+// Recovery panic log
 func Recovery(ctx *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -33,10 +35,10 @@ func Recovery(ctx *gin.Context) {
 						strings.Contains(strings.ToLower(se.Error()), "connection reset by peer")
 				}
 			}
-			newCtx := ctx.Request.Context()
+			c := ctx.Request.Context()
 			httpRequest, err := httputil.DumpRequest(ctx.Request, false)
 			if err != nil {
-				logx.FromContext(newCtx).Error(err.Error())
+				log.FromContext(c).Error(err.Error())
 			}
 			headers := strings.Split(string(httpRequest), "\r\n")
 			for idx, header := range headers {
@@ -46,13 +48,17 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			headersToStr := strings.Join(headers, "\r\n")
-			logx.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s",
+			log.FromContext(ctx.Request.Context()).Errorf("[Recovery] %s\n%v\n%s",
 				headersToStr, r, internal.Stack(3))
 			extra := fmt.Sprint(err)
 			if brokenPipe {
 				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", err)
 			}
-			e.AbortWith(ctx, e.Recovery, extra)
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, resp.ResponseCode{
+				Code:   e.ErrInternalServerError.Code(),
+				Msg:    e.ErrInternalServerError.Error(),
+				Detail: extra,
+			})
 		}
 	}()
 	ctx.Next()

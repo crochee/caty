@@ -12,18 +12,21 @@ require (
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.7.3
 	github.com/go-kratos/kratos/v2 v2.0.4
+	github.com/go-openapi/spec v0.19.14 // indirect
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
+	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/json-iterator/go v1.1.11
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/sony/sonyflake v1.0.0 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.3.0
-	github.com/swaggo/swag v1.7.0
+	github.com/swaggo/swag v1.6.7
 	github.com/volatiletech/authboss/v3 v3.0.3
 	go.etcd.io/etcd/api/v3 v3.5.0-alpha.0
 	go.etcd.io/etcd/client/v3 v3.5.0-alpha.0

@@ -6,7 +6,7 @@ package cron
 
 import (
 	"fmt"
-	"obs/pkg/logx"
+	"obs/pkg/log"
 	"testing"
 	"time"
 
@@ -14,8 +14,8 @@ import (
 )
 
 func TestCronSetup(t *testing.T) {
-	config.InitConfig("../conf/config.yml")
-	logx.InitSystemLogger("", "INFO")
+	config.LoadConfig("../conf/config.yml")
+	log.InitSystemLogger("", "INFO")
 	Setup()
 	// 0 0/5 * * * ?
 	id, err := timeCron.AddFunc("*/20 */30 * * * *", func() {

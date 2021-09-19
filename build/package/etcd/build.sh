@@ -48,9 +48,9 @@ ${image} \
 #  --initial-cluster-token etcd-cluster-k8s \
 #  --initial-cluster-state new \
 #  --initial-cluster etcd_node0=http://172.24.152.17:2380,etcd_node1=http://172.24.149.46:2380,etcd_node2=http://172.24.155.15:2380 \
-#  --logx-level info \
-#  --logx zap \
-#  --logx-outputs stderr
+#  --log-level info \
+#  --log zap \
+#  --log-outputs stderr
 
 #--name：节点名称，默认为 default。
 #--data-dir：服务运行数据保存的路径，默认为${name}.etcd。

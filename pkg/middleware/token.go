@@ -7,24 +7,23 @@ package middleware
 import (
 	"errors"
 	"net/http"
-	"obs/pkg/logx"
+	"obs/pkg/log"
+	"obs/pkg/service/business/tokenx"
 
 	"github.com/gin-gonic/gin"
-
-	"obs/service/business/tokenx"
 )
 
 // Token add trace_id
 func Token(ctx *gin.Context) {
 	xAuthToken, err := queryToken(ctx)
 	if err != nil { // 缺少token 禁止访问
-		logx.FromContext(ctx.Request.Context()).Error(err.Error())
+		log.FromContext(ctx.Request.Context()).Error(err.Error())
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	var claims *tokenx.TokenClaims
 	if claims, err = tokenx.ParseToken(xAuthToken); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("parse token failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("parse token failed.Error:%v", err)
 		ctx.AbortWithStatus(http.StatusForbidden)
 		return
 	}

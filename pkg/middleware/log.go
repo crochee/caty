@@ -7,17 +7,17 @@
 package middleware
 
 import (
-	"obs/pkg/logx"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
-	"obs/cmd"
+	"obs/pkg/log"
+	"obs/pkg/v"
 )
 
-// Log request logx
+// Log request log
 func Log(ctx *gin.Context) {
 	// Start timer
 	start := time.Now()
@@ -50,10 +50,10 @@ func Log(ctx *gin.Context) {
 		path = buf.String()
 	}
 	param.Path = path
-	logx.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
+	log.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
 }
 
-// defaultLogFormatter is the default logx format function Logger middleware uses.
+// defaultLogFormatter is the default log format function Logger middleware uses.
 var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 	var statusColor, methodColor, resetColor string
 	if param.IsOutputColor() {
@@ -67,7 +67,7 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 	}
 	var buf strings.Builder
 	buf.WriteByte('[')
-	buf.WriteString(cmd.ServiceName)
+	buf.WriteString(v.ServiceName)
 	buf.WriteString("] ")
 	buf.WriteString(param.TimeStamp.Format("2006/01/02 - 15:04:05"))
 	buf.WriteString(" |")

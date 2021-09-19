@@ -7,22 +7,21 @@ package main
 import (
 	"fmt"
 	"log"
+	"obs/pkg/v"
 	"os"
 
 	"github.com/spf13/cobra"
-
-	"obs/cmd"
 )
 
 //go:generate go install github.com/spf13/cobra/cobra@v1.1.3
 func main() {
 	rootCmd := &cobra.Command{
-		Use:     cmd.ServiceName,
+		Use:     v.ServiceName,
 		Short:   "osb service cmd",
 		Long:    "obs service cmd",
 		Example: "OBS [cmd]",
 		Args:    cobra.MinimumNArgs(1),
-		Version: cmd.Version,
+		Version: v.Version,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside rootCmd Run with args: %v\n", args)
 		},

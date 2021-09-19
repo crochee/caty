@@ -9,8 +9,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"obs/pkg/logx"
+	"obs/pkg/log"
+	"obs/pkg/model"
 	db2 "obs/pkg/model/db"
+	"obs/pkg/service/business/bucket"
+	tokenx2 "obs/pkg/service/business/tokenx"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +23,6 @@ import (
 	"obs/cmd"
 	"obs/config"
 	"obs/e"
-	"obs/service/business/bucket"
-	"obs/service/business/tokenx"
 )
 
 // UploadFile godoc
@@ -41,22 +42,22 @@ import (
 func UploadFile(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
 	var fileInfo Info
 	if err := ctx.ShouldBindWith(&fileInfo, binding.FormMultipart); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
-	token, err := tokenx.QueryToken(ctx)
+	token, err := tokenx2.QueryToken(ctx)
 	if err != nil {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Write); err != nil {
+	if err = tokenx2.VerifyAuth(token.ActionMap, v.ServiceName, tokenx2.Write); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -84,16 +85,16 @@ func UploadFile(ctx *gin.Context) {
 func DeleteFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
-	token, err := tokenx.QueryToken(ctx)
+	token, err := tokenx2.QueryToken(ctx)
 	if err != nil {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Delete); err != nil {
+	if err = tokenx2.VerifyAuth(token.ActionMap, v.ServiceName, tokenx2.Delete); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -121,16 +122,16 @@ func DeleteFile(ctx *gin.Context) {
 func SignFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
-	token, err := tokenx.QueryToken(ctx)
+	token, err := tokenx2.QueryToken(ctx)
 	if err != nil {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Read); err != nil {
+	if err = tokenx2.VerifyAuth(token.ActionMap, v.ServiceName, tokenx2.Read); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
@@ -161,41 +162,41 @@ func SignFile(ctx *gin.Context) {
 func DownloadFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
 
-	token, err := tokenx.QueryToken(ctx)
+	token, err := tokenx2.QueryToken(ctx)
 	if err != nil {
 		e.ErrorWith(ctx, e.GetTokenFail, err.Error())
 		return
 	}
-	if err = tokenx.VerifyAuth(token.ActionMap, cmd.ServiceName, tokenx.Read); err != nil {
+	if err = tokenx2.VerifyAuth(token.ActionMap, v.ServiceName, tokenx2.Read); err != nil {
 		e.ErrorWith(ctx, e.Forbidden, err.Error())
 		return
 	}
 
 	conn := db2.NewDBWithContext(ctx)
-	b := new(db2.Bucket)
+	b := new(model.Bucket)
 	if err = conn.Model(b).Where("bucket =? AND domain= ?",
 		target.BucketName, token.Domain).First(b).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		log.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}
-	bucketFile := &db2.BucketFile{}
+	bucketFile := &model.BucketFile{}
 	if err = conn.Model(bucketFile).Where("file =? AND bucket= ?",
 		target.FileName, b.Bucket).First(bucketFile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		log.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}
