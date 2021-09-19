@@ -24,7 +24,7 @@ type Option struct {
 	Password string
 	IP       string
 	Port     string
-	Name     string
+	Database string
 	Charset  string
 
 	Timeout         time.Duration
@@ -141,7 +141,7 @@ func getLevel(l string, debug bool) logger.LogLevel {
 
 func dsn(opt *Option) string {
 	uri := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%t&loc=%s",
-		opt.User, opt.Password, opt.IP, opt.Port, opt.Name, opt.Charset, true, "UTC")
+		opt.User, opt.Password, opt.IP, opt.Port, opt.Database, opt.Charset, true, "UTC")
 	if opt.Timeout != 0 {
 		uri += fmt.Sprintf("&timeout=%s", opt.Timeout)
 	}

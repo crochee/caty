@@ -54,10 +54,10 @@ func Recovery(ctx *gin.Context) {
 			if brokenPipe {
 				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", err)
 			}
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, resp.ResponseCode{
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, resp.Response{
 				Code:   e.ErrInternalServerError.Code(),
 				Msg:    e.ErrInternalServerError.Error(),
-				Detail: extra,
+				Result: extra,
 			})
 		}
 	}()

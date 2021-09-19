@@ -8,9 +8,37 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"obs/pkg/e"
 )
+
+type Response struct {
+	ResponseCode
+	Result interface{} `json:"result"`
+}
 
 // Success response data
 func Success(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, data)
+	ctx.JSON(e.ErrSuccess.StatusCode(), Response{
+		ResponseCode: ResponseCode{
+			Code: e.ErrSuccess.Code(),
+			Msg:  e.ErrSuccess.Error(),
+		},
+		Result: data,
+	})
+}
+
+// SuccessNone response none
+func SuccessNone(ctx *gin.Context) {
+	ctx.JSON(e.ErrSuccess.StatusCode(), Response{
+		ResponseCode: ResponseCode{
+			Code: e.ErrSuccess.Code(),
+			Msg:  e.ErrSuccess.Error(),
+		},
+	})
+}
+
+// SuccessNotContent response 204 nothing
+func SuccessNotContent(ctx *gin.Context) {
+	ctx.Status(http.StatusNoContent)
 }

@@ -20,7 +20,7 @@ import (
 )
 
 func TestUploadFile(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func TestUploadFile(t *testing.T) {
 }
 
 func TestDeleteFile(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestDeleteFile(t *testing.T) {
 }
 
 func TestSignFile(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func TestSignFile(t *testing.T) {
 }
 
 func TestDownloadFile(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}

@@ -90,7 +90,7 @@ func NewProxyBuilder() (http.Handler, error) {
 			case errors.Is(err, io.EOF):
 				statusCode = http.StatusBadGateway
 			case errors.Is(err, context.Canceled):
-				statusCode = status.StatusClientClosedRequest
+				statusCode = status.ClientClosedRequest
 			default:
 				var netErr net.Error
 				if errors.As(err, &netErr) {
@@ -102,7 +102,7 @@ func NewProxyBuilder() (http.Handler, error) {
 				}
 			}
 			log := log.FromContext(request.Context())
-			text := status.StatusText(statusCode)
+			text := status.Text(statusCode)
 			log.Errorf("%+v '%d %s' caused by: %v", request.URL, statusCode, text, err)
 			writer.WriteHeader(statusCode)
 			if _, err = writer.Write([]byte(text)); err != nil {

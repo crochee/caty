@@ -7,25 +7,20 @@ package model
 import (
 	"obs/pkg/db"
 	"obs/pkg/log"
-	"time"
-
-	"gorm.io/gorm"
 )
 
 type Domain struct {
-	Domain string `gorm:"primary_key:domain;type:varchar(50);not null"`
+	ID         uint64 `json:"id" gorm:"primary_key:id"`
+	AccountID  string `json:"account_id" gorm:"column:account_id;type:varchar(50);not null;comment:主账号ID"`
+	UserID     string `json:"user_id" gorm:"column:user_id;type:varchar(50);not null"`
+	Nick       string `json:"nick" gorm:"type:varchar(50);not null;column:nick"`
+	PassWord   string `json:"pass_word" gorm:"type:varchar(20);not null;column:pass_word"`
+	Email      string `json:"email" gorm:"type:varchar(50);not null;unique_index:email"`
+	Permission string `json:"permission" gorm:"type:text;not null;column:permission"`
+	Verify     bool   `json:"verify" gorm:"column:verify"`
 
-	Email    string `gorm:"type:varchar(50);not null;unique_index:email"`
-	Nick     string `gorm:"type:varchar(50);not null;column:nick"`
-	PassWord string `gorm:"type:varchar(20);not null;column:pass_word"`
-
-	Permission string `gorm:"type:text;not null;column:permission"`
-
-	Verify bool `gorm:"column:verify"`
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Deleted db.Deleted `json:"deleted" gorm:""`
+	db.Base
 }
 
 func DeleteDomain() {

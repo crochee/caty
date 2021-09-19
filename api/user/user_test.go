@@ -19,12 +19,12 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
 	body := new(bytes.Buffer)
-	r := &Domain{
+	r := &User{
 		Nick: "nick",
 		LoginInfo: LoginInfo{
 			Email:    "13522570308@139.com",
@@ -41,7 +41,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestModify(t *testing.T) {
-	config.LoadConfig("../../conf/config.yml")
+	config.LoadConfig("../../conf/obs.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}

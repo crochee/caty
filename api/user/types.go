@@ -4,11 +4,6 @@
 
 package user
 
-type Domain struct {
-	Nick string `json:"nick" uri:"nick" form:"nick" binding:"required"`
-	LoginInfo
-}
-
 type LoginInfo struct {
 	Email    string `json:"email" uri:"email" form:"email" binding:"required"`
 	PassWord string `json:"pass_word" uri:"pass_word" form:"pass_word" binding:"required"`

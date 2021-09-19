@@ -14,7 +14,7 @@ import (
 )
 
 func TestCronSetup(t *testing.T) {
-	config.LoadConfig("../conf/config.yml")
+	config.LoadConfig("../conf/obs.yml")
 	log.InitSystemLogger()
 	Setup()
 	// 0 0/5 * * * ?

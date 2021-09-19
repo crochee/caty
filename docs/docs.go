@@ -49,7 +49,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/file.Name"
+                            "$ref": "#/definitions/file.Database"
                         }
                     }
                 ],
@@ -556,7 +556,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.Domain"
+                            "$ref": "#/definitions/user.User"
                         }
                     }
                 ],
@@ -612,7 +612,7 @@ var doc = `{
                 }
             }
         },
-        "file.Name": {
+        "file.Database": {
             "type": "object",
             "required": [
                 "bucket_name"
@@ -623,7 +623,7 @@ var doc = `{
                 }
             }
         },
-        "user.Domain": {
+        "user.User": {
             "type": "object",
             "required": [
                 "email",

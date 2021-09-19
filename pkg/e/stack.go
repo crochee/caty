@@ -175,7 +175,7 @@ func callers() *stack {
 	return &st
 }
 
-// funcName removes the path prefix component of a function's name reported by func.Name().
+// funcName removes the path prefix component of a function's name reported by func.Database().
 func funcName(name string) string {
 	i := strings.LastIndex(name, "/")
 	name = name[i+1:]

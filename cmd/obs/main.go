@@ -34,7 +34,7 @@ import (
 	"obs/pkg/validator"
 )
 
-var configFile = flag.String("f", "./conf/config.yml", "the config file")
+var configFile = flag.String("f", "./conf/obs.yml", "the config file")
 
 func main() {
 	flag.Parse()

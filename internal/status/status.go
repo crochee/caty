@@ -6,15 +6,15 @@ package status
 
 import "net/http"
 
-// StatusClientClosedRequest non-standard HTTP status code for client disconnection.
-const StatusClientClosedRequest = 499
+// ClientClosedRequest non-standard HTTP status code for client disconnection.
+const ClientClosedRequest = 499
 
-// StatusClientClosedRequestText non-standard HTTP status for client disconnection.
-const StatusClientClosedRequestText = "Client Closed Request"
+// ClientClosedRequestText non-standard HTTP status for client disconnection.
+const ClientClosedRequestText = "Client Closed Request"
 
-func StatusText(statusCode int) string {
-	if statusCode == StatusClientClosedRequest {
-		return StatusClientClosedRequestText
+func Text(statusCode int) string {
+	if statusCode == ClientClosedRequest {
+		return ClientClosedRequestText
 	}
 	return http.StatusText(statusCode)
 }

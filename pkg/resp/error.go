@@ -10,25 +10,41 @@ import (
 )
 
 type ResponseCode struct {
-	Code   int    `json:"code"`
-	Msg    string `json:"message"`
-	Detail string `json:"detail,omitempty"`
+	// 返回码
+	// Required: true
+	// Example: 20000000
+	Code int `json:"code"`
+	// 返回信息描述
+	// Required: true
+	// Example: success
+	Msg string `json:"message"`
+}
+
+type ResponseError struct {
+	ResponseCode
+	// 具体描述信息
+	// Required: true
+	Result string `json:"result"`
 }
 
 // Error gin response with Code
 func Error(ctx *gin.Context, code e.Code) {
-	ctx.JSON(code.StatusCode(), ResponseCode{
-		Code: code.Code(),
-		Msg:  code.Error(),
+	ctx.JSON(code.StatusCode(), ResponseError{
+		ResponseCode: ResponseCode{
+			Code: code.Code(),
+			Msg:  code.Error(),
+		},
 	})
 }
 
 // ErrorWith gin response with Code and message
 func ErrorWith(ctx *gin.Context, code e.Code, message string) {
-	ctx.JSON(code.StatusCode(), &ResponseCode{
-		Code:   code.Code(),
-		Msg:    code.Error(),
-		Detail: message,
+	ctx.JSON(code.StatusCode(), ResponseError{
+		ResponseCode: ResponseCode{
+			Code: code.Code(),
+			Msg:  code.Error(),
+		},
+		Result: message,
 	})
 }
 

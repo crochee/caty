@@ -7,7 +7,7 @@ func (c Code) Error() string {
 	if c < 10000000 || c >= 60000000 {
 		return InvalidError
 	}
-	message, ok := codeMessageBox[c]
+	message, ok := codeZhMessageBox[c]
 	if ok {
 		return message
 	}
@@ -28,6 +28,7 @@ const (
 )
 
 const (
+	ErrSuccess Code = 20000000
 	// 00~100为服务级别错误码
 
 	ErrInvalidParam        Code = 40010000
@@ -36,7 +37,8 @@ const (
 	ErrMethodNotAllow      Code = 40510003
 )
 
-var codeMessageBox = map[Code]string{
+var codeZhMessageBox = map[Code]string{
+	ErrSuccess:             "成功",
 	ErrInvalidParam:        "请求参数不正确",
 	ErrNotFound:            "资源不存在",
 	ErrMethodNotAllow:      "方法不允许",

@@ -24,12 +24,12 @@ var (
 // Init init database
 func Init(ctx context.Context) (err error) {
 	dbClient, err = NewClient(ctx, func(opt *Option) {
-		opt.Debug = viper.GetBool("debug")
+		opt.Debug = viper.GetString("mode") == "debug"
 		opt.User = viper.GetString("mysql.user")
 		opt.Password = viper.GetString("mysql.password")
 		opt.IP = viper.GetString("mysql.ip")
 		opt.Port = viper.GetString("mysql.port")
-		opt.Name = viper.GetString("mysql.name")
+		opt.Database = viper.GetString("mysql.database")
 		opt.Charset = viper.GetString("mysql.charset")
 		opt.MaxOpenConn = viper.GetInt("mysql.max_open_conns")
 		opt.MaxIdleConn = viper.GetInt("mysql.max_idle_conns")

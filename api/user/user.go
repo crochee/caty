@@ -6,9 +6,10 @@ package user
 
 import (
 	"net/http"
+	"obs/pkg/e"
 	"obs/pkg/log"
 	"obs/pkg/model"
-	db2 "obs/pkg/model/db"
+	"obs/pkg/resp"
 	"obs/pkg/service/business/tokenx"
 	"obs/pkg/service/business/userx"
 
@@ -17,9 +18,16 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/json-iterator/go"
 
-	"obs/e"
 	"obs/internal"
 )
+
+type User struct {
+	AccountID string `json:"account_id" binding:"required"`
+	UserID    string `json:"user_id" binding:"required"`
+	Nick      string `json:"nick"  binding:"required"`
+	Email     string `json:"email"  binding:"required"`
+	PassWord  string `json:"pass_word"  binding:"required"`
+}
 
 // Register godoc
 // @Summary register
@@ -27,16 +35,28 @@ import (
 // @Tags user
 // @Accept application/json
 // @Produce application/json
-// @Param request body Domain true "register request's content"
+// @Param request body User true "register request's content"
 // @Success 200
 // @Failure 400 {object} e.Response
 // @Failure 500 {object} e.Response
 // @Router /v1/user/register [post]
+
+// Register godoc
+// swagger:route  POST /v1/account 账户 SwaggerDomain
+// 注册账户
+//
+// register account
+//     Consumes:
+//     - application/json
+//     Produces:
+//     - application/json
+//     Responses:
+//		 204: SwaggerNoneResponse
+//       default: SwaggerResponseError
 func Register(ctx *gin.Context) {
-	var domainInfo Domain
+	var domainInfo User
 	if err := ctx.ShouldBindBodyWith(&domainInfo, binding.JSON); err != nil {
-		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
+		resp.ErrorParam(ctx, err)
 		return
 	}
 	// 检测邮箱的合法性
