@@ -21,15 +21,14 @@ func TestDeleteUser(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	v := db.RawMessage(`{"op":90}`)
 	d := db.Client().Debug()
 	u := &User{
 		AccountID:  "lcf",
 		UserID:     "44",
-		Nick:       "5",
+		Account:    "90",
 		PassWord:   "5",
 		Email:      "6",
-		Permission: &v,
+		Permission: `{"op":90}`,
 		Verify:     0,
 		Desc:       "lcf_desc",
 	}
@@ -37,7 +36,7 @@ func TestDeleteUser(t *testing.T) {
 		t.Log(d.Set("gorm:table_options",
 			"ENGINE=InnoDB COMMENT='账户信息表' COLLATE='utf8mb4_bin'").AutoMigrate(u))
 	}
-	t.Log(d.Model(u).Create(u))
-	t.Log(d.Model(u).Delete(u))
+	//t.Log(d.Model(u).Create(u))
+	//t.Log(d.Model(u).Delete(u))
 	//t.Log(d.Model(u).First(u))
 }

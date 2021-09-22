@@ -1,7 +1,14 @@
-// Copyright 2020, The Go Authors. All rights reserved.
-// Author: OnlyOneFace
-// Date: 2020/12/6
-
+// Package router obs
+//
+// The purpose of this service is to provide an application
+// that is using object
+//
+//     title: obs
+//     Schemes: http,https
+//     Host: localhost:8120
+//     Version: 0.0.1
+//
+// swagger:meta
 package router
 
 import (
@@ -10,8 +17,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"obs/api/file"
-	"obs/api/user"
 	_ "obs/docs"
 	"obs/pkg/middleware"
 )
@@ -42,29 +47,32 @@ func New() *gin.Engine {
 	router.Use(middleware.TraceId, middleware.RequestLogger(nil), middleware.Log, middleware.Recovery)
 
 	v1Router := router.Group("/v1")
-	userRouter := v1Router.Group("/user")
-	{
-		userRouter.POST("/register", user.Register)
-		userRouter.POST("/login", user.Login)
-		userRouter.PUT("/modify", user.Modify)
-	}
-	v1Router.Use(middleware.Token)
-	{
-		// bucket
-		v1Router.POST("/bucket", file.CreateBucket)
-		v1Router.GET("/bucket/:bucket_name", file.GetBucket)
-		v1Router.DELETE("/bucket/:bucket_name", file.DeleteBucket)
 
-		// file
-		fileRouter := v1Router.Group("/bucket/:bucket_name")
-		{
-			fileRouter.POST("/file", file.UploadFile)
-			fileRouter.DELETE("/file/:file_name", file.DeleteFile)
-			fileRouter.GET("/file/:file_name/sign", file.SignFile)
-			fileRouter.GET("/file/:file_name", file.DownloadFile)
-			//fileRouter.GET("/files", file.FileList)
-		}
-	}
+	registerAccount(v1Router)
+
+	//userRouter := v1Router.Group("/user")
+	//{
+	//	userRouter.POST("/v1/account", user.Register)
+	//	userRouter.POST("/login", user.Login)
+	//	userRouter.PUT("/modify", user.Modify)
+	//}
+	//v1Router.Use(middleware.Token)
+	//{
+	//	// bucket
+	//	v1Router.POST("/bucket", file.CreateBucket)
+	//	v1Router.GET("/bucket/:bucket_name", file.GetBucket)
+	//	v1Router.DELETE("/bucket/:bucket_name", file.DeleteBucket)
+	//
+	//	// file
+	//	fileRouter := v1Router.Group("/bucket/:bucket_name")
+	//	{
+	//		fileRouter.POST("/file", file.UploadFile)
+	//		fileRouter.DELETE("/file/:file_name", file.DeleteFile)
+	//		fileRouter.GET("/file/:file_name/sign", file.SignFile)
+	//		fileRouter.GET("/file/:file_name", file.DownloadFile)
+	//		//fileRouter.GET("/files", file.FileList)
+	//	}
+	//}
 
 	return router
 }

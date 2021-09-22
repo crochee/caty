@@ -1,671 +1,136 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "description": "This is a obs server.",
-        "title": "obs Swagger API",
-        "contact": {},
-        "version": "1.0"
-    },
-    "paths": {
-        "/v1/bucket": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "create bucket",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "bucket"
-                ],
-                "summary": "CreateBucket",
-                "parameters": [
-                    {
-                        "description": "bucket name",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/file.Name"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bucket/{bucket_name}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get bucket",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "bucket"
-                ],
-                "summary": "GetBucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "bucket info",
-                        "schema": {
-                            "$ref": "#/definitions/bucket.Info"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "delete bucket",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "bucket"
-                ],
-                "summary": "DeleteBucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bucket/{bucket_name}/file": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "upload file",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "UploadFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "file",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bucket/{bucket_name}/file/{file_name}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "download File",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "DownloadFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "file name",
-                        "name": "file_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "sign",
-                        "name": "sign",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "delete file",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "DeleteFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "file name",
-                        "name": "file_name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bucket/{bucket_name}/file/{file_name}/sign": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get file sign info",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "file"
-                ],
-                "summary": "SignFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bucket name",
-                        "name": "bucket_name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "file name",
-                        "name": "file_name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "file link",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/user/login": {
-            "post": {
-                "description": "user login",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Login",
-                "parameters": [
-                    {
-                        "description": "login request's content",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.LoginInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/user/modify": {
-            "put": {
-                "description": "user modify",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Modify",
-                "parameters": [
-                    {
-                        "description": "request's content",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.ModifyInfo"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "304": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/user/register": {
-            "post": {
-                "description": "register user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "register",
-                "parameters": [
-                    {
-                        "description": "register request's content",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.Domain"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "bucket.Info": {
-            "type": "object",
-            "properties": {
-                "count": {
-                    "type": "integer"
+  "schemes": [
+    "http,https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "The purpose of this service is to provide an application\nthat is using object\n\ntitle: obs",
+    "title": "obs",
+    "version": "0.0.1"
+  },
+  "host": "localhost:8120",
+  "paths": {
+    "/v1/account": {
+      "post": {
+        "description": "register account",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "注册账户",
+        "operationId": "SwaggerRegisterUserRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "account"
+              ],
+              "properties": {
+                "account": {
+                  "description": "账户",
+                  "type": "string",
+                  "x-go-name": "Account"
                 },
-                "last_modified": {
-                    "type": "string"
+                "desc": {
+                  "description": "描述信息",
+                  "type": "string",
+                  "x-go-name": "Desc"
                 },
-                "name": {
-                    "type": "string"
+                "email": {
+                  "description": "邮箱",
+                  "type": "string",
+                  "x-go-name": "Email"
                 },
-                "size": {
-                    "type": "integer"
+                "pass_word": {
+                  "description": "密码",
+                  "type": "string",
+                  "x-go-name": "PassWord"
                 }
+              }
             }
-        },
-        "e.ErrorResponse": {
-            "type": "object",
-            "properties": {
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message",
+                "result"
+              ],
+              "properties": {
                 "code": {
-                    "type": "string"
-                },
-                "extra": {
-                    "type": "string"
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
                 },
                 "message": {
-                    "type": "string"
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
                 }
+              }
             }
-        },
-        "file.Name": {
-            "type": "object",
-            "required": [
-                "bucket_name"
-            ],
-            "properties": {
-                "bucket_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.Domain": {
-            "type": "object",
-            "required": [
-                "email",
-                "nick",
-                "pass_word"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "nick": {
-                    "type": "string"
-                },
-                "pass_word": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.LoginInfo": {
-            "type": "object",
-            "required": [
-                "email",
-                "pass_word"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "pass_word": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.ModifyInfo": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "new_pass_word": {
-                    "type": "string"
-                },
-                "nick": {
-                    "type": "string"
-                },
-                "old_pass_word": {
-                    "type": "string"
-                }
-            }
+          }
         }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "X-Auth-Token",
-            "in": "header"
-        }
+      }
     }
+  },
+  "responses": {
+    "SwaggerNoneResponse": {
+      "description": ""
+    },
+    "SwaggerResponseError": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "result"
+        ],
+        "properties": {
+          "code": {
+            "description": "返回码",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code",
+            "example": 20000000
+          },
+          "message": {
+            "description": "返回信息描述",
+            "type": "string",
+            "x-go-name": "Msg",
+            "example": "success"
+          },
+          "result": {
+            "description": "具体描述信息",
+            "type": "string",
+            "x-go-name": "Result"
+          }
+        }
+      }
+    }
+  }
 }

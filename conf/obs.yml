@@ -6,7 +6,7 @@ storage_path: /obs/
 mysql:
   user: root
   password: 123456
-  ip: 192.168.31.6
+  ip: 127.0.0.1
   port: 3306
   database: obs
   charset: utf8

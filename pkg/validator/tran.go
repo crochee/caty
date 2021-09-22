@@ -16,17 +16,28 @@ import (
 	"obs/pkg/e"
 )
 
-var Default *defaultValidator
+var v *defaultValidator
+
+func Var(field interface{}, tag string) error {
+	if v == nil {
+		return nil
+	}
+	err := v.Validate.Var(field, tag)
+	if err == nil {
+		return nil
+	}
+	return v.Translate(err)
+}
 
 // Init init validator
 func Init() error {
-	Default = &defaultValidator{Validate: validator.New()}
-	Default.Validate.SetTagName("binding")
-	Default.translator, _ = ut.New(zh.New()).GetTranslator("zh")
-	if err := translations.RegisterDefaultTranslations(Default.Validate, Default.translator); err != nil {
+	v = &defaultValidator{Validate: validator.New()}
+	v.Validate.SetTagName("binding")
+	v.translator, _ = ut.New(zh.New()).GetTranslator("zh")
+	if err := translations.RegisterDefaultTranslations(v.Validate, v.translator); err != nil {
 		return err
 	}
-	binding.Validator = Default
+	binding.Validator = v
 	return nil
 }
 

@@ -5,14 +5,16 @@
 package user
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/json-iterator/go"
+
 	"obs/pkg/db"
 	"obs/pkg/e"
 	"obs/pkg/id"
 	"obs/pkg/model"
 	"obs/pkg/resp"
+	"obs/pkg/service/business/tokenx"
 	"obs/pkg/validator"
 )
 
@@ -27,16 +29,12 @@ type RegisterUserRequest struct {
 	// 账户
 	// Required: true
 	Account string `json:"account" binding:"required"`
-	// 昵称
-	Nick string `json:"nick"`
 	// 邮箱
 	Email string `json:"email"`
 	// 密码
 	PassWord string `json:"pass_word" binding:"required"`
-	// 权限信息
-	Permission *json.RawMessage `json:"permission" binding:"json"`
 	// 描述信息
-	Desc *json.RawMessage `json:"desc" binding:"json"`
+	Desc string `json:"desc" binding:"json"`
 }
 
 // Register godoc
@@ -71,41 +69,32 @@ func Register(ctx *gin.Context) {
 	}
 	if userRequest.Email != "" {
 		// 检测邮箱的合法性
-		if err := validator.Default.Validate.Var(userRequest.Email, "email"); err != nil {
-			resp.ErrorParam(ctx, validator.Default.Translate(err))
+		if err := validator.Var(userRequest.Email, "email"); err != nil {
+			resp.ErrorParam(ctx, err)
 			return
 		}
 	}
 
-	//permission, err := jsoniter.ConfigFastest.MarshalToString(map[string]tokenx.Action{
-	//	tokenx.AllService: tokenx.Admin,
-	//})
-	//if err != nil {
-	//	log.FromContext(ctx.Request.Context()).Errorf("marshal permission failed.Error:%v", err)
-	//	e.Error(ctx, e.MarshalFail)
-	//	return
-	//}
-	//domain := &model.Domain{
-	//	Domain:     uid.New().String(),
-	//	Email:      userRequest.Email,
-	//	Nick:       userRequest.Nick,
-	//	PassWord:   userRequest.PassWord,
-	//	Permission: permission,
-	//}
-	idString, err := id.NextIDString()
+	permission, err := jsoniter.ConfigFastest.MarshalToString(map[string]tokenx.Action{
+		tokenx.AllService: tokenx.Admin,
+	})
 	if err != nil {
+		resp.ErrorWith(ctx, e.ErrInternalServerError, err.Error())
+		return
+	}
+	var idString string
+	if idString, err = id.NextIDString(); err != nil {
 		resp.ErrorWith(ctx, e.ErrInternalServerError, err.Error())
 		return
 	}
 	user := &model.User{
 		AccountID:  idString,
+		Account:    userRequest.Account,
 		UserID:     idString,
-		Nick:       "",
-		PassWord:   "",
-		Email:      "",
-		Permission: nil,
-		Verify:     0,
-		Desc:       "",
+		PassWord:   userRequest.PassWord,
+		Email:      userRequest.Email,
+		Permission: permission,
+		Desc:       userRequest.Desc,
 	}
 
 	if err = db.New(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {

@@ -21,8 +21,8 @@ var (
 )
 
 type Token struct {
-	Domain    string            `json:"domain"`
-	User      string            `json:"user"`
+	AccountID string            `json:"account_id"`
+	UserID    string            `json:"user_id"`
 	ActionMap map[string]Action `json:"action_map"` //service-action
 }
 
