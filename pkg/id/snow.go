@@ -7,6 +7,7 @@ package id
 import (
 	"errors"
 	"net"
+	"strconv"
 
 	"github.com/sony/sonyflake"
 )
@@ -16,6 +17,15 @@ var sf = sonyflake.NewSonyflake(sonyflake.Settings{MachineID: machineID})
 // NextID generate id
 func NextID() (uint64, error) {
 	return sf.NextID()
+}
+
+// NextIDString generate id
+func NextIDString() (string, error) {
+	id, err := sf.NextID()
+	if err != nil {
+		return "", err
+	}
+	return strconv.FormatUint(id, 10), nil
 }
 
 func machineID() (uint16, error) {

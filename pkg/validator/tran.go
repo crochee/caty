@@ -16,26 +16,36 @@ import (
 	"obs/pkg/e"
 )
 
+var Default *defaultValidator
+
 // Init init validator
 func Init() error {
-	v := &defaultValidator{validate: validator.New()}
-	v.validate.SetTagName("binding")
-	v.translator, _ = ut.New(zh.New()).GetTranslator("zh")
-	if err := translations.RegisterDefaultTranslations(v.validate, v.translator); err != nil {
+	Default = &defaultValidator{Validate: validator.New()}
+	Default.Validate.SetTagName("binding")
+	Default.translator, _ = ut.New(zh.New()).GetTranslator("zh")
+	if err := translations.RegisterDefaultTranslations(Default.Validate, Default.translator); err != nil {
 		return err
 	}
-	binding.Validator = v
+	binding.Validator = Default
 	return nil
 }
 
 type defaultValidator struct {
-	validate   *validator.Validate
+	Validate   *validator.Validate
 	translator ut.Translator
 }
 
 // ValidateStruct receives any kind of type, but only performed struct or pointer to struct type.
 func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 	err := v.defaultValidateStruct(obj)
+	if err == nil {
+		return nil
+	}
+	return v.Translate(err)
+}
+
+// Translate receives struct type
+func (v *defaultValidator) Translate(err error) error {
 	if err == nil {
 		return nil
 	}
@@ -52,7 +62,7 @@ func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 
 // validateStruct receives struct type
 func (v *defaultValidator) validateStruct(obj interface{}) error {
-	return v.validate.Struct(obj)
+	return v.Validate.Struct(obj)
 }
 
 // Engine returns the underlying validator engine which powers the default
@@ -60,7 +70,7 @@ func (v *defaultValidator) validateStruct(obj interface{}) error {
 // or struct level validations. See validator GoDoc for more info -
 // https://godoc.org/gopkg.in/go-playground/validator.v8
 func (v *defaultValidator) Engine() interface{} {
-	return v.validate
+	return v.Validate
 }
 
 func (v *defaultValidator) defaultValidateStruct(obj interface{}) error {

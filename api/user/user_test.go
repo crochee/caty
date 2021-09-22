@@ -24,7 +24,7 @@ func TestRegister(t *testing.T) {
 		t.Fatal(err)
 	}
 	body := new(bytes.Buffer)
-	r := &User{
+	r := &RegisterUser{
 		Nick: "nick",
 		LoginInfo: LoginInfo{
 			Email:    "13522570308@139.com",

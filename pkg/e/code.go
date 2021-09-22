@@ -29,18 +29,27 @@ const (
 
 const (
 	ErrSuccess Code = 20000000
-	// 00~100为服务级别错误码
+	// 00~99为服务级别错误码
 
 	ErrInvalidParam        Code = 40010000
 	ErrNotFound            Code = 40410001
 	ErrInternalServerError Code = 50010002
 	ErrMethodNotAllow      Code = 40510003
+	ErrOperateDB           Code = 50010004
+
+	// 100~200为用户验证类
+
+	ErrInvalidEmail Code = 40510100
 )
 
 var codeZhMessageBox = map[Code]string{
-	ErrSuccess:             "成功",
+	ErrSuccess: "成功",
+
 	ErrInvalidParam:        "请求参数不正确",
 	ErrNotFound:            "资源不存在",
 	ErrMethodNotAllow:      "方法不允许",
 	ErrInternalServerError: "服务器内部错误",
+	ErrOperateDB:           "操作数据库失败",
+
+	ErrInvalidEmail: "非法邮箱格式",
 }

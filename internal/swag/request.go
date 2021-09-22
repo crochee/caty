@@ -9,10 +9,10 @@ import "obs/api/user"
 type SwaggerNoneRequest struct {
 }
 
-// swagger:parameters SwaggerDomain
-type SwaggerDomain struct {
+// swagger:parameters SwaggerRegisterUserRequest
+type SwaggerRegisterUserRequest struct {
 	// in: body
 	Body struct {
-		user.User
+		user.RegisterUserRequest
 	}
 }
