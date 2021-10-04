@@ -26,7 +26,7 @@ type User struct {
 
 func DeleteUser() {
 	u := new(User)
-	if err := db.Client().Model(u).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
+	if err := db.New().Model(u).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
 		log.Warn(err.Error())
 	}
 }

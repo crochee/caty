@@ -2,7 +2,6 @@ package resp
 
 import (
 	"errors"
-
 	"github.com/gin-gonic/gin"
 
 	"obs/pkg/e"
@@ -65,5 +64,12 @@ func Errors(ctx *gin.Context, err error) {
 }
 
 func ErrorParam(ctx *gin.Context, err error) {
-	ErrorWith(ctx, e.ErrInvalidParam, err.Error())
+	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.Error:%+v", err)
+	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseError{
+		ResponseCode: ResponseCode{
+			Code: e.ErrInvalidParam.Code(),
+			Msg:  e.ErrInvalidParam.Error(),
+		},
+		Result: err.Error(),
+	})
 }

@@ -42,10 +42,10 @@ func Close() {
 	internal.Close(dbClient)
 }
 
-func New(ctx context.Context) *DB {
+func With(ctx context.Context) *DB {
 	return dbClient.WithContext(ctx)
 }
 
-func Client() *DB {
+func New() *DB {
 	return dbClient
 }

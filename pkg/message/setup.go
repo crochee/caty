@@ -20,6 +20,9 @@ var router *message.Router
 
 // Setup run message pub/sub or not
 func Setup(ctx context.Context) error {
+	if !viper.GetBool("rabbitmq.enable") {
+		return nil
+	}
 	logger := watermill.NewStdLogger(viper.GetBool("debug"), gin.Mode() == gin.DebugMode)
 	var err error
 	router, err = message.NewRouter(message.RouterConfig{}, logger)

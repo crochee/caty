@@ -28,7 +28,7 @@ type BucketFile struct {
 
 func DeleteBucketFile() {
 	b := new(BucketFile)
-	if err := db.Client().Model(b).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
+	if err := db.New().Model(b).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
 		log.Warn(err.Error())
 	}
 }

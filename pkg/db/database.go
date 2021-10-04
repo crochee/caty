@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"obs/internal"
-	"obs/pkg/log"
 	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+
+	"obs/internal"
+	"obs/pkg/log"
 )
 
 type Option struct {
@@ -72,12 +73,12 @@ func NewClient(ctx context.Context, opts ...func(*Option)) (*DB, error) {
 //// NewMock new a mock todo mock解除测试对数据库等中间件的依赖
 //func NewMock() (sqlmock.Sqlmock, error) {
 //	// 创建sqlmock
-//	slqDb, mock, err := sqlmock.New()
+//	slqDb, mock, err := sqlmock.With()
 //	if err != nil {
 //		return nil, err
 //	}
 //	// 结合gorm、sqlmock
-//	if db, err = gorm.Open(mysql.New(mysql.Config{
+//	if db, err = gorm.Open(mysql.With(mysql.Config{
 //		SkipInitializeWithVersion: true,
 //		Conn:                      slqDb,
 //	}), &gorm.Config{

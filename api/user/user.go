@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/json-iterator/go"
+	"net/http"
+	"obs/pkg/service/business/userx"
 
 	"obs/pkg/db"
 	"obs/pkg/e"
@@ -36,18 +38,6 @@ type RegisterUserRequest struct {
 	// 描述信息
 	Desc string `json:"desc" binding:"json"`
 }
-
-// Register godoc
-// @Summary register
-// @Description register user
-// @Tags user
-// @Accept application/json
-// @Produce application/json
-// @Param request body User true "register request's content"
-// @Success 200
-// @Failure 400 {object} e.Response
-// @Failure 500 {object} e.Response
-// @Router /v1/user/register [post]
 
 // Register godoc
 // swagger:route  POST /v1/account 账户 SwaggerRegisterUserRequest
@@ -97,43 +87,43 @@ func Register(ctx *gin.Context) {
 		Desc:       userRequest.Desc,
 	}
 
-	if err = db.New(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {
+	if err = db.With(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {
 		resp.ErrorWith(ctx, e.ErrOperateDB, err.Error())
 		return
 	}
 	resp.SuccessNotContent(ctx)
 }
 
-//// Login godoc
-//// @Summary Login
-//// @Description user login
-//// @Tags user
-//// @Accept application/json
-//// @Produce application/json
-//// @Param request body LoginInfo true "login request's content"
-//// @Success 200 {string} string
-//// @Failure 400 {object} e.Response
-//// @Failure 500 {object} e.Response
-//// @Router /v1/user/login [post]
-//func Login(ctx *gin.Context) {
-//	var loginInfo LoginInfo
-//	if err := ctx.ShouldBindBodyWith(&loginInfo, binding.JSON); err != nil {
-//		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-//		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
-//		return
-//	}
-//	// 检测邮箱的合法性
-//	if !internal.VerifyEmail(loginInfo.Email) {
-//		e.Error(ctx, e.InvalidEmail)
-//		return
-//	}
-//	token, err := userx.UserLogin(ctx.Request.Context(), loginInfo.Email, loginInfo.PassWord)
-//	if err != nil {
-//		e.Errors(ctx, err)
-//		return
-//	}
-//	ctx.JSON(http.StatusOK, token)
-//}
+// Login godoc
+// @Summary Login
+// @Description user login
+// @Tags user
+// @Accept application/json
+// @Produce application/json
+// @Param request body LoginInfo true "login request's content"
+// @Success 200 {string} string
+// @Failure 400 {object} e.Response
+// @Failure 500 {object} e.Response
+// @Router /v1/user/login [post]
+func Login(ctx *gin.Context) {
+	var loginInfo LoginInfo
+	if err := ctx.ShouldBindBodyWith(&loginInfo, binding.JSON); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
+	// 检测邮箱的合法性
+	if !internal.VerifyEmail(loginInfo.Email) {
+		e.Error(ctx, e.InvalidEmail)
+		return
+	}
+	token, err := userx.UserLogin(ctx.Request.Context(), loginInfo.Email, loginInfo.PassWord)
+	if err != nil {
+		e.Errors(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, token)
+}
+
 //
 //// Modify godoc
 //// @Summary Modify

@@ -21,7 +21,7 @@ func TestDeleteUser(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	d := db.Client().Debug()
+	d := db.New().Debug()
 	u := &User{
 		AccountID:  "lcf",
 		UserID:     "44",

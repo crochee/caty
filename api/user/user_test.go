@@ -54,7 +54,7 @@ func TestRegister(t *testing.T) {
 //	if err := jsoniter.ConfigFastest.NewEncoder(body).Encode(r); err != nil {
 //		t.Fatal(err)
 //	}
-//	router := gin.New()
+//	router := gin.With()
 //	router.POST("/v1/user/login", Login)
 //	w := internal.PerformRequest(router, http.MethodPost, "/v1/user/login", body, nil)
 //	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())
@@ -75,7 +75,7 @@ func TestRegister(t *testing.T) {
 //	if err := jsoniter.ConfigFastest.NewEncoder(body).Encode(r); err != nil {
 //		t.Fatal(err)
 //	}
-//	router := gin.New()
+//	router := gin.With()
 //	router.POST("/v1/user/modify", Modify)
 //	w := internal.PerformRequest(router, http.MethodPost, "/v1/user/modify", body, nil)
 //	t.Logf("%+v modify:%+v body:%s", w.Result(), w.Header(), w.Body.String())

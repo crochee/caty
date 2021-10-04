@@ -3,11 +3,14 @@ package db
 import (
 	"database/sql"
 	"database/sql/driver"
-	"encoding/json"
+	"reflect"
+
+	"github.com/json-iterator/go"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
-	"reflect"
+
+	"obs/internal"
 )
 
 type DeletedAt sql.NullTime
@@ -27,17 +30,17 @@ func (n DeletedAt) Value() (driver.Value, error) {
 
 func (n DeletedAt) MarshalJSON() ([]byte, error) {
 	if n.Valid {
-		return json.Marshal(n.Time)
+		return jsoniter.ConfigFastest.Marshal(n.Time)
 	}
-	return json.Marshal(nil)
+	return jsoniter.ConfigFastest.Marshal(nil)
 }
 
 func (n *DeletedAt) UnmarshalJSON(b []byte) error {
-	if string(b) == "null" {
+	if internal.String(b) == "null" {
 		n.Valid = false
 		return nil
 	}
-	err := json.Unmarshal(b, &n.Time)
+	err := jsoniter.ConfigFastest.Unmarshal(b, &n.Time)
 	if err == nil {
 		n.Valid = true
 	}

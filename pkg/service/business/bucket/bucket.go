@@ -25,7 +25,7 @@ import (
 
 // CreateBucket 创建桶
 func CreateBucket(ctx context.Context, token *tokenx.Token, bucketName string) error {
-	tx := db.New(ctx).Begin()
+	tx := db.With(ctx).Begin()
 	defer tx.Rollback()
 	bucket := &model.Bucket{
 		Bucket: bucketName,
