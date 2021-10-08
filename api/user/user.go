@@ -5,18 +5,19 @@
 package user
 
 import (
+	"net/http"
+
 	"github.com/crochee/lib/e"
 	"github.com/crochee/lib/id"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/json-iterator/go"
-	"net/http"
-	"obs/pkg/service/business/userx"
 
-	"obs/pkg/model"
-	"obs/pkg/resp"
-	"obs/pkg/service/business/tokenx"
-	"obs/pkg/validator"
+	"cca/pkg/model"
+	"cca/pkg/resp"
+	"cca/pkg/service/business/tokenx"
+	"cca/pkg/service/business/userx"
+	"cca/pkg/validator"
 )
 
 type RegisterUserRequest struct {
