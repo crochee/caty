@@ -6,21 +6,21 @@ package file
 
 import (
 	"bytes"
+	"cca/pkg/middleware"
+	"cca/pkg/model/db"
 	"context"
 	"mime/multipart"
 	"net/http"
-	"obs/pkg/middleware"
-	"obs/pkg/model/db"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 
-	"obs/config"
-	"obs/internal"
+	"cca/config"
+	"cca/internal"
 )
 
 func TestUploadFile(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func TestUploadFile(t *testing.T) {
 }
 
 func TestDeleteFile(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestDeleteFile(t *testing.T) {
 }
 
 func TestSignFile(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func TestSignFile(t *testing.T) {
 }
 
 func TestDownloadFile(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}

@@ -1,19 +1,15 @@
-// Date: 2021/9/19
-
-// Package validator
 package validator
 
 import (
 	"errors"
 	"reflect"
 
+	"github.com/crochee/lib/e"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	translations "github.com/go-playground/validator/v10/translations/zh"
-
-	"obs/pkg/e"
 )
 
 var v *defaultValidator
@@ -60,8 +56,8 @@ func (v *defaultValidator) Translate(err error) error {
 	if err == nil {
 		return nil
 	}
-	vErrs, ok := err.(validator.ValidationErrors)
-	if !ok {
+	var vErrs validator.ValidationErrors
+	if !errors.As(err, &vErrs) {
 		return err
 	}
 	var errs e.Errors

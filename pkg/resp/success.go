@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"obs/pkg/e"
+	"cca/pkg/ex"
 )
 
 type Response struct {
@@ -19,10 +19,10 @@ type Response struct {
 
 // Success response data
 func Success(ctx *gin.Context, data interface{}) {
-	ctx.JSON(e.ErrSuccess.StatusCode(), Response{
+	ctx.JSON(ex.ErrSuccess.StatusCode(), Response{
 		ResponseCode: ResponseCode{
-			Code: e.ErrSuccess.Code(),
-			Msg:  e.ErrSuccess.Error(),
+			Code: ex.ErrSuccess.Code(),
+			Msg:  ex.ErrSuccess.Error(),
 		},
 		Result: data,
 	})
@@ -30,10 +30,10 @@ func Success(ctx *gin.Context, data interface{}) {
 
 // SuccessNone response none
 func SuccessNone(ctx *gin.Context) {
-	ctx.JSON(e.ErrSuccess.StatusCode(), Response{
+	ctx.JSON(ex.ErrSuccess.StatusCode(), Response{
 		ResponseCode: ResponseCode{
-			Code: e.ErrSuccess.Code(),
-			Msg:  e.ErrSuccess.Error(),
+			Code: ex.ErrSuccess.Code(),
+			Msg:  ex.ErrSuccess.Error(),
 		},
 	})
 }

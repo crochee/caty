@@ -7,7 +7,7 @@ import (
 	"context"
 	"testing"
 
-	"obs/config"
+	"cca/config"
 	"obs/pkg/db"
 )
 

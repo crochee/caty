@@ -1,5 +1,3 @@
-// Date: 2020/12/6
-
 package main
 
 import (
@@ -15,19 +13,20 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/crochee/lib/log"
+	"github.com/crochee/lib/routine"
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
 	"obs/config"
 	"obs/internal/host"
-	"obs/pkg/db"
 	"obs/pkg/etcdx"
-	"obs/pkg/log"
+	"obs/pkg/ex"
 	"obs/pkg/message"
+	"obs/pkg/model"
 	"obs/pkg/registry"
 	"obs/pkg/router"
-	"obs/pkg/routine"
 	"obs/pkg/tlsx"
 	"obs/pkg/transport/httpx"
 	"obs/pkg/v"
@@ -45,8 +44,8 @@ func main() {
 	}
 	// 初始化系统日志
 	log.InitSystemLogger(func(option *log.Option) {
-		option.Path = viper.GetString("system-log-path")
-		option.Level = viper.GetString("system-log-level")
+		option.Path = viper.GetString("system-logx-path")
+		option.Level = viper.GetString("system-logx-level")
 	})
 
 	if err = run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -74,11 +73,14 @@ func run() error {
 }
 
 func startAction(ctx context.Context) error {
-	// 初始化数据库
-	if err := db.Init(ctx); err != nil {
+	if err := ex.AddCode(); err != nil {
 		return err
 	}
-	defer db.Close()
+	// 初始化数据库
+	if err := model.Init(ctx); err != nil {
+		return err
+	}
+	defer model.Close()
 	if err := validator.Init(); err != nil {
 		return err
 	}

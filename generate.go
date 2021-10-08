@@ -2,7 +2,7 @@
 // Author: crochee
 // Date: 2021/3/25
 
-package obs
+package cca
 
 //go:generate go install github.com/swaggo/swag/cmd/swag@v1.7.0
 //go:generate swag i -g router/router.go

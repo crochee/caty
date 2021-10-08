@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/json-iterator/go"
 
-	"obs/config"
+	"cca/config"
 	"obs/internal"
 	"obs/pkg/db"
 )

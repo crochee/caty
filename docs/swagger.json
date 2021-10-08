@@ -4,8 +4,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "The purpose of this service is to provide an application\nthat is using object\n\ntitle: obs",
-    "title": "obs",
+    "description": "The purpose of this service is to provide an application\nthat is using object\n\ntitle: cca",
+    "title": "cca",
     "version": "0.0.1"
   },
   "host": "localhost:8120",

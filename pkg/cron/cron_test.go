@@ -6,15 +6,16 @@ package cron
 
 import (
 	"fmt"
-	"obs/pkg/log"
 	"testing"
 	"time"
 
-	"obs/config"
+	"github.com/crochee/lib/log"
+
+	"cca/config"
 )
 
 func TestCronSetup(t *testing.T) {
-	config.LoadConfig("../conf/obs.yml")
+	config.LoadConfig("../conf/cca.yml")
 	log.InitSystemLogger()
 	Setup()
 	// 0 0/5 * * * ?

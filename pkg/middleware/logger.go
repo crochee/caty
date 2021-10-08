@@ -1,13 +1,10 @@
-// Date: 2021/9/19
-
-// Package middleware
 package middleware
 
 import (
+	"github.com/crochee/lib/log"
 	"github.com/gin-gonic/gin"
 
-	"obs/pkg/log"
-	"obs/pkg/v"
+	"cca/pkg/v"
 )
 
 // RequestLogger 设置请求日志

@@ -5,10 +5,10 @@
 package middleware
 
 import (
+	"github.com/crochee/lib/id"
 	"github.com/gin-gonic/gin"
 
-	"obs/pkg/id"
-	"obs/pkg/v"
+	"cca/pkg/v"
 )
 
 // TraceId add trace_id

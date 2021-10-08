@@ -1,7 +1,3 @@
-// Copyright 2021, The Go Authors. All rights reserved.
-// Author: crochee
-// Date: 2021/4/2
-
 package etcdx
 
 import (
@@ -18,10 +14,10 @@ import (
 
 	"github.com/json-iterator/go"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
-	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 
-	"obs/pkg/registry"
+	"cca/pkg/registry"
 )
 
 type Option struct {

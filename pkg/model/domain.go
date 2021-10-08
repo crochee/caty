@@ -5,8 +5,8 @@
 package model
 
 import (
-	"obs/pkg/db"
-	"obs/pkg/log"
+	"github.com/crochee/lib/db"
+	"github.com/crochee/lib/log"
 )
 
 type Domain struct {
@@ -25,7 +25,7 @@ type Domain struct {
 
 func DeleteDomain() {
 	d := new(Domain)
-	if err := db.New().Model(d).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
+	if err := New().Model(d).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
 		log.Warn(err.Error())
 	}
 }

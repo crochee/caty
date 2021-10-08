@@ -9,10 +9,9 @@ import (
 	"sync"
 
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/crochee/lib/e"
 	"github.com/hashicorp/go-multierror"
 	"github.com/streadway/amqp"
-
-	"woslo/e"
 )
 
 type producer struct {

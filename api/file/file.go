@@ -5,24 +5,24 @@
 package file
 
 import (
+	"cca/pkg/logx"
+	"cca/pkg/model"
+	db2 "cca/pkg/model/db"
+	"cca/pkg/service/business/bucket"
+	tokenx2 "cca/pkg/service/business/tokenx"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
-	"obs/pkg/log"
-	"obs/pkg/model"
-	db2 "obs/pkg/model/db"
-	"obs/pkg/service/business/bucket"
-	tokenx2 "obs/pkg/service/business/tokenx"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"gorm.io/gorm"
 
-	"obs/cmd"
-	"obs/config"
-	"obs/e"
+	"cca/cmd"
+	"cca/config"
+	"cca/e"
 )
 
 // UploadFile godoc
@@ -35,20 +35,20 @@ import (
 // @Param bucket_name path string true "bucket name"
 // @Param file formData file true "file"
 // @Success 204
-// @Failure 400 {object} e.Response
-// @Failure 403 {object} e.Response
-// @Failure 500 {object} e.Response
+// @Failure 400 {object} ex.Response
+// @Failure 403 {object} ex.Response
+// @Failure 500 {object} ex.Response
 // @Router /v1/bucket/{bucket_name}/file [post]
 func UploadFile(ctx *gin.Context) {
 	var name Name
 	if err := ctx.ShouldBindUri(&name); err != nil {
-		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
 	var fileInfo Info
 	if err := ctx.ShouldBindWith(&fileInfo, binding.FormMultipart); err != nil {
-		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
 		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
 		return
 	}
@@ -78,14 +78,14 @@ func UploadFile(ctx *gin.Context) {
 // @Param bucket_name path string true "bucket name"
 // @Param file_name path string true "file name"
 // @Success 204
-// @Failure 400 {object} e.Response
-// @Failure 403 {object} e.Response
-// @Failure 500 {object} e.Response
+// @Failure 400 {object} ex.Response
+// @Failure 403 {object} ex.Response
+// @Failure 500 {object} ex.Response
 // @Router /v1/bucket/{bucket_name}/file/{file_name} [delete]
 func DeleteFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -115,14 +115,14 @@ func DeleteFile(ctx *gin.Context) {
 // @Param bucket_name path string true "bucket name"
 // @Param file_name path string true "file name"
 // @Success 200 {string} string "file link"
-// @Failure 400 {object} e.Response
-// @Failure 403 {object} e.Response
-// @Failure 500 {object} e.Response
+// @Failure 400 {object} ex.Response
+// @Failure 403 {object} ex.Response
+// @Failure 500 {object} ex.Response
 // @Router /v1/bucket/{bucket_name}/file/{file_name}/sign [get]
 func SignFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -155,14 +155,14 @@ func SignFile(ctx *gin.Context) {
 // @Param file_name path string true "file name"
 // @Param sign query string false "sign"
 // @Success 200
-// @Failure 400 {object} e.Response
-// @Failure 403 {object} e.Response
-// @Failure 500 {object} e.Response
+// @Failure 400 {object} ex.Response
+// @Failure 403 {object} ex.Response
+// @Failure 500 {object} ex.Response
 // @Router /v1/bucket/{bucket_name}/file/{file_name} [get]
 func DownloadFile(ctx *gin.Context) {
 	var target Target
 	if err := ctx.ShouldBindUri(&target); err != nil {
-		log.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
+		logx.FromContext(ctx.Request.Context()).Errorf("bind url failed.Error:%v", err)
 		e.Error(ctx, e.ParseUrlFail)
 		return
 	}
@@ -185,7 +185,7 @@ func DownloadFile(ctx *gin.Context) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		log.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}
@@ -196,7 +196,7 @@ func DownloadFile(ctx *gin.Context) {
 			e.Error(ctx, e.NotFound)
 			return
 		}
-		log.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		e.ErrorWith(ctx, e.OperateDbFail, err.Error())
 		return
 	}

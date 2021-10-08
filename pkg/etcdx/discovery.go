@@ -1,15 +1,12 @@
-// Copyright 2021, The Go Authors. All rights reserved.
-// Author: crochee
-// Date: 2021/4/3
-
 package etcdx
 
 import (
 	"context"
 	"errors"
 
-	"github.com/go-kratos/kratos/v2/registry"
-	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3"
+
+	"cca/pkg/registry"
 )
 
 func (e *etcdRegistry) GetService(ctx context.Context, serviceName string) ([]*registry.ServiceInstance, error) {
