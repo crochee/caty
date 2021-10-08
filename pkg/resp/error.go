@@ -2,10 +2,10 @@ package resp
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
 
-	"cca/pkg/ex"
-	"cca/pkg/logx"
+	"github.com/crochee/lib/e"
+	"github.com/crochee/lib/log"
+	"github.com/gin-gonic/gin"
 )
 
 type ResponseCode struct {
@@ -27,7 +27,7 @@ type ResponseError struct {
 }
 
 // Error gin response with Code
-func Error(ctx *gin.Context, code ex.Code) {
+func Error(ctx *gin.Context, code e.Code) {
 	ctx.JSON(code.StatusCode(), ResponseError{
 		ResponseCode: ResponseCode{
 			Code: code.Code(),
@@ -37,7 +37,7 @@ func Error(ctx *gin.Context, code ex.Code) {
 }
 
 // ErrorWith gin response with Code and message
-func ErrorWith(ctx *gin.Context, code ex.Code, message string) {
+func ErrorWith(ctx *gin.Context, code e.Code, message string) {
 	ctx.JSON(code.StatusCode(), ResponseError{
 		ResponseCode: ResponseCode{
 			Code: code.Code(),
@@ -49,26 +49,26 @@ func ErrorWith(ctx *gin.Context, code ex.Code, message string) {
 
 // Errors gin Response with error
 func Errors(ctx *gin.Context, err error) {
-	logx.FromContext(ctx.Request.Context()).Errorf("has error %+v", err)
+	log.FromContext(ctx.Request.Context()).Errorf("has error %+v", err)
 	var errResult error
-	if errResult = ex.Unwrap(err); errResult == nil {
-		ErrorWith(ctx, ex.ErrInternalServerError, err.Error())
+	if errResult = e.Unwrap(err); errResult == nil {
+		ErrorWith(ctx, e.ErrInternalServerError, err.Error())
 		return
 	}
-	var errorCode ex.Code
+	var errorCode e.Code
 	if errors.As(errResult, &errorCode) {
 		Error(ctx, errorCode)
 		return
 	}
-	ErrorWith(ctx, ex.ErrInternalServerError, err.Error())
+	ErrorWith(ctx, e.ErrInternalServerError, err.Error())
 }
 
 func ErrorParam(ctx *gin.Context, err error) {
-	logx.FromContext(ctx.Request.Context()).Errorf("parse param failed.Error:%+v", err)
-	ctx.AbortWithStatusJSON(ex.ErrInvalidParam.StatusCode(), ResponseError{
+	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.Error:%+v", err)
+	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseError{
 		ResponseCode: ResponseCode{
-			Code: ex.ErrInvalidParam.Code(),
-			Msg:  ex.ErrInvalidParam.Error(),
+			Code: e.ErrInvalidParam.Code(),
+			Msg:  e.ErrInvalidParam.Error(),
 		},
 		Result: err.Error(),
 	})

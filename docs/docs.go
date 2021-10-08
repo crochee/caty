@@ -702,8 +702,8 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
-	Title:       "obs Swagger API",
-	Description: "This is a obs server.",
+	Title:       "cca Swagger API",
+	Description: "This is a cca server.",
 }
 
 type s struct{}

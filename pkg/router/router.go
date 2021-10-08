@@ -1,9 +1,9 @@
-// Package router obs
+// Package router cca
 //
 // The purpose of this service is to provide an application
 // that is using object
 //
-//     title: obs
+//     title: cca
 //     Schemes: http,https
 //     Host: localhost:8120
 //     Version: 0.0.1
@@ -12,18 +12,19 @@
 package router
 
 import (
+	"github.com/crochee/lib/log"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	_ "obs/docs"
-	"obs/pkg/middleware"
+	_ "cca/docs"
+	"cca/pkg/middleware"
 )
 
-// @title obs Swagger API
+// @title cca Swagger API
 // @version 1.0
-// @description This is a obs server.
+// @description This is a cca server.
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
@@ -44,7 +45,7 @@ func New() *gin.Engine {
 		pprof.Register(router)
 	}
 
-	router.Use(middleware.TraceId, middleware.RequestLogger(nil), middleware.Log, middleware.Recovery)
+	router.Use(middleware.TraceId, middleware.RequestLogger(log.NewLogger()), middleware.Log, middleware.Recovery)
 
 	v1Router := router.Group("/v1")
 

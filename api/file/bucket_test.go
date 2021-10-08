@@ -46,7 +46,7 @@ func TestCreateBucket(t *testing.T) {
 }
 
 func TestHeadBucket(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestHeadBucket(t *testing.T) {
 }
 
 func TestDeleteBucket(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}

@@ -19,7 +19,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	if err := config.LoadConfig("E:\\project\\obs\\conf\\obs.yml"); err != nil {
+	if err := config.LoadConfig("E:\\project\\cca\\conf\\cca.yml"); err != nil {
 		t.Fatal(err)
 	}
 	if err := db.Init(context.Background()); err != nil {
@@ -42,7 +42,7 @@ func TestRegister(t *testing.T) {
 }
 
 //func TestLogin(t *testing.T) {
-//	config.LoadConfig("../../conf/obs.yml")
+//	config.LoadConfig("../../conf/cca.yml")
 //	if err := db.Setup(context.Background()); err != nil {
 //		t.Fatal(err)
 //	}
@@ -61,7 +61,7 @@ func TestRegister(t *testing.T) {
 //}
 //
 //func TestModify(t *testing.T) {
-//	config.LoadConfig("../../conf/obs.yml")
+//	config.LoadConfig("../../conf/cca.yml")
 //	if err := db.Setup(context.Background()); err != nil {
 //		t.Fatal(err)
 //	}

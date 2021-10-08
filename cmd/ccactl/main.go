@@ -15,7 +15,7 @@ func main() {
 	rootCmd := &cobra.Command{
 		Use:     v.ServiceName,
 		Short:   "osb service cmd",
-		Long:    "obs service cmd",
+		Long:    "cca service cmd",
 		Example: "OBS [cmd]",
 		Args:    cobra.MinimumNArgs(1),
 		Version: v.Version,

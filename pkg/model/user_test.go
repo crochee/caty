@@ -13,7 +13,7 @@ import (
 
 func TestDeleteUser(t *testing.T) {
 	ctx := context.Background()
-	err := config.LoadConfig("E:\\project\\obs\\conf\\obs.yml")
+	err := config.LoadConfig("E:\\project\\cca\\conf\\cca.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

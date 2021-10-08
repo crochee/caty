@@ -19,21 +19,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
-	"obs/config"
-	"obs/internal/host"
-	"obs/pkg/etcdx"
-	"obs/pkg/ex"
-	"obs/pkg/message"
-	"obs/pkg/model"
-	"obs/pkg/registry"
-	"obs/pkg/router"
-	"obs/pkg/tlsx"
-	"obs/pkg/transport/httpx"
-	"obs/pkg/v"
-	"obs/pkg/validator"
+	"cca/config"
+	"cca/internal/host"
+	"cca/pkg/etcdx"
+	"cca/pkg/ex"
+	"cca/pkg/message"
+	"cca/pkg/model"
+	"cca/pkg/registry"
+	"cca/pkg/router"
+	"cca/pkg/tlsx"
+	"cca/pkg/transport/httpx"
+	"cca/pkg/v"
+	"cca/pkg/validator"
 )
 
-var configFile = flag.String("f", "./conf/obs.yml", "the config file")
+var configFile = flag.String("f", "./conf/cca.yml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -44,8 +44,8 @@ func main() {
 	}
 	// 初始化系统日志
 	log.InitSystemLogger(func(option *log.Option) {
-		option.Path = viper.GetString("system-logx-path")
-		option.Level = viper.GetString("system-logx-level")
+		option.Path = viper.GetString("system-log-path")
+		option.Level = viper.GetString("system-log-level")
 	})
 
 	if err = run(); err != nil && !errors.Is(err, http.ErrServerClosed) {

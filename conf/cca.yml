@@ -1,14 +1,14 @@
 mode: debug
 port: 8120
-system-log-path: mongodb://admin:1234567@192.168.31.62:27017
+system-log-path: ./log/cca.log
 system-log_level: debug
-storage_path: /obs/
+storage_path: /data/
 mysql:
   user: root
   password: 123456
   ip: 127.0.0.1
   port: 3306
-  database: obs
+  database: cca
   charset: utf8
   max_open_conns: 50
   max_idle_conns: 10
