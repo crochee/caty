@@ -1,41 +1,37 @@
-// Copyright 2021, The Go Authors. All rights reserved.
-// Author: crochee
-// Date: 2021/3/14
-
 package userx
 
 import (
+	"cca/pkg/logx"
+	"cca/pkg/model"
+	"cca/pkg/service/business/tokenx"
 	"context"
 	"errors"
-	"obs/pkg/log"
-	"obs/pkg/model"
-	db2 "obs/pkg/model/db"
-	"obs/pkg/service/business/tokenx"
+	"github.com/crochee/lib/db"
+	"github.com/crochee/lib/e"
+	"github.com/crochee/lib/log"
 	"time"
 
 	"github.com/json-iterator/go"
 	"gorm.io/gorm"
-
-	"obs/e"
 )
 
 // UserLogin 登录生成token信息
 func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	domain := &model.Domain{}
-	if err := db2.NewDBWithContext(ctx).Model(domain).Where("email =?", email).First(domain).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", e.New(e.NotFound, "not found record")
+	if err := model.With(ctx).Model(domain).Where("email =?", email).First(domain).Error; err != nil {
+		if errors.Is(err, db.NotFound) {
+			return "", e.Wrap(e.ErrNotFound, err.Error())
 		}
 		log.FromContext(ctx).Errorf("query db failed.Error:%v", err)
-		return "", e.New(e.OperateDbFail, err.Error())
+		return "", e.Wrap(e.OperateDbFail, err.Error())
 	}
 	if domain.PassWord != passWord {
-		return "", e.New(e.Forbidden, "wrong password")
+		return "", e.Wrap(e.Forbidden, "wrong password")
 	}
 	var permission map[string]tokenx.Action
 	if err := jsoniter.ConfigFastest.UnmarshalFromString(domain.Permission, &permission); err != nil {
-		log.FromContext(ctx).Errorf("Unmarshal permission failed.Error:%v", err)
-		return "", e.New(e.UnmarshalFail, err.Error())
+		logx.FromContext(ctx).Errorf("Unmarshal permission failed.Error:%v", err)
+		return "", e.Wrap(e.UnmarshalFail, err.Error())
 	}
 	token := &tokenx.TokenClaims{
 		Now: time.Now(),
@@ -47,7 +43,7 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	}
 	tokenStr, err := tokenx.CreateToken(token)
 	if err != nil {
-		log.FromContext(ctx).Errorf("Create token failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("Create token failed.Error:%v", err)
 		return "", e.New(e.GenerateTokenFail, err.Error())
 	}
 	return tokenStr, nil
@@ -62,7 +58,7 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.New(e.NotFound, "not found record")
 		}
-		log.FromContext(ctx).Errorf("query db failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("query db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	if domain.PassWord != oldPassWord {
@@ -79,7 +75,7 @@ func ModifyUser(ctx context.Context, email, newPassWord, oldPassWord, nick strin
 		return nil
 	}
 	if err := tx.Model(domain).UpdateColumns(columnMap).Error; err != nil {
-		log.FromContext(ctx).Errorf("update db failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("update db failed.Error:%v", err)
 		return e.New(e.OperateDbFail, err.Error())
 	}
 	tx.Commit()

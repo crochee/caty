@@ -5,15 +5,14 @@ import (
 	"crypto/x509"
 	"errors"
 
+	"github.com/crochee/lib"
 	"github.com/gin-gonic/gin"
-
-	"obs/pkg/filecontent"
 )
 
 type Config struct {
-	Ca   filecontent.FileOrContent `json:"ca" yaml:"ca"`
-	Cert filecontent.FileOrContent `json:"cert" yaml:"cert"`
-	Key  filecontent.FileOrContent `json:"key" yaml:"key"`
+	Ca   lib.FileOrContent `json:"ca" yaml:"ca"`
+	Cert lib.FileOrContent `json:"cert" yaml:"cert"`
+	Key  lib.FileOrContent `json:"key" yaml:"key"`
 }
 
 // TlsConfig output tls

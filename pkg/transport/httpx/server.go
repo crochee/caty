@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"obs/pkg/registry"
+	"cca/pkg/registry"
 )
 
 type HTTPServer struct {

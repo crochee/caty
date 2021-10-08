@@ -9,8 +9,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"obs/pkg/db"
-	"obs/pkg/log"
+	"cca/pkg/db"
+	"cca/pkg/logx"
 )
 
 type Bucket struct {
@@ -25,6 +25,6 @@ type Bucket struct {
 func DeleteBucket() {
 	b := new(Bucket)
 	if err := db.New().Model(b).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
-		log.Warn(err.Error())
+		logx.Warn(err.Error())
 	}
 }

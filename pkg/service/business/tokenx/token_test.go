@@ -16,7 +16,7 @@ func TestCreateToken(t *testing.T) {
 			Domain: "123",
 			User:   "test123",
 			ActionMap: map[string]Action{
-				"OBS": Admin,
+				"cca": Admin,
 			},
 		},
 	}

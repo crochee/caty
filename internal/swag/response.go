@@ -3,7 +3,7 @@
 // Package swag
 package swag
 
-import "obs/pkg/resp"
+import "cca/pkg/resp"
 
 // swagger:response SwaggerNoneResponse
 type SwaggerNoneResponse struct {

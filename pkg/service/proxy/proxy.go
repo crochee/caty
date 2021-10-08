@@ -5,6 +5,7 @@
 package proxy
 
 import (
+	"cca/pkg/logx"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
@@ -12,14 +13,13 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"obs/pkg/log"
 	"os"
 	"time"
 
 	"github.com/pkg/errors"
 
-	"obs/internal"
-	"obs/internal/status"
+	"cca/internal"
+	"cca/internal/status"
 )
 
 func NewProxyBuilder() (http.Handler, error) {
@@ -46,7 +46,7 @@ func NewProxyBuilder() (http.Handler, error) {
 			request.RequestURI = "" // Outgoing request should not have RequestURI
 
 			if _, ok := request.Header["User-Agent"]; !ok {
-				request.Header.Set("User-Agent", "OBS")
+				request.Header.Set("User-Agent", "cca")
 			}
 
 			// Even if the websocket RFC says that headers should be case-insensitive,
@@ -101,7 +101,7 @@ func NewProxyBuilder() (http.Handler, error) {
 					}
 				}
 			}
-			log := log.FromContext(request.Context())
+			log := logx.FromContext(request.Context())
 			text := status.Text(statusCode)
 			log.Errorf("%+v '%d %s' caused by: %v", request.URL, statusCode, text, err)
 			writer.WriteHeader(statusCode)

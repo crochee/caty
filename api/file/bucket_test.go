@@ -8,22 +8,22 @@ package file
 
 import (
 	"bytes"
+	"cca/pkg/middleware"
+	"cca/pkg/model/db"
 	"context"
 	"net/http"
-	"obs/pkg/middleware"
-	"obs/pkg/model/db"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 
-	"obs/config"
-	"obs/internal"
+	"cca/config"
+	"cca/internal"
 )
 
 func TestCreateBucket(t *testing.T) {
-	config.LoadConfig("../../conf/obs.yml")
+	config.LoadConfig("../../conf/cca.yml")
 	if err := db.Setup(context.Background()); err != nil {
 		t.Fatal(err)
 	}

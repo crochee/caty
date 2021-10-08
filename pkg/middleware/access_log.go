@@ -1,9 +1,3 @@
-// Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-// Description:
-// Author: l30002214
-// Create: 2020/12/8
-
-// Package middleware
 package middleware
 
 import (
@@ -11,13 +5,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/crochee/lib/log"
 	"github.com/gin-gonic/gin"
 
-	"obs/pkg/log"
-	"obs/pkg/v"
+	"cca/pkg/v"
 )
 
-// Log request log
+// Log request logx
 func Log(ctx *gin.Context) {
 	// Start timer
 	start := time.Now()
@@ -53,7 +47,7 @@ func Log(ctx *gin.Context) {
 	log.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
 }
 
-// defaultLogFormatter is the default log format function Logger middleware uses.
+// defaultLogFormatter is the default logx format function Logger middleware uses.
 var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 	var statusColor, methodColor, resetColor string
 	if param.IsOutputColor() {

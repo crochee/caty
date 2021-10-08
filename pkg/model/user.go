@@ -5,8 +5,8 @@
 package model
 
 import (
-	"obs/pkg/db"
-	"obs/pkg/log"
+	"github.com/crochee/lib/db"
+	"github.com/crochee/lib/log"
 )
 
 type User struct {
@@ -26,7 +26,7 @@ type User struct {
 
 func DeleteUser() {
 	u := new(User)
-	if err := db.New().Model(u).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
+	if err := New().Model(u).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
 		log.Warn(err.Error())
 	}
 }

@@ -5,27 +5,19 @@
 package user
 
 import (
+	"github.com/crochee/lib/e"
+	"github.com/crochee/lib/id"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/json-iterator/go"
 	"net/http"
 	"obs/pkg/service/business/userx"
 
-	"obs/pkg/db"
-	"obs/pkg/e"
-	"obs/pkg/id"
 	"obs/pkg/model"
 	"obs/pkg/resp"
 	"obs/pkg/service/business/tokenx"
 	"obs/pkg/validator"
 )
-
-//// 账户ID
-//// Required: true
-//AccountID string `json:"account_id" binding:"required,numeric"`
-//// 用户ID
-//// Required: true
-//UserID string `json:"user_id" binding:"required,numeric"`
 
 type RegisterUserRequest struct {
 	// 账户
@@ -34,6 +26,7 @@ type RegisterUserRequest struct {
 	// 邮箱
 	Email string `json:"email"`
 	// 密码
+	// Required: true
 	PassWord string `json:"pass_word" binding:"required"`
 	// 描述信息
 	Desc string `json:"desc" binding:"json"`
@@ -87,11 +80,75 @@ func Register(ctx *gin.Context) {
 		Desc:       userRequest.Desc,
 	}
 
-	if err = db.With(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {
+	if err = model.With(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {
 		resp.ErrorWith(ctx, e.ErrOperateDB, err.Error())
 		return
 	}
 	resp.SuccessNotContent(ctx)
+}
+
+type ModifyUserRequest struct {
+	// 账户
+	// Required: true
+	Account string `json:"account" binding:"required"`
+	// 邮箱
+	Email string `json:"email"`
+	// 密码
+	// Required: true
+	PassWord string `json:"pass_word" binding:"required"`
+	// 描述信息
+	Desc string `json:"desc" binding:"json"`
+}
+
+// Modify godoc
+// swagger:route  PATCH /v1/account 账户 SwaggerRegisterUserRequest
+// 注册账户
+//
+// register account
+//     Consumes:
+//     - application/json
+//     Produces:
+//     - application/json
+//     Responses:
+//		 204: SwaggerNoneResponse
+//       default: SwaggerResponseError
+
+// Modify godoc
+// @Summary Modify
+// @Description user modify
+// @Tags user
+// @Accept application/json
+// @Produce application/json
+// @Param request body ModifyInfo true "request's content"
+// @Success 200
+// @Success 304
+// @Failure 400 {object} ex.Response
+// @Failure 403 {object} ex.Response
+// @Failure 500 {object} ex.Response
+// @Router /v1/user/modify [put]
+func Modify(ctx *gin.Context) {
+	var modifyInfo ModifyInfo
+	if err := ctx.ShouldBindBodyWith(&modifyInfo, binding.JSON); err != nil {
+		logx.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
+		ex.ErrorWith(ctx, ex.ParsePayloadFailed, err.Error())
+		return
+	}
+	// 检测邮箱的合法性
+	if !internal.VerifyEmail(modifyInfo.Email) {
+		ex.Error(ctx, ex.InvalidEmail)
+		return
+	}
+	if modifyInfo.OldPassWord == "" {
+		ctx.Status(http.StatusNotModified)
+		return
+	}
+
+	if err := userx.ModifyUser(ctx.Request.Context(), modifyInfo.Email, modifyInfo.NewPassWord,
+		modifyInfo.OldPassWord, modifyInfo.Nick); err != nil {
+		ex.Errors(ctx, err)
+		return
+	}
+	ctx.Status(http.StatusOK)
 }
 
 // Login godoc
@@ -102,8 +159,8 @@ func Register(ctx *gin.Context) {
 // @Produce application/json
 // @Param request body LoginInfo true "login request's content"
 // @Success 200 {string} string
-// @Failure 400 {object} e.Response
-// @Failure 500 {object} e.Response
+// @Failure 400 {object} ex.Response
+// @Failure 500 {object} ex.Response
 // @Router /v1/user/login [post]
 func Login(ctx *gin.Context) {
 	var loginInfo LoginInfo
@@ -113,7 +170,7 @@ func Login(ctx *gin.Context) {
 	}
 	// 检测邮箱的合法性
 	if !internal.VerifyEmail(loginInfo.Email) {
-		e.Error(ctx, e.InvalidEmail)
+		resp.Error(ctx, e.InvalidEmail)
 		return
 	}
 	token, err := userx.UserLogin(ctx.Request.Context(), loginInfo.Email, loginInfo.PassWord)
@@ -123,42 +180,3 @@ func Login(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, token)
 }
-
-//
-//// Modify godoc
-//// @Summary Modify
-//// @Description user modify
-//// @Tags user
-//// @Accept application/json
-//// @Produce application/json
-//// @Param request body ModifyInfo true "request's content"
-//// @Success 200
-//// @Success 304
-//// @Failure 400 {object} e.Response
-//// @Failure 403 {object} e.Response
-//// @Failure 500 {object} e.Response
-//// @Router /v1/user/modify [put]
-//func Modify(ctx *gin.Context) {
-//	var modifyInfo ModifyInfo
-//	if err := ctx.ShouldBindBodyWith(&modifyInfo, binding.JSON); err != nil {
-//		log.FromContext(ctx.Request.Context()).Errorf("bind body failed.Error:%v", err)
-//		e.ErrorWith(ctx, e.ParsePayloadFailed, err.Error())
-//		return
-//	}
-//	// 检测邮箱的合法性
-//	if !internal.VerifyEmail(modifyInfo.Email) {
-//		e.Error(ctx, e.InvalidEmail)
-//		return
-//	}
-//	if modifyInfo.OldPassWord == "" {
-//		ctx.Status(http.StatusNotModified)
-//		return
-//	}
-//
-//	if err := userx.ModifyUser(ctx.Request.Context(), modifyInfo.Email, modifyInfo.NewPassWord,
-//		modifyInfo.OldPassWord, modifyInfo.Nick); err != nil {
-//		e.Errors(ctx, err)
-//		return
-//	}
-//	ctx.Status(http.StatusOK)
-//}

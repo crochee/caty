@@ -6,14 +6,14 @@ package message
 
 import (
 	"context"
-	"obs/internal"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/crochee/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
-	"obs/pkg/message/mq"
+	"cca/pkg/message/mq"
 )
 
 var router *message.Router
@@ -43,5 +43,5 @@ func Close() {
 	if router == nil {
 		return
 	}
-	internal.Close(router)
+	lib.Close(router)
 }

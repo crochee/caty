@@ -60,19 +60,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -115,31 +115,31 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -177,19 +177,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -236,19 +236,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -301,19 +301,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -358,19 +358,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -420,19 +420,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -472,13 +472,13 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -518,19 +518,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -567,13 +567,13 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/e.ErrorResponse"
+                            "$ref": "#/definitions/ex.ErrorResponse"
                         }
                     }
                 }
@@ -598,7 +598,7 @@ var doc = `{
                 }
             }
         },
-        "e.ErrorResponse": {
+        "ex.ErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {

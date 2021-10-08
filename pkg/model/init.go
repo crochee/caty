@@ -1,29 +1,24 @@
-// Date: 2021/9/19
-
-// Package db
-package db
+package model
 
 import (
 	"context"
 	"errors"
-	"time"
 
+	"github.com/crochee/lib"
+	"github.com/crochee/lib/db"
 	"github.com/spf13/viper"
-	"gorm.io/gorm"
 
-	"obs/internal"
+	"time"
 )
 
 var (
-	dbClient *DB
-
+	dbClient           *db.DB
 	ErrNotRowsAffected = errors.New("0 rows affected")
-	ErrNotFound        = gorm.ErrRecordNotFound
 )
 
 // Init init database
 func Init(ctx context.Context) (err error) {
-	dbClient, err = NewClient(ctx, func(opt *Option) {
+	dbClient, err = db.NewClient(ctx, func(opt *db.Option) {
 		opt.Debug = viper.GetString("mode") == "debug"
 		opt.User = viper.GetString("mysql.user")
 		opt.Password = viper.GetString("mysql.password")
@@ -39,13 +34,13 @@ func Init(ctx context.Context) (err error) {
 }
 
 func Close() {
-	internal.Close(dbClient)
+	lib.Close(dbClient)
 }
 
-func With(ctx context.Context) *DB {
+func With(ctx context.Context) *db.DB {
 	return dbClient.WithContext(ctx)
 }
 
-func New() *DB {
+func New() *db.DB {
 	return dbClient
 }

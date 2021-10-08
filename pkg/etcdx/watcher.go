@@ -1,7 +1,3 @@
-// Copyright 2021, The Go Authors. All rights reserved.
-// Author: crochee
-// Date: 2021/4/3
-
 package etcdx
 
 import (
@@ -9,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-kratos/kratos/v2/registry"
 	clientv3 "go.etcd.io/etcd/client/v3"
+
+	"obs/pkg/registry"
 )
 
 type etcdWatcher struct {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"obs/internal"
+	"cca/internal"
 )
 
 const abortIndex int8 = math.MaxInt8 / 2 // 中间件最大数+1
@@ -23,7 +23,7 @@ type ProxyMiddle struct {
 	index        int8
 }
 
-// Proxy example: /proxy/obs/...
+// Proxy example: /proxy/cca/...
 func (p *ProxyMiddle) Proxy(ctx *gin.Context) {
 	list := strings.SplitN(ctx.Request.URL.Path, "/", 3)
 	if len(list) > 1 {

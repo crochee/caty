@@ -3,7 +3,7 @@
 // Package swag
 package swag
 
-import "obs/api/user"
+import "cca/api/user"
 
 // swagger:parameters SwaggerNoneRequest
 type SwaggerNoneRequest struct {

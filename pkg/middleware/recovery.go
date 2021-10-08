@@ -13,16 +13,16 @@ import (
 	"os"
 	"strings"
 
+	"github.com/crochee/lib/e"
+	"github.com/crochee/lib/log"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"obs/internal"
-	"obs/pkg/e"
-	"obs/pkg/log"
-	"obs/pkg/resp"
+	"cca/internal"
+	"cca/pkg/resp"
 )
 
-// Recovery panic log
+// Recovery panic logx
 func Recovery(ctx *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {

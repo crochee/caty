@@ -5,10 +5,10 @@
 package middleware
 
 import (
+	"github.com/crochee/lib/e"
 	"github.com/gin-gonic/gin"
 
-	"obs/pkg/e"
-	"obs/pkg/resp"
+	"cca/pkg/resp"
 )
 
 // NoRoute 404
