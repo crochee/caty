@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cca/pkg/db"
 	"context"
 	"crypto/tls"
 	"errors"
@@ -24,7 +25,6 @@ import (
 	"cca/pkg/etcdx"
 	"cca/pkg/ex"
 	"cca/pkg/message"
-	"cca/pkg/model"
 	"cca/pkg/registry"
 	"cca/pkg/router"
 	"cca/pkg/tlsx"
@@ -77,10 +77,10 @@ func startAction(ctx context.Context) error {
 		return err
 	}
 	// 初始化数据库
-	if err := model.Init(ctx); err != nil {
+	if err := db.Init(ctx); err != nil {
 		return err
 	}
-	defer model.Close()
+	defer db.Close()
 	if err := validator.Init(); err != nil {
 		return err
 	}

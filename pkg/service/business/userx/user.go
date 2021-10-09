@@ -1,6 +1,7 @@
 package userx
 
 import (
+	db2 "cca/pkg/db"
 	"cca/pkg/logx"
 	"cca/pkg/model"
 	"cca/pkg/service/business/tokenx"
@@ -18,7 +19,7 @@ import (
 // UserLogin 登录生成token信息
 func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	domain := &model.Domain{}
-	if err := model.With(ctx).Model(domain).Where("email =?", email).First(domain).Error; err != nil {
+	if err := db2.With(ctx).Model(domain).Where("email =?", email).First(domain).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
 			return "", e.Wrap(e.ErrNotFound, err.Error())
 		}

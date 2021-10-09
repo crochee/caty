@@ -5,6 +5,7 @@
 package model
 
 import (
+	db2 "cca/pkg/db"
 	"github.com/crochee/lib/db"
 	"github.com/crochee/lib/log"
 )
@@ -25,7 +26,7 @@ type Domain struct {
 
 func DeleteDomain() {
 	d := new(Domain)
-	if err := New().Model(d).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
+	if err := db2.New().Model(d).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(d).Error; err != nil {
 		log.Warn(err.Error())
 	}
 }

@@ -5,6 +5,7 @@
 package user
 
 import (
+	"cca/pkg/db"
 	"net/http"
 
 	"github.com/crochee/lib/e"
@@ -71,7 +72,7 @@ func Register(ctx *gin.Context) {
 		resp.ErrorWith(ctx, e.ErrInternalServerError, err.Error())
 		return
 	}
-	user := &model.User{
+	user := &model.Account{
 		AccountID:  idString,
 		Account:    userRequest.Account,
 		UserID:     idString,
@@ -81,7 +82,7 @@ func Register(ctx *gin.Context) {
 		Desc:       userRequest.Desc,
 	}
 
-	if err = model.With(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {
+	if err = db.With(ctx.Request.Context()).Model(user).Create(user).Error; err != nil {
 		resp.ErrorWith(ctx, e.ErrOperateDB, err.Error())
 		return
 	}

@@ -49,7 +49,7 @@ func TestRegister(t *testing.T) {
 //	body := new(bytes.Buffer)
 //	r := &LoginInfo{
 //		Email:    "13522570308@139.com",
-//		PassWord: "123",
+//		Password: "123",
 //	}
 //	if err := jsoniter.ConfigFastest.NewEncoder(body).Encode(r); err != nil {
 //		t.Fatal(err)

@@ -22,7 +22,7 @@ func TestDeleteUser(t *testing.T) {
 	}
 	defer db.Close()
 	d := db.New().Debug()
-	u := &User{
+	u := &Account{
 		AccountID:  "lcf",
 		UserID:     "44",
 		Account:    "90",

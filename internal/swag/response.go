@@ -25,6 +25,6 @@ type SwaggerRegisterUserResponse struct {
 	// in: body
 	Body struct {
 		resp.ResponseCode
-		Result *account.RegisterUserResponseResult
+		Result *account.RegisterResponseResult
 	}
 }

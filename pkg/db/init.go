@@ -1,24 +1,19 @@
-package model
+package db
 
 import (
 	"context"
-	"errors"
 
 	"github.com/crochee/lib"
-	"github.com/crochee/lib/db"
 	"github.com/spf13/viper"
 
 	"time"
 )
 
-var (
-	dbClient           *db.DB
-	ErrNotRowsAffected = errors.New("0 rows affected")
-)
+var dbClient *DB
 
 // Init init database
 func Init(ctx context.Context) (err error) {
-	dbClient, err = db.NewClient(ctx, func(opt *db.Option) {
+	dbClient, err = NewClient(ctx, func(opt *Option) {
 		opt.Debug = viper.GetString("mode") == "debug"
 		opt.User = viper.GetString("mysql.user")
 		opt.Password = viper.GetString("mysql.password")
@@ -37,10 +32,10 @@ func Close() {
 	lib.Close(dbClient)
 }
 
-func With(ctx context.Context) *db.DB {
+func With(ctx context.Context) *DB {
 	return dbClient.WithContext(ctx)
 }
 
-func New() *db.DB {
+func New() *DB {
 	return dbClient
 }

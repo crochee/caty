@@ -5,6 +5,7 @@
 package tokenx
 
 import (
+	"crypto/sha256"
 	"errors"
 	"time"
 
@@ -61,16 +62,17 @@ var ActionString = map[Action]string{
 // CreateToken 生成token
 func CreateToken(claims *TokenClaims) (string, error) {
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return tokenImpl.SignedString(secret)
+	secretKey, err := CalcSecret(&jwt.Token{Claims: claims})
+	if err != nil {
+		return "", err
+	}
+	return tokenImpl.SignedString(secretKey)
 }
 
 // ParseToken 解析出token信息 TokenClaims
 func ParseToken(tokenString string) (*TokenClaims, error) {
 	claims := new(TokenClaims)
-	tokenImpl, err := jwt.ParseWithClaims(tokenString, claims,
-		func(token *jwt.Token) (interface{}, error) {
-			return secret, nil
-		})
+	tokenImpl, err := jwt.ParseWithClaims(tokenString, claims, CalcSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +85,19 @@ func ParseToken(tokenString string) (*TokenClaims, error) {
 		return nil, errors.New("token is invalid")
 	}
 	return claims, nil
+}
+
+func CalcSecret(token *jwt.Token) (interface{}, error) {
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return nil, errors.New("cannot convert sign claim")
+	}
+	h := sha256.New()
+	_, err := h.Write([]byte(claims.Token.UserID))
+	if err != nil {
+		return nil, err
+	}
+	return h.Sum(nil), nil
 }
 
 // Signature jwt.Claims的签名实现
