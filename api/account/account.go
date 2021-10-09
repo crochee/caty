@@ -4,6 +4,7 @@
 package account
 
 import (
+	"gorm.io/gorm"
 	"time"
 
 	"github.com/crochee/lib/e"
@@ -19,77 +20,12 @@ import (
 	"cca/pkg/validator"
 )
 
-type QueryRequest struct {
-	// 账户ID
+type RegisterRequest struct {
+	// 用户名
 	// Required: true
-	AccountID string `json:"account_id" binding:"required"`
-	// 用户ID
-	// Required: true
-	UserID string `json:"user_id" binding:"required"`
-}
-
-type QueryResponseResult struct {
+	Name string `json:"account" binding:"required"`
 	// 账户ID
 	AccountID string `json:"account_id"`
-	// 账户
-	Account string `json:"account"`
-	// 用户
-	UserID string `json:"user_id"`
-	// 邮箱
-	Email string `json:"email"`
-	// 权限
-	Permission string `json:"permission"`
-	// 是否认证
-	Verify uint8 `json:"verify"`
-	// 描述
-	Desc string `json:"desc"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
-	// 更新时间
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
-// Query godoc
-// swagger:route  GET /v1/account 账户 SwaggerRegisterUserRequest
-// 查询账户
-//
-// register account
-//     Consumes:
-//     - application/json
-//     Produces:
-//     - application/json
-//     Responses:
-//		 200: SwaggerRegisterUserResponse
-//       default: SwaggerResponseError
-func Query(ctx *gin.Context) {
-	var queryRequest QueryRequest
-	if err := ctx.ShouldBindBodyWith(&queryRequest, binding.JSON); err != nil {
-		resp.ErrorParam(ctx, err)
-		return
-	}
-	accountModel := &model.Account{}
-	if err := db.With(ctx.Request.Context()).Model(accountModel).Where("user_id =? AND account_id =?",
-		queryRequest.UserID, queryRequest.AccountID).First(accountModel).Error; err != nil {
-		resp.ErrorWith(ctx, e.ErrOperateDB, err.Error())
-		return
-	}
-	resp.Success(ctx, &QueryResponseResult{
-		AccountID:  accountModel.AccountID,
-		Account:    accountModel.Account,
-		UserID:     accountModel.UserID,
-		Email:      accountModel.Email,
-		Permission: accountModel.Permission,
-		Verify:     accountModel.Verify,
-		Desc:       accountModel.Desc,
-		CreatedAt:  accountModel.CreatedAt,
-		UpdatedAt:  accountModel.UpdatedAt,
-	})
-}
-
-type RegisterRequest struct {
-	// 账户
-	// Required: true
-	Account string `json:"account" binding:"required"`
 	// 邮箱
 	Email string `json:"email"`
 	// 密码
@@ -133,26 +69,56 @@ type RegisterResponseResult struct {
 //		 204: SwaggerRegisterUserResponse
 //       default: SwaggerResponseError
 func Register(ctx *gin.Context) {
-	var userRequest RegisterRequest
-	if err := ctx.ShouldBindBodyWith(&userRequest, binding.JSON); err != nil {
+	var registerRequest RegisterRequest
+	if err := ctx.ShouldBindBodyWith(&registerRequest, binding.JSON); err != nil {
 		resp.ErrorParam(ctx, err)
 		return
 	}
-	if userRequest.Email != "" {
+	if registerRequest.Email != "" {
 		// 检测邮箱的合法性
-		if err := validator.Var(userRequest.Email, "email"); err != nil {
+		if err := validator.Var(registerRequest.Email, "email"); err != nil {
 			resp.ErrorParam(ctx, err)
 			return
 		}
 	}
-
-	permission, err := jsoniter.ConfigFastest.MarshalToString(map[string]tokenx.Action{
+	actionMap := map[string]tokenx.Action{
 		tokenx.AllService: tokenx.Admin,
-	})
+	}
+	if registerRequest.AccountID != "" {
+		actionMap[tokenx.AllService] = tokenx.Read
+	}
+	permission, err := jsoniter.ConfigFastest.MarshalToString(actionMap)
 	if err != nil {
 		resp.ErrorWith(ctx, e.ErrInternalServerError, err.Error())
 		return
 	}
+
+	db.With(ctx.Request.Context()).Transaction(func(tx *gorm.DB) error {
+		accountModel := &model.Account{}
+		if registerRequest.AccountID != "" {
+			err = tx.Model(accountModel).Where("id =?", registerRequest.AccountID).First(accountModel).Error
+			if err != nil {
+				return err
+			}
+		} else {
+			err = tx.Model(accountModel).Create(accountModel).Error
+			if err != nil {
+				return err
+			}
+		}
+		userModel := &model.User{
+			AccountID:  "",
+			Name:       "",
+			Password:   "",
+			Email:      "",
+			Permission: "",
+			Verify:     0,
+			Desc:       "",
+		}
+		tx.Model()
+		return nil
+	})
+
 	var idString string
 	if idString, err = id.NextIDString(); err != nil {
 		resp.ErrorWith(ctx, e.ErrInternalServerError, err.Error())
@@ -160,12 +126,12 @@ func Register(ctx *gin.Context) {
 	}
 	accountModel := &model.Account{
 		AccountID:  idString,
-		Account:    userRequest.Account,
+		Account:    registerRequest.Account,
 		UserID:     idString,
-		Password:   userRequest.Password,
-		Email:      userRequest.Email,
+		Password:   registerRequest.Password,
+		Email:      registerRequest.Email,
 		Permission: permission,
-		Desc:       userRequest.Desc,
+		Desc:       registerRequest.Desc,
 	}
 
 	if err = db.With(ctx.Request.Context()).Model(accountModel).Create(accountModel).Error; err != nil {
@@ -248,6 +214,109 @@ func Modify(ctx *gin.Context) {
 	}
 	if query.RowsAffected == 0 {
 		resp.Error(ctx, e.ErrOperateDB)
+		return
+	}
+	resp.SuccessNotContent(ctx)
+}
+
+type QueryRequest struct {
+	// 账户ID
+	// Required: true
+	AccountID string `json:"account_id" binding:"required"`
+	// 用户ID
+	// Required: true
+	UserID string `json:"user_id" binding:"required"`
+}
+
+type QueryResponseResult struct {
+	// 账户ID
+	AccountID string `json:"account_id"`
+	// 账户
+	Account string `json:"account"`
+	// 用户
+	UserID string `json:"user_id"`
+	// 邮箱
+	Email string `json:"email"`
+	// 权限
+	Permission string `json:"permission"`
+	// 是否认证
+	Verify uint8 `json:"verify"`
+	// 描述
+	Desc string `json:"desc"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// Query godoc
+// swagger:route  GET /v1/account 账户 SwaggerRegisterUserRequest
+// 查询账户
+//
+// register account
+//     Consumes:
+//     - application/json
+//     Produces:
+//     - application/json
+//     Responses:
+//		 200: SwaggerRegisterUserResponse
+//       default: SwaggerResponseError
+func Query(ctx *gin.Context) {
+	var queryRequest QueryRequest
+	if err := ctx.ShouldBindBodyWith(&queryRequest, binding.JSON); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
+	accountModel := &model.Account{}
+	if err := db.With(ctx.Request.Context()).Model(accountModel).Where("user_id =? AND account_id =?",
+		queryRequest.UserID, queryRequest.AccountID).First(accountModel).Error; err != nil {
+		resp.ErrorWith(ctx, e.ErrOperateDB, err.Error())
+		return
+	}
+	resp.Success(ctx, &QueryResponseResult{
+		AccountID:  accountModel.AccountID,
+		Account:    accountModel.Account,
+		UserID:     accountModel.UserID,
+		Email:      accountModel.Email,
+		Permission: accountModel.Permission,
+		Verify:     accountModel.Verify,
+		Desc:       accountModel.Desc,
+		CreatedAt:  accountModel.CreatedAt,
+		UpdatedAt:  accountModel.UpdatedAt,
+	})
+}
+
+type DeleteRequest struct {
+	// 账户ID
+	// Required: true
+	AccountID string `json:"account_id" binding:"required"`
+	// 用户ID
+	// Required: true
+	UserID string `json:"user_id" binding:"required"`
+}
+
+// Delete godoc
+// swagger:route  GET /v1/account 账户 SwaggerRegisterUserRequest
+// 查询账户
+//
+// register account
+//     Consumes:
+//     - application/json
+//     Produces:
+//     - application/json
+//     Responses:
+//		 200: SwaggerRegisterUserResponse
+//       default: SwaggerResponseError
+func Delete(ctx *gin.Context) {
+	var deleteRequest DeleteRequest
+	if err := ctx.ShouldBindBodyWith(&deleteRequest, binding.JSON); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
+	accountModel := &model.Account{}
+	if err := db.With(ctx.Request.Context()).Model(accountModel).Where("user_id =? AND account_id =?",
+		deleteRequest.UserID, deleteRequest.AccountID).Delete(accountModel).Error; err != nil {
+		resp.ErrorWith(ctx, e.ErrOperateDB, err.Error())
 		return
 	}
 	resp.SuccessNotContent(ctx)
