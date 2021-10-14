@@ -3,16 +3,18 @@
 // Package swag
 package swag
 
-import "cca/api/user"
+import (
+	"cca/pkg/service/account"
+)
 
-// swagger:parameters SwaggerNoneRequest
-type SwaggerNoneRequest struct {
+// swagger:parameters SNoneRequest
+type SNoneRequest struct {
 }
 
-// swagger:parameters SwaggerRegisterUserRequest
-type SwaggerRegisterUserRequest struct {
+// swagger:parameters SAccountRegisterRequest
+type SAccountRegisterRequest struct {
 	// in: body
 	Body struct {
-		user.RegisterUserRequest
+		account.CreateRequest
 	}
 }

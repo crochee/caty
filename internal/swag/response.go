@@ -4,27 +4,27 @@
 package swag
 
 import (
-	"cca/api/account"
 	"cca/pkg/resp"
+	"cca/pkg/service/account"
 )
 
-// swagger:response SwaggerNoneResponse
-type SwaggerNoneResponse struct {
+// swagger:response SNoneResponse
+type SNoneResponse struct {
 }
 
-// swagger:response SwaggerResponseError
-type SwaggerResponseError struct {
+// swagger:response SResponseError
+type SResponseError struct {
 	// in: body
 	Body struct {
 		resp.ResponseError
 	}
 }
 
-// swagger:response SwaggerRegisterUserResponse
-type SwaggerRegisterUserResponse struct {
+// swagger:response SAccountRegisterResponseResult
+type SAccountRegisterResponseResult struct {
 	// in: body
 	Body struct {
 		resp.ResponseCode
-		Result *account.RegisterResponseResult
+		Result *account.CreateResponseResult
 	}
 }
