@@ -241,3 +241,46 @@ func Retrieve(ctx context.Context, request *RetrieveRequest) ([]*RetrieveRespons
 	}
 	return responses, nil
 }
+
+// Delete 删除账户
+func Delete(ctx context.Context, request *RetrieveRequest) ([]*RetrieveResponse, error) {
+	queryList := make(map[string]string)
+	if request.AccountID != "" {
+		queryList["account_id =?"] = request.AccountID
+	}
+	if request.UserID != "" {
+		queryList["id"] = request.UserID
+	}
+	if request.Account != "" {
+		queryList["name"] = request.Account
+	}
+	if request.Email != "" {
+		queryList["email"] = request.Email
+	}
+	if len(queryList) == 0 {
+		return nil, fmt.Errorf("retrieve has 0 conditions,%w", e.ErrInvalidParam)
+	}
+	query := db.With(ctx).Model(&model.User{})
+	for k, v := range queryList {
+		query = query.Where("? = ?", k, v)
+	}
+	var userList []*model.User
+	if err := query.Find(userList); err != nil {
+		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, ex.ErrRetrieveAccount)
+	}
+	responses := make([]*RetrieveResponse, 0, len(userList))
+	for _, v := range userList {
+		responses = append(responses, &RetrieveResponse{
+			AccountID:  strconv.FormatUint(v.AccountID, 10),
+			Account:    v.Name,
+			UserID:     strconv.FormatUint(v.ID, 10),
+			Email:      v.Email,
+			Permission: v.Permission,
+			Verify:     v.Verify,
+			Desc:       v.Desc,
+			CreatedAt:  v.CreatedAt,
+			UpdatedAt:  v.UpdatedAt,
+		})
+	}
+	return responses, nil
+}

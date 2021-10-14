@@ -1,7 +1,6 @@
 package main
 
 import (
-	"cca/pkg/db"
 	"context"
 	"crypto/tls"
 	"errors"
@@ -22,6 +21,7 @@ import (
 
 	"cca/config"
 	"cca/internal/host"
+	"cca/pkg/db"
 	"cca/pkg/etcdx"
 	"cca/pkg/ex"
 	"cca/pkg/message"
@@ -38,8 +38,10 @@ var configFile = flag.String("f", "./conf/cca.yml", "the config file")
 func main() {
 	flag.Parse()
 	// 初始化配置
-	err := config.LoadConfig(*configFile)
-	if err != nil {
+	if err := config.LoadConfig(*configFile); err != nil {
+		panic(err)
+	}
+	if err := ex.Loading(); err != nil {
 		panic(err)
 	}
 	// 初始化系统日志
@@ -48,7 +50,7 @@ func main() {
 		option.Level = viper.GetString("system-log-level")
 	})
 
-	if err = run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	if err := run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err.Error())
 	}
 }
@@ -73,9 +75,6 @@ func run() error {
 }
 
 func startAction(ctx context.Context) error {
-	if err := ex.AddCode(); err != nil {
-		return err
-	}
 	// 初始化数据库
 	if err := db.Init(ctx); err != nil {
 		return err
@@ -111,7 +110,6 @@ func NewServer(ctx context.Context) (*httpx.HTTPServer, error) {
 	}
 	srv := &httpx.HTTPServer{
 		Server: &http.Server{
-			Addr:    "0.0.0.0:8120",
 			Handler: router.New(),
 			BaseContext: func(_ net.Listener) context.Context {
 				return ctx
@@ -130,7 +128,7 @@ func NewServer(ctx context.Context) (*httpx.HTTPServer, error) {
 		cfg *tls.Config
 		uri = &url.URL{
 			Scheme: "https",
-			Host:   fmt.Sprintf("%s:%d", ip, viper.GetInt("port")),
+			Host:   fmt.Sprintf("%s:8120", ip),
 		}
 	)
 	if cfg, err = tlsx.TlsConfig(tls.RequireAndVerifyClientCert, tlsx.Config{

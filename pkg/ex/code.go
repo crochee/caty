@@ -10,7 +10,7 @@ const (
 	ErrRetrieveAccount e.Code = 40510102
 )
 
-func AddCode() error {
+func Loading() error {
 	return e.AddCode(map[e.Code]string{
 		ErrRegisterAccount: "注册账号错误",
 		ErrUpdateAccount:   "编辑账号错误",

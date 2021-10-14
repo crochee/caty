@@ -13,12 +13,8 @@ package router
 
 import (
 	"github.com/crochee/lib/log"
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 
-	_ "cca/docs"
 	"cca/pkg/middleware"
 )
 
@@ -37,12 +33,8 @@ func New() *gin.Engine {
 	router.NoRoute(middleware.NoRoute)
 	router.NoMethod(middleware.NoMethod)
 	if gin.Mode() == gin.DebugMode {
-		// swagger
-		url := ginSwagger.URL("/swagger/doc.json")
-		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
 		// 增加性能测试
-		pprof.Register(router)
+		// pprof.Register(router)
 	}
 
 	router.Use(middleware.TraceId, middleware.RequestLogger(log.NewLogger()), middleware.Log, middleware.Recovery)

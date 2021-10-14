@@ -1,5 +1,4 @@
 mode: debug
-port: 8120
 system-log-path: ./log/cca.log
 system-log_level: debug
 storage_path: /data/

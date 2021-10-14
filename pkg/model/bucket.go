@@ -7,10 +7,10 @@ package model
 import (
 	"time"
 
+	"github.com/crochee/lib/log"
 	"gorm.io/gorm"
 
 	"cca/pkg/db"
-	"cca/pkg/logx"
 )
 
 type Bucket struct {
@@ -25,6 +25,6 @@ type Bucket struct {
 func DeleteBucket() {
 	b := new(Bucket)
 	if err := db.New().Model(b).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(b).Error; err != nil {
-		logx.Warn(err.Error())
+		log.Warn(err.Error())
 	}
 }

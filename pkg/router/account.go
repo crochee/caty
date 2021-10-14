@@ -4,13 +4,15 @@
 package router
 
 import (
-	"cca/api/account"
 	"github.com/gin-gonic/gin"
+
+	"cca/api/account"
 )
 
 func registerAccount(v1Router *gin.RouterGroup) {
 	v1Router.POST("/account", account.Register)
 	v1Router.PATCH("/account", account.Modify)
 	v1Router.GET("/account", account.Retrieve)
-	v1Router.DELETE("/account", account.Delete)
+	v1Router.GET("/account/:id", account.RetrieveSingle)
+	v1Router.DELETE("/account/:id", account.Delete)
 }

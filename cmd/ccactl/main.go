@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"obs/pkg/v"
+	"cca/pkg/v"
 )
 
 //go:generate go install github.com/spf13/cobra/cobra@v1.1.3

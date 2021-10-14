@@ -87,3 +87,55 @@ func Retrieve(ctx *gin.Context) {
 	}
 	resp.Success(ctx, response)
 }
+
+// RetrieveSingle godoc
+// swagger:route  GET /v1/account 账户 SwaggerRegisterUserRequest
+// 查询账户
+//
+// register account
+//     Consumes:
+//     - application/json
+//     Produces:
+//     - application/json
+//     Responses:
+//		 200: SwaggerRegisterUserResponse
+//       default: SwaggerResponseError
+func RetrieveSingle(ctx *gin.Context) {
+	var retrieveRequest account.RetrieveRequest
+	if err := ctx.ShouldBindBodyWith(&retrieveRequest, binding.JSON); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
+	response, err := account.Retrieve(ctx.Request.Context(), &retrieveRequest)
+	if err != nil {
+		resp.Errors(ctx, err)
+		return
+	}
+	resp.Success(ctx, response)
+}
+
+// Delete godoc
+// swagger:route  GET /v1/account 账户 SwaggerRegisterUserRequest
+// 删除账户
+//
+// register account
+//     Consumes:
+//     - application/json
+//     Produces:
+//     - application/json
+//     Responses:
+//		 200: SwaggerRegisterUserResponse
+//       default: SwaggerResponseError
+func Delete(ctx *gin.Context) {
+	var retrieveRequest account.RetrieveRequest
+	if err := ctx.ShouldBindBodyWith(&retrieveRequest, binding.JSON); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
+	response, err := account.Retrieve(ctx.Request.Context(), &retrieveRequest)
+	if err != nil {
+		resp.Errors(ctx, err)
+		return
+	}
+	resp.Success(ctx, response)
+}
