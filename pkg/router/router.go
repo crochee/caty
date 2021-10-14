@@ -4,7 +4,7 @@
 // that is using object
 //
 //     title: cca
-//     Schemes: http,https
+//     Schemes: http
 //     Host: localhost:8120
 //     Version: 0.0.1
 //

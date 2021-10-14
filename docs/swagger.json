@@ -1,6 +1,6 @@
 {
   "schemes": [
-    "http,https"
+    "http"
   ],
   "swagger": "2.0",
   "info": {
@@ -36,22 +36,22 @@
               ],
               "properties": {
                 "account": {
-                  "description": "账户",
+                  "description": "账户\nin: query",
                   "type": "string",
                   "x-go-name": "Account"
                 },
                 "account_id": {
-                  "description": "账户ID",
+                  "description": "账户ID\nin: query",
                   "type": "string",
                   "x-go-name": "AccountID"
                 },
                 "email": {
-                  "description": "邮箱",
+                  "description": "邮箱\nin: query",
                   "type": "string",
                   "x-go-name": "Email"
                 },
                 "user_id": {
-                  "description": "用户",
+                  "description": "用户\nin: query",
                   "type": "string",
                   "x-go-name": "UserID"
                 }
@@ -440,7 +440,7 @@
               ],
               "properties": {
                 "user_id": {
-                  "description": "用户ID",
+                  "description": "用户ID\nin: path",
                   "type": "string",
                   "x-go-name": "UserID"
                 }
@@ -562,7 +562,7 @@
               ],
               "properties": {
                 "user_id": {
-                  "description": "用户ID",
+                  "description": "用户ID\nin: path",
                   "type": "string",
                   "x-go-name": "UserID"
                 }

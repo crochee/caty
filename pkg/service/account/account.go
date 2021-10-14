@@ -167,15 +167,19 @@ func Update(ctx context.Context, request *UpdateRequest) error {
 
 type RetrieveRequest struct {
 	// 账户ID
+	// in: query
 	// Required: true
-	AccountID string `json:"account_id" binding:"omitempty,numeric"`
+	AccountID string `json:"account_id" uri:"account-id" binding:"omitempty,numeric"`
 	// 用户
+	// in: query
 	// Required: true
-	UserID string `json:"user_id" binding:"omitempty,numeric"`
+	UserID string `json:"user_id" uri:"user-id" binding:"omitempty,numeric"`
 	// 账户
-	Account string `json:"account" binding:"omitempty"`
+	// in: query
+	Account string `json:"account" uri:"account" binding:"omitempty"`
 	// 邮箱
-	Email string `json:"email" binding:"omitempty,email"`
+	// in: query
+	Email string `json:"email" uri:"email" binding:"omitempty,email"`
 }
 
 type RetrieveResponses struct {
@@ -251,8 +255,8 @@ func Retrieve(ctx context.Context, request *RetrieveRequest) (*RetrieveResponses
 
 type RetrieveSingleRequest struct {
 	// 用户ID
-	// Required: true
 	// in: path
+	// Required: true
 	UserID string `json:"user_id" uri:"id" binding:"required,numeric"`
 }
 
@@ -277,8 +281,8 @@ func RetrieveSingle(ctx context.Context, request *RetrieveSingleRequest) (*Retri
 
 type DeleteRequest struct {
 	// 用户ID
-	// Required: true
 	// in: path
+	// Required: true
 	UserID string `json:"user_id" uri:"id" binding:"required,numeric"`
 }
 
