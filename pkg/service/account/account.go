@@ -4,7 +4,6 @@
 package account
 
 import (
-	"cca/pkg/ex"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -16,6 +15,7 @@ import (
 	"gorm.io/gorm"
 
 	"cca/pkg/db"
+	"cca/pkg/ex"
 	"cca/pkg/model"
 	"cca/pkg/service/business/tokenx"
 )
@@ -178,6 +178,11 @@ type RetrieveRequest struct {
 	Email string `json:"email" binding:"omitempty,email"`
 }
 
+type RetrieveResponses struct {
+	// 结果集
+	Result []*RetrieveResponse `json:"result"`
+}
+
 type RetrieveResponse struct {
 	// 账户ID
 	AccountID string `json:"account_id"`
@@ -200,7 +205,7 @@ type RetrieveResponse struct {
 }
 
 // Retrieve 查询、获取账户信息
-func Retrieve(ctx context.Context, request *RetrieveRequest) ([]*RetrieveResponse, error) {
+func Retrieve(ctx context.Context, request *RetrieveRequest) (*RetrieveResponses, error) {
 	queryList := make(map[string]string)
 	if request.AccountID != "" {
 		queryList["account_id =?"] = request.AccountID
@@ -225,9 +230,11 @@ func Retrieve(ctx context.Context, request *RetrieveRequest) ([]*RetrieveRespons
 	if err := query.Find(userList); err != nil {
 		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, ex.ErrRetrieveAccount)
 	}
-	responses := make([]*RetrieveResponse, 0, len(userList))
+	responses := &RetrieveResponses{
+		Result: make([]*RetrieveResponse, 0, len(userList)),
+	}
 	for _, v := range userList {
-		responses = append(responses, &RetrieveResponse{
+		responses.Result = append(responses.Result, &RetrieveResponse{
 			AccountID:  strconv.FormatUint(v.AccountID, 10),
 			Account:    v.Name,
 			UserID:     strconv.FormatUint(v.ID, 10),
@@ -242,45 +249,44 @@ func Retrieve(ctx context.Context, request *RetrieveRequest) ([]*RetrieveRespons
 	return responses, nil
 }
 
+type RetrieveSingleRequest struct {
+	// 用户ID
+	// Required: true
+	// in: path
+	UserID string `json:"user_id" uri:"id" binding:"required,numeric"`
+}
+
+// RetrieveSingle 查询、获取指定账户信息
+func RetrieveSingle(ctx context.Context, request *RetrieveSingleRequest) (*RetrieveResponse, error) {
+	user := &model.User{}
+	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).First(user).Error; err != nil {
+		return nil, fmt.Errorf("%v.%w", err, ex.ErrRetrieveAccount)
+	}
+	return &RetrieveResponse{
+		AccountID:  strconv.FormatUint(user.AccountID, 10),
+		Account:    user.Name,
+		UserID:     strconv.FormatUint(user.ID, 10),
+		Email:      user.Email,
+		Permission: user.Permission,
+		Verify:     user.Verify,
+		Desc:       user.Desc,
+		CreatedAt:  user.CreatedAt,
+		UpdatedAt:  user.UpdatedAt,
+	}, nil
+}
+
+type DeleteRequest struct {
+	// 用户ID
+	// Required: true
+	// in: path
+	UserID string `json:"user_id" uri:"id" binding:"required,numeric"`
+}
+
 // Delete 删除账户
-func Delete(ctx context.Context, request *RetrieveRequest) ([]*RetrieveResponse, error) {
-	queryList := make(map[string]string)
-	if request.AccountID != "" {
-		queryList["account_id =?"] = request.AccountID
+func Delete(ctx context.Context, request *DeleteRequest) error {
+	user := &model.User{}
+	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).Delete(user).Error; err != nil {
+		return fmt.Errorf("%v.%w", err, ex.ErrDeleteAccount)
 	}
-	if request.UserID != "" {
-		queryList["id"] = request.UserID
-	}
-	if request.Account != "" {
-		queryList["name"] = request.Account
-	}
-	if request.Email != "" {
-		queryList["email"] = request.Email
-	}
-	if len(queryList) == 0 {
-		return nil, fmt.Errorf("retrieve has 0 conditions,%w", e.ErrInvalidParam)
-	}
-	query := db.With(ctx).Model(&model.User{})
-	for k, v := range queryList {
-		query = query.Where("? = ?", k, v)
-	}
-	var userList []*model.User
-	if err := query.Find(userList); err != nil {
-		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, ex.ErrRetrieveAccount)
-	}
-	responses := make([]*RetrieveResponse, 0, len(userList))
-	for _, v := range userList {
-		responses = append(responses, &RetrieveResponse{
-			AccountID:  strconv.FormatUint(v.AccountID, 10),
-			Account:    v.Name,
-			UserID:     strconv.FormatUint(v.ID, 10),
-			Email:      v.Email,
-			Permission: v.Permission,
-			Verify:     v.Verify,
-			Desc:       v.Desc,
-			CreatedAt:  v.CreatedAt,
-			UpdatedAt:  v.UpdatedAt,
-		})
-	}
-	return responses, nil
+	return nil
 }

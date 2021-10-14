@@ -17,10 +17,6 @@ type ResponseCode struct {
 	// Required: true
 	// Example: success
 	Msg string `json:"message"`
-}
-
-type ResponseError struct {
-	ResponseCode
 	// 具体描述信息
 	// Required: true
 	Result string `json:"result"`
@@ -28,48 +24,46 @@ type ResponseError struct {
 
 // Error gin response with Code
 func Error(ctx *gin.Context, code e.Code) {
-	ctx.JSON(code.StatusCode(), ResponseError{
-		ResponseCode: ResponseCode{
-			Code: code.Code(),
-			Msg:  code.Error(),
-		},
+	ctx.JSON(code.StatusCode(), ResponseCode{
+		Code: code.Code(),
+		Msg:  code.Error(),
 	})
 }
 
-// ErrorWith gin response with Code and message
-func ErrorWith(ctx *gin.Context, code e.Code, message string) {
-	ctx.JSON(code.StatusCode(), ResponseError{
-		ResponseCode: ResponseCode{
-			Code: code.Code(),
-			Msg:  code.Error(),
-		},
-		Result: message,
-	})
+// A Wrapper provides context around another error.
+type Wrapper interface {
+	// Unwrap returns the next error in the error chain.
+	// If there is no next error, Unwrap returns nil.
+	Unwrap() error
 }
 
 // Errors gin Response with error
 func Errors(ctx *gin.Context, err error) {
 	log.FromContext(ctx.Request.Context()).Errorf("has error %+v", err)
-	var errResult error
-	if errResult = e.Unwrap(err); errResult == nil {
-		ErrorWith(ctx, e.ErrInternalServerError, err.Error())
+	for err != nil {
+		wrapper, ok := err.(Wrapper)
+		if !ok {
+			break
+		}
+		err = wrapper.Unwrap()
+	}
+	if err == nil {
+		Error(ctx, e.ErrInternalServerError)
 		return
 	}
 	var errorCode e.Code
-	if errors.As(errResult, &errorCode) {
+	if errors.As(err, &errorCode) {
 		Error(ctx, errorCode)
 		return
 	}
-	ErrorWith(ctx, e.ErrInternalServerError, err.Error())
+	Error(ctx, e.ErrInternalServerError)
 }
 
 func ErrorParam(ctx *gin.Context, err error) {
 	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.Error:%+v", err)
-	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseError{
-		ResponseCode: ResponseCode{
-			Code: e.ErrInvalidParam.Code(),
-			Msg:  e.ErrInvalidParam.Error(),
-		},
+	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseCode{
+		Code:   e.ErrInvalidParam.Code(),
+		Msg:    e.ErrInvalidParam.Error(),
 		Result: err.Error(),
 	})
 }

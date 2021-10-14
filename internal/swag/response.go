@@ -8,15 +8,15 @@ import (
 	"cca/pkg/service/account"
 )
 
-// swagger:response SNoneResponse
-type SNoneResponse struct {
+// swagger:response SNullResponse
+type SNullResponse struct {
 }
 
-// swagger:response SResponseError
-type SResponseError struct {
+// swagger:response SResponseCode
+type SResponseCode struct {
 	// in: body
 	Body struct {
-		resp.ResponseError
+		resp.ResponseCode
 	}
 }
 
@@ -24,7 +24,22 @@ type SResponseError struct {
 type SAccountRegisterResponseResult struct {
 	// in: body
 	Body struct {
-		resp.ResponseCode
-		Result *account.CreateResponseResult
+		account.CreateResponseResult
+	}
+}
+
+// swagger:response SAccountRetrieveResponses
+type SAccountRetrieveResponses struct {
+	// in: body
+	Body struct {
+		account.RetrieveResponses
+	}
+}
+
+// swagger:response SAccountRetrieveResponse
+type SAccountRetrieveResponse struct {
+	// in: body
+	Body struct {
+		account.RetrieveResponse
 	}
 }
