@@ -51,7 +51,9 @@ func main() {
 	})
 
 	if err := run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err.Error())
+		log.Error(err.Error())
+		_, _ = os.Stderr.WriteString(err.Error())
+		os.Exit(1)
 	}
 }
 
@@ -63,9 +65,13 @@ func run() error {
 		return err
 	}
 	// 服务启动流程
-	g.Go(srv.Start)
+	g.Go(func(ctx context.Context) error {
+		return startAction(ctx, srv)
+	})
 	// 服务关闭流程
-	g.Go(srv.Stop)
+	g.Go(func(ctx context.Context) error {
+		return shutdownAction(ctx, srv)
+	})
 	// 启动mq
 	g.Go(message.Setup)
 	if err = g.Wait(); err != nil && !errors.Is(err, context.Canceled) {
@@ -74,7 +80,7 @@ func run() error {
 	return nil
 }
 
-func startAction(ctx context.Context) error {
+func startAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	// 初始化数据库
 	if err := db.Init(ctx); err != nil {
 		return err
@@ -83,11 +89,11 @@ func startAction(ctx context.Context) error {
 	if err := validator.Init(); err != nil {
 		return err
 	}
-	log.FromContext(ctx).Infof("%s run on %s", v.ServiceName, gin.Mode())
-	return nil
+	log.Infof("%s run on %s", v.ServiceName, gin.Mode())
+	return srv.Start(ctx)
 }
 
-func shutdownAction(ctx context.Context) error {
+func shutdownAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	select {
@@ -95,8 +101,8 @@ func shutdownAction(ctx context.Context) error {
 	case <-quit:
 	}
 	message.Close()
-	log.FromContext(ctx).Info("shutting down server...")
-	return nil
+	log.Info("shutting down server...")
+	return srv.Stop(ctx)
 }
 
 func NewServer(ctx context.Context) (*httpx.HTTPServer, error) {
@@ -120,9 +126,7 @@ func NewServer(ctx context.Context) (*httpx.HTTPServer, error) {
 			Name:    v.ServiceName,
 			Version: v.Version,
 		},
-		Registrar:   r,
-		BeforeStart: startAction,
-		BeforeStop:  shutdownAction,
+		Registrar: r,
 	}
 	var (
 		cfg *tls.Config

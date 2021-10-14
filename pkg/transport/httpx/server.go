@@ -13,19 +13,12 @@ import (
 )
 
 type HTTPServer struct {
-	Server      *http.Server
-	Instance    *registry.ServiceInstance
-	Registrar   registry.Registrar
-	BeforeStart func(ctx context.Context) error
-	BeforeStop  func(ctx context.Context) error
+	Server    *http.Server
+	Instance  *registry.ServiceInstance
+	Registrar registry.Registrar
 }
 
 func (s *HTTPServer) Start(ctx context.Context) error {
-	if s.BeforeStart != nil {
-		if err := s.BeforeStart(ctx); err != nil {
-			return err
-		}
-	}
 	if s.Registrar != nil {
 		if err := s.Registrar.Register(ctx, s.Instance); err != nil {
 			return err
@@ -37,11 +30,6 @@ func (s *HTTPServer) Start(ctx context.Context) error {
 var DefaultStopTime = 10 * time.Second
 
 func (s *HTTPServer) Stop(ctx context.Context) error {
-	if s.BeforeStart != nil {
-		if err := s.BeforeStart(ctx); err != nil {
-			return err
-		}
-	}
 	if s.Registrar != nil {
 		if err := s.Registrar.Deregister(ctx, s.Instance); err != nil {
 			return err

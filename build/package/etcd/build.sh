@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e
+
+set -ex
 # 官网地址 https://github.com/etcd-io/etcd/releases
 
 image=quay.io/coreos/etcd:v3.2.32

@@ -1,8 +1,0 @@
-{"Level":"ERROR","Time":"2021-08-13 21:54:46","Caller":"server/main.go:110","Message":"open ca.pem: The system cannot find the file specified."}
-{"Level":"ERROR","Time":"2021-08-13 21:54:46","Caller":"server/main.go:114","Message":"open server.pem: The system cannot find the file specified."}
-{"Level":"ERROR","Time":"2021-08-13 21:54:46","Caller":"server/main.go:118","Message":"open server-key.pem: The system cannot find the file specified."}
-{"Level":"ERROR","Time":"2021-08-13 21:54:46","Caller":"server/main.go:125","Message":"unable to decode tls private key data: tls: failed to find any PEM data in certificate input"}
-{"Level":"ERROR","Time":"2021-08-13 21:55:07","Caller":"server/main.go:81","Message":"cannot connect to AMQP: dial tcp 192.168.31.62:5672: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond."}
-{"Level":"INFO","Time":"2021-08-13 21:55:07","Caller":"cron/cron.go:38","Message":"start"}
-{"Level":"ERROR","Time":"2021-08-13 21:55:12","Caller":"server/main.go:103","Message":"context deadline exceeded"}
-8-13 21:55:07","Caller":"log/log.go:27","Message":"levelINFOmoduletransport/grpcmessage[gRPC] server listening on: [::]:9000"}
