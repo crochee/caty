@@ -4,6 +4,7 @@
 package account
 
 import (
+	"cca/pkg/ex"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -94,7 +95,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		return tx.Model(userModel).Create(userModel).Error
 	})
 	if err != nil {
-		return nil, fmt.Errorf("register do transaction failed.Error:%v,%w", err, e.ErrOperateDB)
+		return nil, fmt.Errorf("register do transaction failed.Error:%v,%w", err, ex.ErrRegisterAccount)
 	}
 	return &CreateResponseResult{
 		AccountID:      strconv.FormatUint(userModel.AccountID, 10),
@@ -110,7 +111,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 	}, nil
 }
 
-type ModifyRequest struct {
+type UpdateRequest struct {
 	// 账户ID
 	// Required: true
 	AccountID string `json:"account_id" binding:"required,numeric"`
@@ -132,8 +133,8 @@ type ModifyRequest struct {
 	Desc string `json:"desc"`
 }
 
-// Modify 编辑账户
-func Modify(ctx context.Context, request *ModifyRequest) error {
+// Update 编辑账户
+func Update(ctx context.Context, request *UpdateRequest) error {
 	updates := make(map[string]interface{})
 	if request.Account != "" {
 		updates["name"] = request.Account
@@ -156,42 +157,87 @@ func Modify(ctx context.Context, request *ModifyRequest) error {
 	query := db.With(ctx).Model(&model.User{}).Where("id=? AND account_id=? AND password=?",
 		request.UserID, request.AccountID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
-		return fmt.Errorf("update failed.Error:%v,%w", err, e.ErrOperateDB)
+		return fmt.Errorf("update failed.Error:%v,%w", err, ex.ErrUpdateAccount)
 	}
 	if query.RowsAffected == 0 {
-		return fmt.Errorf("update 0 rows affected,%w", e.ErrOperateDB)
+		return fmt.Errorf("update 0 rows affected,%w", ex.ErrUpdateAccount)
 	}
 	return nil
 }
 
+type RetrieveRequest struct {
+	// 账户ID
+	// Required: true
+	AccountID string `json:"account_id" binding:"omitempty,numeric"`
+	// 用户
+	// Required: true
+	UserID string `json:"user_id" binding:"omitempty,numeric"`
+	// 账户
+	Account string `json:"account" binding:"omitempty"`
+	// 邮箱
+	Email string `json:"email" binding:"omitempty,email"`
+}
+
+type RetrieveResponse struct {
+	// 账户ID
+	AccountID string `json:"account_id"`
+	// 账户
+	Account string `json:"account"`
+	// 用户
+	UserID string `json:"user_id"`
+	// 邮箱
+	Email string `json:"email"`
+	// 权限
+	Permission string `json:"permission"`
+	// 是否认证
+	Verify uint8 `json:"verify"`
+	// 描述
+	Desc string `json:"desc"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 // Retrieve 查询、获取账户信息
-func Retrieve(ctx context.Context, request *ModifyRequest) error {
-	updates := make(map[string]interface{})
+func Retrieve(ctx context.Context, request *RetrieveRequest) ([]*RetrieveResponse, error) {
+	queryList := make(map[string]string)
+	if request.AccountID != "" {
+		queryList["account_id =?"] = request.AccountID
+	}
+	if request.UserID != "" {
+		queryList["id"] = request.UserID
+	}
 	if request.Account != "" {
-		updates["name"] = request.Account
+		queryList["name"] = request.Account
 	}
 	if request.Email != "" {
-		updates["email"] = request.Email
+		queryList["email"] = request.Email
 	}
-	if request.Password != "" {
-		updates["password"] = request.Password
+	if len(queryList) == 0 {
+		return nil, fmt.Errorf("retrieve has 0 conditions,%w", e.ErrInvalidParam)
 	}
-	if request.Permission != "" {
-		updates["permission"] = request.Permission
+	query := db.With(ctx).Model(&model.User{})
+	for k, v := range queryList {
+		query = query.Where("? = ?", k, v)
 	}
-	if request.Desc != "" {
-		updates["desc"] = request.Desc
+	var userList []*model.User
+	if err := query.Find(userList); err != nil {
+		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, ex.ErrRetrieveAccount)
 	}
-	if len(updates) == 0 {
-		return nil
+	responses := make([]*RetrieveResponse, 0, len(userList))
+	for _, v := range userList {
+		responses = append(responses, &RetrieveResponse{
+			AccountID:  strconv.FormatUint(v.AccountID, 10),
+			Account:    v.Name,
+			UserID:     strconv.FormatUint(v.ID, 10),
+			Email:      v.Email,
+			Permission: v.Permission,
+			Verify:     v.Verify,
+			Desc:       v.Desc,
+			CreatedAt:  v.CreatedAt,
+			UpdatedAt:  v.UpdatedAt,
+		})
 	}
-	query := db.With(ctx).Model(&model.User{}).Where("id=? AND account_id=? AND password=?",
-		request.UserID, request.AccountID, request.OldPassword).Updates(updates)
-	if err := query.Error; err != nil {
-		return fmt.Errorf("update failed.Error:%v,%w", err, e.ErrOperateDB)
-	}
-	if query.RowsAffected == 0 {
-		return fmt.Errorf("update 0 rows affected,%w", e.ErrOperateDB)
-	}
-	return nil
+	return responses, nil
 }

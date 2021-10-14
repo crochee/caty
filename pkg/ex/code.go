@@ -3,13 +3,17 @@ package ex
 import "github.com/crochee/lib/e"
 
 const (
-	// 100~200为用户验证类
+	// 100~200为账号类
 
-	ErrInvalidEmail e.Code = 40510100
+	ErrRegisterAccount e.Code = 40510100
+	ErrUpdateAccount   e.Code = 40510101
+	ErrRetrieveAccount e.Code = 40510102
 )
 
 func AddCode() error {
 	return e.AddCode(map[e.Code]string{
-		ErrInvalidEmail: "非法邮箱格式",
+		ErrRegisterAccount: "注册账号错误",
+		ErrUpdateAccount:   "编辑账号错误",
+		ErrRetrieveAccount: "查询账号错误",
 	})
 }
