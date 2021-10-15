@@ -3,15 +3,19 @@
 // The purpose of this service is to provide an application
 // that is using object
 //
-//		title: cca
-//		Schemes: http, https
-//		Host: localhost:8120
-//		Version: 0.0.1
-//		security:
-//			token:
-//				type: apiKey
-//				name: X-Auth-Token
-//				in: header
+// title: cca
+// Schemes: http, https
+// Host: localhost:8120
+// Version: 1.0.1
+// security:
+// - token:
+// 		type: apiKey
+//		name: X-Auth-Token
+//		in: header
+//  - ak:
+//      type: apiKey
+//      name: ak
+//      in: query
 // swagger:meta
 package router
 
@@ -19,6 +23,7 @@ import (
 	"github.com/crochee/lib/log"
 	"github.com/gin-gonic/gin"
 
+	"cca/api"
 	"cca/pkg/middleware"
 )
 
@@ -31,6 +36,7 @@ func New() *gin.Engine {
 
 	router.Use(middleware.TraceID, middleware.RequestLogger(log.NewLogger()), middleware.Log, middleware.Recovery)
 
+	router.GET("/", api.Version)
 	v1Router := router.Group("/v1")
 
 	registerAccount(v1Router)

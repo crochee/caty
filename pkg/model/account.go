@@ -4,11 +4,7 @@
 
 package model
 
-import (
-	"github.com/crochee/lib/log"
-
-	"cca/pkg/db"
-)
+import "cca/pkg/db"
 
 type Account struct {
 	ID uint64 `json:"id" gorm:"primary_key:id"`
@@ -16,9 +12,6 @@ type Account struct {
 	db.Base
 }
 
-func DeleteUser() {
-	u := new(Account)
-	if err := db.New().Model(u).Unscoped().Where("`deleted_at` IS NOT NULL").Delete(u).Error; err != nil {
-		log.Warn(err.Error())
-	}
+func (Account) TableName() string {
+	return "account"
 }

@@ -4,6 +4,7 @@
 package swag
 
 import (
+	"cca/api"
 	"cca/pkg/resp"
 	"cca/pkg/service/account"
 )
@@ -17,6 +18,14 @@ type SResponseCode struct {
 	// in: body
 	Body struct {
 		resp.ResponseCode
+	}
+}
+
+// swagger:response SAPIVersionResponse
+type SAPIVersionResponse struct {
+	// in: body
+	Body struct {
+		api.VersionResponse
 	}
 }
 

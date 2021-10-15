@@ -111,13 +111,17 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 	}, nil
 }
 
+type User struct {
+	// 用户
+	// Required: true
+	// in: path
+	UserID string `form:"id" binding:"required,numeric"`
+}
+
 type UpdateRequest struct {
 	// 账户ID
 	// Required: true
 	AccountID string `json:"account_id" binding:"required,numeric"`
-	// 用户
-	// Required: true
-	UserID string `json:"user_id" binding:"required,numeric"`
 	// 旧密码
 	// Required: true
 	OldPassword string `json:"old_password" binding:"required,alphanum"`
@@ -130,11 +134,11 @@ type UpdateRequest struct {
 	// 权限
 	Permission string `json:"permission" binding:"omitempty,json"`
 	// 描述信息
-	Desc string `json:"desc"`
+	Desc string `json:"desc" binding:"omitempty,json"`
 }
 
 // Update 编辑账户
-func Update(ctx context.Context, request *UpdateRequest) error {
+func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 	updates := make(map[string]interface{})
 	if request.Account != "" {
 		updates["name"] = request.Account
@@ -155,7 +159,7 @@ func Update(ctx context.Context, request *UpdateRequest) error {
 		return nil
 	}
 	query := db.With(ctx).Model(&model.User{}).Where("id=? AND account_id=? AND password=?",
-		request.UserID, request.AccountID, request.OldPassword).Updates(updates)
+		user.UserID, request.AccountID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
 		return fmt.Errorf("update failed.Error:%v,%w", err, code.ErrUpdateAccount)
 	}
@@ -165,7 +169,7 @@ func Update(ctx context.Context, request *UpdateRequest) error {
 	return nil
 }
 
-type RetrieveRequest struct {
+type RetrievesRequest struct {
 	// 账户ID
 	// in: query
 	// Required: true
@@ -208,8 +212,8 @@ type RetrieveResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// Retrieve 查询、获取账户信息
-func Retrieve(ctx context.Context, request *RetrieveRequest) (*RetrieveResponses, error) {
+// Retrieves 查询、获取账户信息
+func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, error) {
 	queryList := make(map[string]string)
 	if request.AccountID != "" {
 		queryList["account_id =?"] = request.AccountID
@@ -253,15 +257,8 @@ func Retrieve(ctx context.Context, request *RetrieveRequest) (*RetrieveResponses
 	return responses, nil
 }
 
-type RetrieveSingleRequest struct {
-	// 用户ID
-	// in: path
-	// Required: true
-	UserID string `json:"user_id" uri:"id" binding:"required,numeric"`
-}
-
-// RetrieveSingle 查询、获取指定账户信息
-func RetrieveSingle(ctx context.Context, request *RetrieveSingleRequest) (*RetrieveResponse, error) {
+// Retrieve 查询、获取指定账户信息
+func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 	user := &model.User{}
 	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).First(user).Error; err != nil {
 		return nil, fmt.Errorf("%v.%w", err, code.ErrRetrieveAccount)
@@ -279,15 +276,8 @@ func RetrieveSingle(ctx context.Context, request *RetrieveSingleRequest) (*Retri
 	}, nil
 }
 
-type DeleteRequest struct {
-	// 用户ID
-	// in: path
-	// Required: true
-	UserID string `json:"user_id" uri:"id" binding:"required,numeric"`
-}
-
 // Delete 删除账户
-func Delete(ctx context.Context, request *DeleteRequest) error {
+func Delete(ctx context.Context, request *User) error {
 	user := &model.User{}
 	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).Delete(user).Error; err != nil {
 		return fmt.Errorf("%v.%w", err, code.ErrDeleteAccount)

@@ -15,7 +15,11 @@ type User struct {
 	Verify         uint8  `json:"verify" gorm:"column:verify;not null;comment:身份认证"`
 	PrimaryAccount bool   `json:"primary_account" gorm:"column:primary_account;not null;comment:是否主账号"`
 
-	Desc string `json:"desc" gorm:"column:desc;type:text;not null;comment:详细描述"`
+	Desc string `json:"desc" gorm:"column:desc;type:json;not null;comment:详细描述"`
 
 	db.Base
+}
+
+func (User) TableName() string {
+	return "user"
 }

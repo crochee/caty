@@ -19,34 +19,26 @@ type SAccountRegisterRequest struct {
 	}
 }
 
+// swagger:parameters SAccountRetrievesRequest
+type SAccountRetrievesRequest struct {
+	account.RetrievesRequest
+}
+
 // swagger:parameters SAccountUpdateRequest
 type SAccountUpdateRequest struct {
 	// in: body
 	Body struct {
 		account.UpdateRequest
 	}
+	account.User
 }
 
 // swagger:parameters SAccountRetrieveRequest
 type SAccountRetrieveRequest struct {
-	// in: body
-	Body struct {
-		account.RetrieveRequest
-	}
-}
-
-// swagger:parameters SAccountRetrieveSingleRequest
-type SAccountRetrieveSingleRequest struct {
-	// in: body
-	Body struct {
-		account.RetrieveSingleRequest
-	}
+	account.User
 }
 
 // swagger:parameters SAccountDeleteRequest
 type SAccountDeleteRequest struct {
-	// in: body
-	Body struct {
-		account.DeleteRequest
-	}
+	account.User
 }
