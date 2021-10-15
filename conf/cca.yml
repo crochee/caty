@@ -1,6 +1,6 @@
 mode: debug
-system-log-path: ./log/cca.log
-system-log_level: debug
+path: ./log/cca.log
+level: debug
 storage_path: /data/
 mysql:
   user: root

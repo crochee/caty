@@ -18,7 +18,6 @@ type ResponseCode struct {
 	// Example: success
 	Msg string `json:"message"`
 	// 具体描述信息
-	// Required: true
 	Result string `json:"result"`
 }
 
@@ -39,7 +38,7 @@ type Wrapper interface {
 
 // Errors gin Response with error
 func Errors(ctx *gin.Context, err error) {
-	log.FromContext(ctx.Request.Context()).Errorf("has error %+v", err)
+	log.FromContext(ctx.Request.Context()).Errorf("%+v", err)
 	for err != nil {
 		wrapper, ok := err.(Wrapper)
 		if !ok {
@@ -60,8 +59,8 @@ func Errors(ctx *gin.Context, err error) {
 }
 
 func ErrorParam(ctx *gin.Context, err error) {
-	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.Error:%+v", err)
-	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseCode{
+	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.%+v", err)
+	ctx.JSON(e.ErrInvalidParam.StatusCode(), ResponseCode{
 		Code:   e.ErrInvalidParam.Code(),
 		Msg:    e.ErrInvalidParam.Error(),
 		Result: err.Error(),

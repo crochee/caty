@@ -26,9 +26,9 @@ func (e *etcdRegistry) GetService(ctx context.Context, serviceName string) ([]*r
 
 	for _, n := range rsp.Kvs {
 		if sn := decode(n.Value); sn != nil {
-			s, ok := serviceMap[sn.Version]
+			_, ok := serviceMap[sn.Version]
 			if !ok {
-				s = &registry.ServiceInstance{
+				s := &registry.ServiceInstance{
 					ID:        sn.ID,
 					Name:      sn.Name,
 					Version:   sn.Version,

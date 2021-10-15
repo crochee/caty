@@ -19,6 +19,11 @@ package cca
 // mock
 //go:generate go get -u github.com/golang/mock/mockgen
 
+// struct layout
+//go:generate go install golang.org/x/tools/...@latest
+//go:generate go install honnef.co/go/tools/cmd/structlayout@latest
+//go:generate go install honnef.co/go/tools/cmd/structlayout-optimize@latest
+//go:generate go install honnef.co/go/tools/cmd/structlayout-pretty@latest
 // API GATEWAY
 // https://github.com/fagongzi/manba
 // https://github.com/eolinker/goku-api-gateway

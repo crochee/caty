@@ -65,20 +65,43 @@ func Update(ctx *gin.Context) {
 }
 
 // Retrieve godoc
-// swagger:route  GET /v1/account 账户 SAccountRetrieveRequest
-// 查询账户
-//
-// retrieve account
-//     Consumes:
-//     - application/json
-//     Produces:
-//     - application/json
-//     Responses:
-//		 200: SAccountRetrieveResponses
-//       default: SResponseCode
+// swagger:operation GET /v1/account 账户 SNullRequest
+// ---
+// summary: 查询账户
+// description: 根据条件查询账户列表
+// produces:
+// - application/json
+// parameters:
+// - name: account-id
+//   in: query
+//   description: 主账号id
+//   required: false
+//   type: string
+// - name: id
+//   in: query
+//   description: 账号id
+//   required: false
+//   type: string
+// - name: account
+//   in: query
+//   description: 账号名称
+//   required: false
+//   type: string
+// - name: email
+//   in: query
+//   description: 邮箱地址
+//   required: false
+//   type: string
+// responses:
+//   '200':
+//     type: object
+//     "$ref": "#/responses/SAccountRetrieveResponses"
+//   default:
+//     type: object
+//     "$ref": "#/responses/SResponseCode"
 func Retrieve(ctx *gin.Context) {
 	var retrieveRequest account.RetrieveRequest
-	if err := ctx.ShouldBindBodyWith(&retrieveRequest, binding.JSON); err != nil {
+	if err := ctx.BindQuery(&retrieveRequest); err != nil {
 		resp.ErrorParam(ctx, err)
 		return
 	}

@@ -15,8 +15,8 @@ type Config struct {
 	Key  lib.FileOrContent `json:"key" yaml:"key"`
 }
 
-// TlsConfig output tls
-func TlsConfig(clientAuth tls.ClientAuthType, cfg Config) (*tls.Config, error) {
+// TLSConfig output tls
+func TLSConfig(clientAuth tls.ClientAuthType, cfg Config) (*tls.Config, error) {
 	caPEMBlock, err := cfg.Ca.Read()
 	if err != nil {
 		return nil, err

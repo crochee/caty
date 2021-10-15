@@ -1,6 +1,7 @@
 {
   "schemes": [
-    "http"
+    "http",
+    "https"
   ],
   "swagger": "2.0",
   "info": {
@@ -12,10 +13,7 @@
   "paths": {
     "/v1/account": {
       "get": {
-        "description": "retrieve account",
-        "consumes": [
-          "application/json"
-        ],
+        "description": "根据条件查询账户列表",
         "produces": [
           "application/json"
         ],
@@ -23,40 +21,31 @@
           "账户"
         ],
         "summary": "查询账户",
-        "operationId": "SAccountRetrieveRequest",
+        "operationId": "SNullRequest",
         "parameters": [
           {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "required": [
-                "account_id",
-                "user_id"
-              ],
-              "properties": {
-                "account": {
-                  "description": "账户\nin: query",
-                  "type": "string",
-                  "x-go-name": "Account"
-                },
-                "account_id": {
-                  "description": "账户ID\nin: query",
-                  "type": "string",
-                  "x-go-name": "AccountID"
-                },
-                "email": {
-                  "description": "邮箱\nin: query",
-                  "type": "string",
-                  "x-go-name": "Email"
-                },
-                "user_id": {
-                  "description": "用户\nin: query",
-                  "type": "string",
-                  "x-go-name": "UserID"
-                }
-              }
-            }
+            "type": "string",
+            "description": "主账号id",
+            "name": "account-id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "账号id",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "账号名称",
+            "name": "account",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "邮箱地址",
+            "name": "email",
+            "in": "query"
           }
         ],
         "responses": {
@@ -133,8 +122,7 @@
               "type": "object",
               "required": [
                 "code",
-                "message",
-                "result"
+                "message"
               ],
               "properties": {
                 "code": {
@@ -281,8 +269,7 @@
               "type": "object",
               "required": [
                 "code",
-                "message",
-                "result"
+                "message"
               ],
               "properties": {
                 "code": {
@@ -387,8 +374,7 @@
               "type": "object",
               "required": [
                 "code",
-                "message",
-                "result"
+                "message"
               ],
               "properties": {
                 "code": {
@@ -511,8 +497,7 @@
               "type": "object",
               "required": [
                 "code",
-                "message",
-                "result"
+                "message"
               ],
               "properties": {
                 "code": {
@@ -580,8 +565,7 @@
               "type": "object",
               "required": [
                 "code",
-                "message",
-                "result"
+                "message"
               ],
               "properties": {
                 "code": {
@@ -859,8 +843,7 @@
         "type": "object",
         "required": [
           "code",
-          "message",
-          "result"
+          "message"
         ],
         "properties": {
           "code": {
@@ -884,5 +867,25 @@
         }
       }
     }
-  }
+  },
+  "security": [
+    {
+      "token": []
+    },
+    {
+      "type": [
+        "apiKey"
+      ]
+    },
+    {
+      "name": [
+        "X-Auth-Token"
+      ]
+    },
+    {
+      "in": [
+        "header"
+      ]
+    }
+  ]
 }

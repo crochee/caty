@@ -11,10 +11,10 @@ import (
 	"cca/pkg/v"
 )
 
-// TraceId add trace_id
-func TraceId(ctx *gin.Context) {
+// TraceID add trace_id
+func TraceID(ctx *gin.Context) {
 	tracedId := ctx.Request.Header.Get(v.XTraceID)
-	if tracedId != "" {
+	if tracedId == "" {
 		tracedId = id.Uuid()
 	}
 	ctx.Request.Header.Set(v.XTraceID, tracedId)  // 请求头

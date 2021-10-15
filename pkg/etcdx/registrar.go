@@ -30,7 +30,7 @@ type Option struct {
 	Context   context.Context
 	Username  string
 	Password  string
-	TTl       time.Duration
+	TTL       time.Duration
 }
 
 func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
@@ -188,14 +188,14 @@ func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceIn
 	}
 
 	var lgr *clientv3.LeaseGrantResponse
-	if second := e.Option.TTl.Seconds(); second > 0 {
+	if second := e.Option.TTL.Seconds(); second > 0 {
 		// get a lease used to expire keys since we have a ttl
 		lgr, err = e.client.Grant(newCtx, int64(second))
 		if err != nil {
 			return err
 		}
 		e.client.GetLogger().Debug(fmt.Sprintf("Registering %s id %s with lease %v and leaseID %v and ttl %v",
-			service.Name, service.ID, lgr, lgr.ID, e.Option.TTl))
+			service.Name, service.ID, lgr, lgr.ID, e.Option.TTL))
 	}
 
 	// create an entry for the node

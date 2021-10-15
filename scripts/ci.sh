@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 GO_VERSION=$(go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
 if [[ "$GO_VERSION" -eq "" ]]; then
   echo "please install golang"
@@ -19,7 +21,7 @@ if [[ $GO_VERSION -gt 16 ]]; then
   if [[ $CI_VERSION != *$VERSION1421* ]]; then
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.42.1 >/dev/null 2>&1
   fi
-  golangci-lint run -c ./build/golangci-lint-demo.yml --tests=false --out-format=json >golangci-lint.json 2>&1
+  golangci-lint run -c ./build/ci/golangci-lint-demo.yml --tests=false --out-format=json >golangci-lint.json 2>&1
 else
   hash golangci-lint >/dev/null 2>&1
   OP_MODE=$?
@@ -30,5 +32,5 @@ else
   if [[ $CI_VERSION != *$VERSION1380* ]]; then
     go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0 >/dev/null 2>&1
   fi
-  golangci-lint run -c ./build/golangci-lint.yml --tests=false --out-format=json >golangci-lint.json 2>&1
+  golangci-lint run -c ./build/ci/golangci-lint.yml --tests=false --out-format=json >golangci-lint.json 2>&1
 fi

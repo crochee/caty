@@ -14,8 +14,8 @@ import (
 	"github.com/crochee/lib/e"
 	"gorm.io/gorm"
 
+	"cca/pkg/code"
 	"cca/pkg/db"
-	"cca/pkg/ex"
 	"cca/pkg/model"
 	"cca/pkg/service/business/tokenx"
 )
@@ -36,6 +36,10 @@ type CreateRequest struct {
 }
 
 type CreateResponseResult struct {
+	// 是否主账号
+	PrimaryAccount bool `json:"primary_account"`
+	// 是否认证
+	Verify uint8 `json:"verify"`
 	// 账户ID
 	AccountID string `json:"account_id"`
 	// 账户
@@ -46,10 +50,6 @@ type CreateResponseResult struct {
 	Email string `json:"email"`
 	// 权限
 	Permission string `json:"permission"`
-	// 是否认证
-	Verify uint8 `json:"verify"`
-	// 是否主账号
-	PrimaryAccount bool `json:"primary_account"`
 	// 描述
 	Desc string `json:"desc"`
 	// 创建时间
@@ -95,7 +95,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		return tx.Model(userModel).Create(userModel).Error
 	})
 	if err != nil {
-		return nil, fmt.Errorf("register do transaction failed.Error:%v,%w", err, ex.ErrRegisterAccount)
+		return nil, fmt.Errorf("register do transaction failed.Error:%v,%w", err, code.ErrRegisterAccount)
 	}
 	return &CreateResponseResult{
 		AccountID:      strconv.FormatUint(userModel.AccountID, 10),
@@ -157,10 +157,10 @@ func Update(ctx context.Context, request *UpdateRequest) error {
 	query := db.With(ctx).Model(&model.User{}).Where("id=? AND account_id=? AND password=?",
 		request.UserID, request.AccountID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
-		return fmt.Errorf("update failed.Error:%v,%w", err, ex.ErrUpdateAccount)
+		return fmt.Errorf("update failed.Error:%v,%w", err, code.ErrUpdateAccount)
 	}
 	if query.RowsAffected == 0 {
-		return fmt.Errorf("update 0 rows affected,%w", ex.ErrUpdateAccount)
+		return fmt.Errorf("update 0 rows affected,%w", code.ErrUpdateAccount)
 	}
 	return nil
 }
@@ -169,17 +169,17 @@ type RetrieveRequest struct {
 	// 账户ID
 	// in: query
 	// Required: true
-	AccountID string `json:"account_id" uri:"account-id" binding:"omitempty,numeric"`
+	AccountID string `form:"account-id" binding:"omitempty,numeric"`
 	// 用户
 	// in: query
 	// Required: true
-	UserID string `json:"user_id" uri:"user-id" binding:"omitempty,numeric"`
+	UserID string `form:"id" binding:"omitempty,numeric"`
 	// 账户
 	// in: query
-	Account string `json:"account" uri:"account" binding:"omitempty"`
+	Account string `form:"account" binding:"omitempty"`
 	// 邮箱
 	// in: query
-	Email string `json:"email" uri:"email" binding:"omitempty,email"`
+	Email string `form:"email" binding:"omitempty,email"`
 }
 
 type RetrieveResponses struct {
@@ -188,6 +188,8 @@ type RetrieveResponses struct {
 }
 
 type RetrieveResponse struct {
+	// 是否认证
+	Verify uint8 `json:"verify"`
 	// 账户ID
 	AccountID string `json:"account_id"`
 	// 账户
@@ -198,8 +200,6 @@ type RetrieveResponse struct {
 	Email string `json:"email"`
 	// 权限
 	Permission string `json:"permission"`
-	// 是否认证
-	Verify uint8 `json:"verify"`
 	// 描述
 	Desc string `json:"desc"`
 	// 创建时间
@@ -232,7 +232,7 @@ func Retrieve(ctx context.Context, request *RetrieveRequest) (*RetrieveResponses
 	}
 	var userList []*model.User
 	if err := query.Find(userList); err != nil {
-		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, ex.ErrRetrieveAccount)
+		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, code.ErrRetrieveAccount)
 	}
 	responses := &RetrieveResponses{
 		Result: make([]*RetrieveResponse, 0, len(userList)),
@@ -264,7 +264,7 @@ type RetrieveSingleRequest struct {
 func RetrieveSingle(ctx context.Context, request *RetrieveSingleRequest) (*RetrieveResponse, error) {
 	user := &model.User{}
 	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).First(user).Error; err != nil {
-		return nil, fmt.Errorf("%v.%w", err, ex.ErrRetrieveAccount)
+		return nil, fmt.Errorf("%v.%w", err, code.ErrRetrieveAccount)
 	}
 	return &RetrieveResponse{
 		AccountID:  strconv.FormatUint(user.AccountID, 10),
@@ -290,7 +290,7 @@ type DeleteRequest struct {
 func Delete(ctx context.Context, request *DeleteRequest) error {
 	user := &model.User{}
 	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).Delete(user).Error; err != nil {
-		return fmt.Errorf("%v.%w", err, ex.ErrDeleteAccount)
+		return fmt.Errorf("%v.%w", err, code.ErrDeleteAccount)
 	}
 	return nil
 }

@@ -1,4 +1,4 @@
-package ex
+package code
 
 import "github.com/crochee/lib/e"
 

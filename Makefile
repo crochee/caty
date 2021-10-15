@@ -19,3 +19,6 @@ swag:
 .PHONY: lint
 lint:
 	@./scripts/ci.sh
+.PHONY: layout
+layout:
+	@./scripts/layout.sh
