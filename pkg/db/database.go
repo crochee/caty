@@ -19,6 +19,7 @@ import (
 var (
 	NotFound           = gorm.ErrRecordNotFound
 	ErrNotRowsAffected = errors.New("0 rows affected")
+	ErrDuplicate       = "1062: Duplicate"
 )
 
 type Option struct {

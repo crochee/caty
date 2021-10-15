@@ -6,8 +6,10 @@ package account
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/crochee/lib"
@@ -23,7 +25,7 @@ import (
 type CreateRequest struct {
 	// 用户名
 	// Required: true
-	Name string `json:"account" binding:"required"`
+	Account string `json:"account" binding:"required"`
 	// 账户ID
 	AccountID string `json:"account_id" binding:"omitempty,numeric"`
 	// 邮箱
@@ -32,7 +34,7 @@ type CreateRequest struct {
 	// Required: true
 	Password string `json:"password" binding:"required,alphanum"`
 	// 描述信息
-	Desc string `json:"desc" binding:"json"`
+	Desc string `json:"desc" binding:"required,json"`
 }
 
 type CreateResponseResult struct {
@@ -71,7 +73,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		return nil, fmt.Errorf("json marshal failed.Error:%v,%w", err, e.ErrInternalServerError)
 	}
 	userModel := &model.User{
-		Name:       request.Name,
+		Name:       request.Account,
 		Password:   request.Password,
 		Email:      request.Email,
 		Permission: lib.String(permission),
@@ -80,22 +82,37 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 	err = db.With(ctx).Transaction(func(tx *gorm.DB) error {
 		accountModel := &model.Account{}
 		if request.AccountID != "" {
-			err = tx.Model(accountModel).Where("id =?", request.AccountID).First(accountModel).Error
-			if err != nil {
-				return err
+			if err = tx.Model(accountModel).Where("id =?", request.AccountID).
+				First(accountModel).Error; err != nil {
+				if errors.Is(err, db.NotFound) {
+					return code.ErrNoAccount
+				}
+				return fmt.Errorf("first account failed;%v;%w", err, code.ErrRegisterAccount)
 			}
 		} else {
-			userModel.PrimaryAccount = true
-			err = tx.Model(accountModel).Create(accountModel).Error
-			if err != nil {
-				return err
+			accountModel.Name = request.Account
+			if err = tx.Model(accountModel).Create(accountModel).Error; err != nil {
+				if strings.Contains(err.Error(), db.ErrDuplicate) {
+					return code.ErrExistAccount
+				}
+				return fmt.Errorf("insert account failed;%v;%w", err, code.ErrRegisterAccount)
 			}
+			userModel.PrimaryAccount = true
 		}
 		userModel.AccountID = accountModel.ID
-		return tx.Model(userModel).Create(userModel).Error
+		if err = tx.Model(userModel).Create(userModel).Error; err != nil {
+			if strings.Contains(err.Error(), db.ErrDuplicate) {
+				return code.ErrExistAccount
+			}
+			return fmt.Errorf("insert user failed;%v;%w", err, code.ErrRegisterAccount)
+		}
+		if err = tx.Model(userModel).First(userModel).Error; err != nil {
+			return fmt.Errorf("first user failed;%v;%w", err, code.ErrRegisterAccount)
+		}
+		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("register do transaction failed.Error:%v,%w", err, code.ErrRegisterAccount)
+		return nil, err
 	}
 	return &CreateResponseResult{
 		AccountID:      strconv.FormatUint(userModel.AccountID, 10),
@@ -115,13 +132,10 @@ type User struct {
 	// 用户
 	// Required: true
 	// in: path
-	UserID string `form:"id" binding:"required,numeric"`
+	ID string `json:"id" uri:"id" binding:"required,numeric"`
 }
 
 type UpdateRequest struct {
-	// 账户ID
-	// Required: true
-	AccountID string `json:"account_id" binding:"required,numeric"`
 	// 旧密码
 	// Required: true
 	OldPassword string `json:"old_password" binding:"required,alphanum"`
@@ -156,15 +170,15 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 		updates["desc"] = request.Desc
 	}
 	if len(updates) == 0 {
-		return nil
+		return code.ErrNoUpdate
 	}
-	query := db.With(ctx).Model(&model.User{}).Where("id=? AND account_id=? AND password=?",
-		user.UserID, request.AccountID, request.OldPassword).Updates(updates)
+	query := db.With(ctx).Model(&model.User{}).Where("id=? AND password=?",
+		user.ID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
 		return fmt.Errorf("update failed.Error:%v,%w", err, code.ErrUpdateAccount)
 	}
 	if query.RowsAffected == 0 {
-		return fmt.Errorf("update 0 rows affected,%w", code.ErrUpdateAccount)
+		return code.ErrNoUpdate
 	}
 	return nil
 }
@@ -172,18 +186,16 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 type RetrievesRequest struct {
 	// 账户ID
 	// in: query
-	// Required: true
-	AccountID string `form:"account-id" binding:"omitempty,numeric"`
+	AccountID string `json:"account-id" form:"account-id" binding:"omitempty,numeric"`
 	// 用户
 	// in: query
-	// Required: true
-	UserID string `form:"id" binding:"omitempty,numeric"`
+	ID string `json:"id" form:"id" binding:"omitempty,numeric"`
 	// 账户
 	// in: query
-	Account string `form:"account" binding:"omitempty"`
+	Account string `json:"account" form:"account" binding:"omitempty"`
 	// 邮箱
 	// in: query
-	Email string `form:"email" binding:"omitempty,email"`
+	Email string `json:"email" form:"email" binding:"omitempty,email"`
 }
 
 type RetrieveResponses struct {
@@ -214,28 +226,21 @@ type RetrieveResponse struct {
 
 // Retrieves 查询、获取账户信息
 func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, error) {
-	queryList := make(map[string]string)
+	query := db.With(ctx).Model(&model.User{})
 	if request.AccountID != "" {
-		queryList["account_id =?"] = request.AccountID
+		query = query.Where("account_id = ?", request.AccountID)
 	}
-	if request.UserID != "" {
-		queryList["id"] = request.UserID
+	if request.ID != "" {
+		query = query.Where("id = ?", request.ID)
 	}
 	if request.Account != "" {
-		queryList["name"] = request.Account
+		query = query.Where("name = ?", request.Account)
 	}
 	if request.Email != "" {
-		queryList["email"] = request.Email
-	}
-	if len(queryList) == 0 {
-		return nil, fmt.Errorf("retrieve has 0 conditions,%w", e.ErrInvalidParam)
-	}
-	query := db.With(ctx).Model(&model.User{})
-	for k, v := range queryList {
-		query = query.Where("? = ?", k, v)
+		query = query.Where("email = ?", request.Email)
 	}
 	var userList []*model.User
-	if err := query.Find(userList); err != nil {
+	if err := query.Find(&userList).Error; err != nil {
 		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, code.ErrRetrieveAccount)
 	}
 	responses := &RetrieveResponses{
@@ -260,7 +265,10 @@ func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveRespons
 // Retrieve 查询、获取指定账户信息
 func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 	user := &model.User{}
-	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).First(user).Error; err != nil {
+	if err := db.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
+		if errors.Is(err, db.NotFound) {
+			return nil, code.ErrNoAccount
+		}
 		return nil, fmt.Errorf("%v.%w", err, code.ErrRetrieveAccount)
 	}
 	return &RetrieveResponse{
@@ -278,9 +286,42 @@ func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 
 // Delete 删除账户
 func Delete(ctx context.Context, request *User) error {
-	user := &model.User{}
-	if err := db.With(ctx).Model(user).Where("id =?", request.UserID).Delete(user).Error; err != nil {
-		return fmt.Errorf("%v.%w", err, code.ErrDeleteAccount)
+	return db.With(ctx).Transaction(func(tx *gorm.DB) error {
+		user := &model.User{}
+		query := tx.Model(user).Where("id =?", request.ID)
+		if err := query.First(user).Error; err != nil {
+			if errors.Is(err, db.NotFound) {
+				return code.ErrNoAccount
+			}
+			return fmt.Errorf("first user failed;%v;%w", err, code.ErrDeleteAccount)
+		}
+		if user.PrimaryAccount {
+			accountModel := &model.Account{}
+			queryAccountDel := tx.Model(accountModel).Where("id =?", user.AccountID).Delete(accountModel)
+			if err := queryAccountDel.Error; err != nil {
+				return fmt.Errorf("delete account failed;%v;%w", err, code.ErrDeleteAccount)
+			}
+			if queryAccountDel.RowsAffected == 0 {
+				return code.ErrNoAccount
+			}
+		}
+		queryDel := query.Delete(user)
+		if err := queryDel.Error; err != nil {
+			return fmt.Errorf("%v.%w", err, code.ErrDeleteAccount)
+		}
+		if queryDel.RowsAffected == 0 {
+			return code.ErrNoAccount
+		}
+		return nil
+	})
+}
+
+const PasswordMaxLength = 15
+
+// ValidPassword 密码校验
+func ValidPassword(password string) error {
+	if len(password) < PasswordMaxLength {
+		return fmt.Errorf("password's length is less than %d", PasswordMaxLength)
 	}
 	return nil
 }

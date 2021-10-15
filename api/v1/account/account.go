@@ -35,6 +35,10 @@ func Register(ctx *gin.Context) {
 		resp.ErrorParam(ctx, err)
 		return
 	}
+	if err := account.ValidPassword(registerRequest.Password); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
 	response, err := account.Create(ctx.Request.Context(), &registerRequest)
 	if err != nil {
 		resp.Errors(ctx, err)
@@ -98,6 +102,10 @@ func Update(ctx *gin.Context) {
 		resp.ErrorParam(ctx, err)
 		return
 	}
+	if err := account.ValidPassword(modifyRequest.Password); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
 	if err := account.Update(ctx.Request.Context(), &user, &modifyRequest); err != nil {
 		resp.Errors(ctx, err)
 		return
@@ -148,12 +156,12 @@ func Retrieve(ctx *gin.Context) {
 //     type: object
 //     "$ref": "#/responses/SResponseCode"
 func Delete(ctx *gin.Context) {
-	var retrieveRequest account.User
-	if err := ctx.ShouldBindBodyWith(&retrieveRequest, binding.JSON); err != nil {
+	var user account.User
+	if err := ctx.BindUri(&user); err != nil {
 		resp.ErrorParam(ctx, err)
 		return
 	}
-	err := account.Delete(ctx.Request.Context(), &retrieveRequest)
+	err := account.Delete(ctx.Request.Context(), &user)
 	if err != nil {
 		resp.Errors(ctx, err)
 		return

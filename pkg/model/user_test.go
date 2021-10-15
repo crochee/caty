@@ -4,10 +4,11 @@
 package model
 
 import (
-	"cca/config"
-	"cca/pkg/db"
 	"context"
 	"testing"
+
+	"cca/config"
+	"cca/pkg/db"
 )
 
 func TestUser_TableName(t *testing.T) {
