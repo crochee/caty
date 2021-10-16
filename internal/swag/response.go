@@ -7,6 +7,7 @@ import (
 	"cca/api"
 	"cca/pkg/resp"
 	"cca/pkg/service/account"
+	"cca/pkg/service/auth"
 )
 
 // swagger:response SNullResponse
@@ -50,5 +51,21 @@ type SAccountRetrieveResponse struct {
 	// in: body
 	Body struct {
 		account.RetrieveResponse
+	}
+}
+
+// swagger:response SAuthSignResponse
+type SAuthSignResponse struct {
+	// in: body
+	Body struct {
+		auth.APIToken
+	}
+}
+
+// swagger:response SAuthParseResponse
+type SAuthParseResponse struct {
+	// in: body
+	Body struct {
+		auth.TokenClaims
 	}
 }

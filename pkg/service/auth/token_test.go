@@ -2,7 +2,7 @@
 // Author: crochee
 // Date: 2021/3/13
 
-package tokenx
+package auth
 
 import (
 	"testing"
@@ -11,11 +11,11 @@ import (
 
 func TestCreateToken(t *testing.T) {
 	var tokenImpl = &TokenClaims{
-		Now: time.Now(),
-		Token: &Token{
-			Domain: "123",
-			User:   "test123",
-			ActionMap: map[string]Action{
+		Now: time.Now().Unix(),
+		Token: Token{
+			AccountID: "123",
+			UserID:    "test123",
+			Permission: map[string]uint8{
 				"cca": Admin,
 			},
 		},

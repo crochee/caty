@@ -40,6 +40,7 @@ func New() *gin.Engine {
 	v1Router := router.Group("/v1")
 
 	registerAccount(v1Router)
+	registerAuth(v1Router)
 
 	return router
 }

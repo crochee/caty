@@ -2,11 +2,27 @@
 // Author: crochee
 // Date: 2021/3/14
 
-package tokenx
+package auth
 
 import "fmt"
 
-func VerifyAuth(actionMap map[string]Action, serviceName string, action Action) error {
+const (
+	Not    uint8 = 0
+	Read   uint8 = 1
+	Write  uint8 = 2
+	Delete uint8 = 3
+	Admin  uint8 = 4
+)
+
+var ActionString = map[uint8]string{
+	Not:    "not",
+	Read:   "read",
+	Write:  "write",
+	Delete: "delete",
+	Admin:  "admin",
+}
+
+func VerifyAuth(actionMap map[string]uint8, serviceName string, action uint8) error {
 	if tempAction, ok := actionMap[AllService]; ok {
 		if tempAction >= action {
 			return nil

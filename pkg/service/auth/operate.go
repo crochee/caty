@@ -2,7 +2,7 @@
 // Author: crochee
 // Date: 2021/3/13
 
-package tokenx
+package auth
 
 import (
 	"errors"

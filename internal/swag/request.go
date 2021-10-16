@@ -5,6 +5,7 @@ package swag
 
 import (
 	"cca/pkg/service/account"
+	"cca/pkg/service/auth"
 )
 
 // swagger:parameters SNullRequest
@@ -41,4 +42,20 @@ type SAccountRetrieveRequest struct {
 // swagger:parameters SAccountDeleteRequest
 type SAccountDeleteRequest struct {
 	account.User
+}
+
+// swagger:parameters SAuthSignRequest
+type SAuthSignRequest struct {
+	// in: body
+	Body struct {
+		auth.TokenClaims
+	}
+}
+
+// swagger:parameters SAuthParseRequest
+type SAuthParseRequest struct {
+	// in: body
+	Body struct {
+		auth.APIToken
+	}
 }

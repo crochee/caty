@@ -4,7 +4,7 @@ import (
 	db2 "cca/pkg/db"
 	"cca/pkg/logx"
 	"cca/pkg/model"
-	"cca/pkg/service/business/tokenx"
+	"cca/pkg/service/auth"
 	"context"
 	"errors"
 	"github.com/crochee/lib/db"
@@ -29,22 +29,22 @@ func UserLogin(ctx context.Context, email, passWord string) (string, error) {
 	if domain.PassWord != passWord {
 		return "", e.Wrap(e.Forbidden, "wrong password")
 	}
-	var permission map[string]tokenx.Action
+	var permission map[string]auth.Action
 	if err := jsoniter.ConfigFastest.UnmarshalFromString(domain.Permission, &permission); err != nil {
 		logx.FromContext(ctx).Errorf("Unmarshal permission failed.Error:%v", err)
 		return "", e.Wrap(e.UnmarshalFail, err.Error())
 	}
-	token := &tokenx.TokenClaims{
+	token := &auth.TokenClaims{
 		Now: time.Now(),
-		Token: &tokenx.Token{
+		Token: &auth.Token{
 			Domain:    domain.Domain,
 			User:      domain.Domain,
 			ActionMap: permission,
 		},
 	}
-	tokenStr, err := tokenx.CreateToken(token)
+	tokenStr, err := auth.CreateToken(token)
 	if err != nil {
-		logx.FromContext(ctx).Errorf("Create token failed.Error:%v", err)
+		logx.FromContext(ctx).Errorf("Sign token failed.Error:%v", err)
 		return "", e.New(e.GenerateTokenFail, err.Error())
 	}
 	return tokenStr, nil

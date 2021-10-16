@@ -19,7 +19,7 @@ import (
 	"cca/pkg/code"
 	"cca/pkg/db"
 	"cca/pkg/model"
-	"cca/pkg/service/business/tokenx"
+	"cca/pkg/service/auth"
 )
 
 type CreateRequest struct {
@@ -62,11 +62,11 @@ type CreateResponseResult struct {
 
 // Create 注册账户
 func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult, error) {
-	actionMap := map[string]tokenx.Action{
-		tokenx.AllService: tokenx.Admin,
+	actionMap := map[string]uint8{
+		auth.AllService: auth.Admin,
 	}
 	if request.AccountID != "" {
-		actionMap[tokenx.AllService] = tokenx.Read
+		actionMap[auth.AllService] = auth.Read
 	}
 	permission, err := json.Marshal(actionMap)
 	if err != nil {
