@@ -13,6 +13,7 @@ import (
 	"github.com/crochee/lib/routine"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	_ "go.uber.org/automaxprocs"
 
 	"cca/config"
 	"cca/pkg/code"

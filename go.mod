@@ -22,6 +22,7 @@ require (
 	go.etcd.io/etcd/api/v3 v3.5.0
 	go.etcd.io/etcd/client/v3 v3.5.0-alpha.0
 	go.mongodb.org/mongo-driver v1.5.0
+	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.19.1
 	gorm.io/gorm v1.21.15
 )
