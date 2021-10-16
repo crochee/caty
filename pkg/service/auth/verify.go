@@ -4,7 +4,11 @@
 
 package auth
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
 
 const (
 	Not    uint8 = 0
@@ -20,6 +24,19 @@ var ActionString = map[uint8]string{
 	Write:  "write",
 	Delete: "delete",
 	Admin:  "admin",
+}
+
+// QueryToken 查询 Token
+func QueryToken(ctx *gin.Context) (*Token, error) {
+	token, ok := ctx.Get("token")
+	if !ok {
+		return nil, errors.New("token isn't exists")
+	}
+	var xToken *Token
+	if xToken, ok = token.(*Token); !ok {
+		return nil, errors.New("token's type isn't Token")
+	}
+	return xToken, nil
 }
 
 func VerifyAuth(actionMap map[string]uint8, serviceName string, action uint8) error {

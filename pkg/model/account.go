@@ -4,7 +4,7 @@
 
 package model
 
-import "cca/pkg/db"
+import "github.com/crochee/lib/db"
 
 type Account struct {
 	ID   uint64 `json:"id" gorm:"primary_key:id"`

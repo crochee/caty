@@ -8,7 +8,8 @@ import "context"
 
 func Retry(ctx context.Context, fn func(ctx context.Context) error, attempts int) error {
 	if err := fn(ctx); err != nil {
-		if attempts--; attempts > 0 {
+		attempts--
+		if attempts > 0 {
 			return Retry(ctx, fn, attempts)
 		}
 		return err

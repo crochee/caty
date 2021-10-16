@@ -41,6 +41,7 @@ func NewProducer(mq *rabbitMq, opts ...func(*Option)) message.Publisher {
 	}
 }
 
+// nolint:gocyclo
 func (p *producer) Publish(topic string, messages ...*message.Message) error {
 	if p.mq.IsClosed() {
 		return errors.New("AMQP is connection closed")
@@ -97,7 +98,7 @@ func (p *producer) Publish(topic string, messages ...*message.Message) error {
 		}
 	}
 	for _, msg := range messages {
-		if err = p.publishMessage(channel, msg); err != nil {
+		if err = p.publishMessage(channel, msg); err != nil { // nolint:gocritic
 			return err
 		}
 	}

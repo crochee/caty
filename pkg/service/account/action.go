@@ -10,10 +10,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/crochee/lib/db"
 	"github.com/crochee/lib/e"
 
 	"cca/pkg/code"
-	"cca/pkg/db"
+	"cca/pkg/dbx"
 	"cca/pkg/model"
 	"cca/pkg/service/auth"
 )
@@ -30,7 +31,7 @@ type LoginRequest struct {
 // Login 用户登录
 func Login(ctx context.Context, request *LoginRequest) (*auth.APIToken, error) {
 	user := &model.User{}
-	if err := db.With(ctx).Model(user).Where("id =?",
+	if err := dbx.With(ctx).Model(user).Where("id =?",
 		request.UserID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
 			return nil, code.ErrNoAccount

@@ -72,7 +72,7 @@ func (v *defaultValidator) defaultValidateStruct(obj interface{}) error {
 		return nil
 	}
 	value := reflect.ValueOf(obj)
-	switch value.Kind() {
+	switch value.Kind() { // nolint:exhaustive
 	case reflect.Ptr:
 		return v.ValidateStruct(value.Elem().Interface())
 	case reflect.Struct:

@@ -13,11 +13,12 @@ import (
 	"time"
 
 	"github.com/crochee/lib"
+	"github.com/crochee/lib/db"
 	"github.com/crochee/lib/e"
 	"gorm.io/gorm"
 
 	"cca/pkg/code"
-	"cca/pkg/db"
+	"cca/pkg/dbx"
 	"cca/pkg/model"
 	"cca/pkg/service/auth"
 )
@@ -79,7 +80,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		Permission: lib.String(permission),
 		Desc:       request.Desc,
 	}
-	err = db.With(ctx).Transaction(func(tx *gorm.DB) error {
+	err = dbx.With(ctx).Transaction(func(tx *gorm.DB) error {
 		accountModel := &model.Account{}
 		if request.AccountID != "" {
 			if err = tx.Model(accountModel).Where("id =?", request.AccountID).
@@ -172,7 +173,7 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 	if len(updates) == 0 {
 		return code.ErrNoUpdate
 	}
-	query := db.With(ctx).Model(&model.User{}).Where("id=? AND password=?",
+	query := dbx.With(ctx).Model(&model.User{}).Where("id=? AND password=?",
 		user.ID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
 		return fmt.Errorf("update failed.Error:%v,%w", err, code.ErrUpdateAccount)
@@ -226,7 +227,7 @@ type RetrieveResponse struct {
 
 // Retrieves 查询、获取账户信息
 func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, error) {
-	query := db.With(ctx).Model(&model.User{})
+	query := dbx.With(ctx).Model(&model.User{})
 	if request.AccountID != "" {
 		query = query.Where("account_id = ?", request.AccountID)
 	}
@@ -265,7 +266,7 @@ func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveRespons
 // Retrieve 查询、获取指定账户信息
 func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 	user := &model.User{}
-	if err := db.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
+	if err := dbx.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
 			return nil, code.ErrNoAccount
 		}
@@ -286,7 +287,7 @@ func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 
 // Delete 删除账户
 func Delete(ctx context.Context, request *User) error {
-	return db.With(ctx).Transaction(func(tx *gorm.DB) error {
+	return dbx.With(ctx).Transaction(func(tx *gorm.DB) error {
 		user := &model.User{}
 		query := tx.Model(user).Where("id =?", request.ID)
 		if err := query.First(user).Error; err != nil {

@@ -16,7 +16,7 @@ import (
 
 	"cca/config"
 	"cca/pkg/code"
-	"cca/pkg/db"
+	"cca/pkg/dbx"
 	"cca/pkg/message"
 	"cca/pkg/transport/httpx"
 	"cca/pkg/v"
@@ -75,10 +75,10 @@ func run() error {
 
 func startAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	// 初始化数据库
-	if err := db.Init(ctx); err != nil {
+	if err := dbx.Init(ctx); err != nil {
 		return err
 	}
-	defer db.Close()
+	defer dbx.Close()
 	if err := validator.Init(); err != nil {
 		return err
 	}

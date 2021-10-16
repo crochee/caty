@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"cca/config"
-	"cca/pkg/db"
+	"cca/pkg/dbx"
 )
 
 func TestAccount_TableName(t *testing.T) {
@@ -17,11 +17,11 @@ func TestAccount_TableName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err = db.Init(ctx); err != nil {
+	if err = dbx.Init(ctx); err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
-	d := db.New().Debug()
+	defer dbx.Close()
+	d := dbx.New().Debug()
 	u := &Account{}
 	if !d.Migrator().HasTable(u) {
 		t.Log(d.Set("gorm:table_options",

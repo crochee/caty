@@ -71,7 +71,7 @@ func (t *TokenClaims) Parse(data string) error {
 	if !ok {
 		return fmt.Errorf("cannot convert token claim;%w", code.ErrInvalidAuth)
 	}
-	//验证token，如果token被修改过则为false
+	// 验证token，如果token被修改过则为false
 	if !tokenImpl.Valid {
 		return code.ErrInvalidAuth
 	}
