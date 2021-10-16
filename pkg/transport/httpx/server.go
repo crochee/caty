@@ -28,15 +28,15 @@ import (
 
 func NewServer(ctx context.Context) (*HTTPServer, error) {
 	r, err := etcdx.NewEtcdRegistry(func(option *etcdx.Option) {
-		option.AddrList = viper.GetStringSlice("ectd.url")
+		option.AddrList = viper.GetStringSlice("etcd.url")
 	})
 	if err != nil {
 		return nil, err
 	}
-	ip := "0.0.0.0"
+	var ip string
 	if gin.Mode() == gin.ReleaseMode {
-		if ip, err = createHost("WLAN"); err != nil {
-			return nil, err
+		if ip, err = createHost("eth0"); err != nil {
+			ip = "0.0.0.0"
 		}
 	}
 	srv := &HTTPServer{
