@@ -35,6 +35,7 @@ func main() {
 	if err := code.Loading(); err != nil {
 		panic(err)
 	}
+	gin.SetMode(viper.GetString("mode"))
 	// 初始化系统日志
 	log.InitSystemLogger(func(option *log.Option) {
 		option.Path = viper.GetString("path")

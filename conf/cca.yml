@@ -1,14 +1,17 @@
-mode: debug
-path: ./log/cca.log
+mode: release
+path:
 level: debug
 storage_path: /data/
 mysql:
   user: root
   password: 123456
-  ip: 127.0.0.1
+  ip: 172.19.32.1
   port: 3306
   database: cca
   charset: utf8
   max_open_conns: 50
   max_idle_conns: 10
   conn_max_lifetime: 500
+etcd:
+  url:
+    - "172.19.32.1:2379"

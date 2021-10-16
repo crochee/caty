@@ -5,7 +5,7 @@ WORKDIR /opt/cloud
 RUN git clone ${URL} &&\
     cd ${Project} &&\
     go mod tidy &&\
-    go build -ldflags="-s -w" -o cca -tags jsoniter cmd/${Project}
+    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -o cca -tags jsoniter ./cmd/${Project}
 
 FROM centos:latest
 ARG Project=/opt/cloud/cca

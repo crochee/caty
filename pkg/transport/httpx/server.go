@@ -16,6 +16,7 @@ import (
 	"github.com/crochee/lib/log"
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 
 	"cca/internal/host"
 	"cca/pkg/etcdx"
@@ -26,7 +27,9 @@ import (
 )
 
 func NewServer(ctx context.Context) (*HTTPServer, error) {
-	r, err := etcdx.NewEtcdRegistry()
+	r, err := etcdx.NewEtcdRegistry(func(option *etcdx.Option) {
+		option.AddrList = viper.GetStringSlice("ectd.url")
+	})
 	if err != nil {
 		return nil, err
 	}
