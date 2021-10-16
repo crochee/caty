@@ -14,7 +14,7 @@ type MongoLogger struct {
 }
 
 func (m *MongoLogger) Write(p []byte) (int, error) {
-	cli := m.client.Database("logx").Collection(time.Now().Local().Format("20060102"))
+	cli := m.client.Database("log").Collection(time.Now().Local().Format("20060102"))
 	var data map[string]interface{}
 	if err := jsoniter.ConfigFastest.Unmarshal(p, &data); err != nil {
 		return 0, err
