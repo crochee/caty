@@ -1,0 +1,1426 @@
+{
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "The purpose of this service is to provide an application\nthat is using object\n\ntitle: cca",
+    "title": "cca",
+    "version": "1.0.1"
+  },
+  "host": "localhost:8120",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "查询api版本详细信息",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "通用"
+        ],
+        "summary": "查询api版本信息",
+        "operationId": "SNullRequest",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "result"
+              ],
+              "properties": {
+                "result": {
+                  "description": "结果集",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "version",
+                      "status",
+                      "release"
+                    ],
+                    "properties": {
+                      "offline": {
+                        "description": "下线时间",
+                        "type": "string",
+                        "x-go-name": "Offline"
+                      },
+                      "release": {
+                        "description": "发布时间",
+                        "type": "string",
+                        "x-go-name": "Release"
+                      },
+                      "status": {
+                        "description": "状态 pre-release,online,offline",
+                        "type": "string",
+                        "x-go-name": "Status"
+                      },
+                      "version": {
+                        "description": "版本",
+                        "type": "string",
+                        "x-go-name": "Version"
+                      }
+                    },
+                    "x-go-package": "cca/api"
+                  },
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account": {
+      "get": {
+        "description": "根据条件查询账户列表",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "查询账户",
+        "operationId": "SAccountRetrievesRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "AccountID",
+            "description": "账户ID",
+            "name": "account-id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "用户",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Account",
+            "description": "账户",
+            "name": "account",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Email",
+            "description": "邮箱",
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "description": "结果集",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "account": {
+                        "description": "账户",
+                        "type": "string",
+                        "x-go-name": "Account"
+                      },
+                      "account_id": {
+                        "description": "账户ID",
+                        "type": "string",
+                        "x-go-name": "AccountID"
+                      },
+                      "created_at": {
+                        "description": "创建时间",
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "desc": {
+                        "description": "描述",
+                        "type": "string",
+                        "x-go-name": "Desc"
+                      },
+                      "email": {
+                        "description": "邮箱",
+                        "type": "string",
+                        "x-go-name": "Email"
+                      },
+                      "permission": {
+                        "description": "权限",
+                        "type": "string",
+                        "x-go-name": "Permission"
+                      },
+                      "updated_at": {
+                        "description": "更新时间",
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "description": "用户",
+                        "type": "string",
+                        "x-go-name": "UserID"
+                      },
+                      "verify": {
+                        "description": "是否认证",
+                        "type": "integer",
+                        "format": "uint8",
+                        "x-go-name": "Verify"
+                      }
+                    },
+                    "x-go-package": "cca/pkg/service/account"
+                  },
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "注册账户信息",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "注册账户",
+        "operationId": "SAccountRegisterRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "account",
+                "password"
+              ],
+              "properties": {
+                "account": {
+                  "description": "用户名",
+                  "type": "string",
+                  "x-go-name": "Account"
+                },
+                "account_id": {
+                  "description": "账户ID",
+                  "type": "string",
+                  "x-go-name": "AccountID"
+                },
+                "desc": {
+                  "description": "描述信息",
+                  "type": "string",
+                  "x-go-name": "Desc"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "password": {
+                  "description": "密码",
+                  "type": "string",
+                  "x-go-name": "Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "description": "账户",
+                  "type": "string",
+                  "x-go-name": "Account"
+                },
+                "account_id": {
+                  "description": "账户ID",
+                  "type": "string",
+                  "x-go-name": "AccountID"
+                },
+                "created_at": {
+                  "description": "创建时间",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "desc": {
+                  "description": "描述",
+                  "type": "string",
+                  "x-go-name": "Desc"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "permission": {
+                  "description": "权限",
+                  "type": "string",
+                  "x-go-name": "Permission"
+                },
+                "primary_account": {
+                  "description": "是否主账号",
+                  "type": "boolean",
+                  "x-go-name": "PrimaryAccount"
+                },
+                "updated_at": {
+                  "description": "更新时间",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_id": {
+                  "description": "用户",
+                  "type": "string",
+                  "x-go-name": "UserID"
+                },
+                "verify": {
+                  "description": "是否认证",
+                  "type": "integer",
+                  "format": "uint8",
+                  "x-go-name": "Verify"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account/login": {
+      "post": {
+        "description": "用户登录获取token信息",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "用户登录",
+        "operationId": "SAccountLoginRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_id",
+                "password"
+              ],
+              "properties": {
+                "password": {
+                  "description": "密码",
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "user_id": {
+                  "description": "用户账号",
+                  "type": "string",
+                  "x-go-name": "UserID"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "token"
+              ],
+              "properties": {
+                "token": {
+                  "description": "加密token信息",
+                  "type": "string",
+                  "x-go-name": "Token"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account/{id}": {
+      "get": {
+        "description": "查询指定账户的信息",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "查询指定账户",
+        "operationId": "SAccountRetrieveRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "用户",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "description": "账户",
+                  "type": "string",
+                  "x-go-name": "Account"
+                },
+                "account_id": {
+                  "description": "账户ID",
+                  "type": "string",
+                  "x-go-name": "AccountID"
+                },
+                "created_at": {
+                  "description": "创建时间",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "desc": {
+                  "description": "描述",
+                  "type": "string",
+                  "x-go-name": "Desc"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "permission": {
+                  "description": "权限",
+                  "type": "string",
+                  "x-go-name": "Permission"
+                },
+                "updated_at": {
+                  "description": "更新时间",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_id": {
+                  "description": "用户",
+                  "type": "string",
+                  "x-go-name": "UserID"
+                },
+                "verify": {
+                  "description": "是否认证",
+                  "type": "integer",
+                  "format": "uint8",
+                  "x-go-name": "Verify"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "删除指定账户信息",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "删除指定账户",
+        "operationId": "SAccountDeleteRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "用户",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "编辑指定账户的信息",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "账户"
+        ],
+        "summary": "编辑账户",
+        "operationId": "SAccountUpdateRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "用户",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "old_password"
+              ],
+              "properties": {
+                "account": {
+                  "description": "账户",
+                  "type": "string",
+                  "x-go-name": "Account"
+                },
+                "desc": {
+                  "description": "描述信息",
+                  "type": "string",
+                  "x-go-name": "Desc"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "old_password": {
+                  "description": "旧密码",
+                  "type": "string",
+                  "x-go-name": "OldPassword"
+                },
+                "password": {
+                  "description": "新密码",
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "permission": {
+                  "description": "权限",
+                  "type": "string",
+                  "x-go-name": "Permission"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/parse": {
+      "post": {
+        "description": "解析token信息",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "鉴权"
+        ],
+        "summary": "解析token",
+        "operationId": "SAuthParseRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "token"
+              ],
+              "properties": {
+                "token": {
+                  "description": "加密token信息",
+                  "type": "string",
+                  "x-go-name": "Token"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "now": {
+                  "description": "生成token的时间戳",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Now"
+                },
+                "token": {
+                  "type": "object",
+                  "required": [
+                    "account_id",
+                    "user_id",
+                    "permission"
+                  ],
+                  "properties": {
+                    "account_id": {
+                      "description": "主账号id",
+                      "type": "string",
+                      "x-go-name": "AccountID"
+                    },
+                    "permission": {
+                      "description": "权限列表",
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "format": "uint8"
+                      },
+                      "x-go-name": "Permission"
+                    },
+                    "user_id": {
+                      "description": "账户id",
+                      "type": "string",
+                      "x-go-name": "UserID"
+                    }
+                  },
+                  "x-go-package": "cca/pkg/service/auth"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/sign": {
+      "post": {
+        "description": "生成token信息",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "鉴权"
+        ],
+        "summary": "生成token",
+        "operationId": "SAuthSignRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "now": {
+                  "description": "生成token的时间戳",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Now"
+                },
+                "token": {
+                  "type": "object",
+                  "required": [
+                    "account_id",
+                    "user_id",
+                    "permission"
+                  ],
+                  "properties": {
+                    "account_id": {
+                      "description": "主账号id",
+                      "type": "string",
+                      "x-go-name": "AccountID"
+                    },
+                    "permission": {
+                      "description": "权限列表",
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "format": "uint8"
+                      },
+                      "x-go-name": "Permission"
+                    },
+                    "user_id": {
+                      "description": "账户id",
+                      "type": "string",
+                      "x-go-name": "UserID"
+                    }
+                  },
+                  "x-go-package": "cca/pkg/service/auth"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "token"
+              ],
+              "properties": {
+                "token": {
+                  "description": "加密token信息",
+                  "type": "string",
+                  "x-go-name": "Token"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "description": "返回码",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Code",
+                  "example": 20000000
+                },
+                "message": {
+                  "description": "返回信息描述",
+                  "type": "string",
+                  "x-go-name": "Msg",
+                  "example": "success"
+                },
+                "result": {
+                  "description": "具体描述信息",
+                  "type": "string",
+                  "x-go-name": "Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "RetrieveResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "账户",
+          "type": "string",
+          "x-go-name": "Account"
+        },
+        "account_id": {
+          "description": "账户ID",
+          "type": "string",
+          "x-go-name": "AccountID"
+        },
+        "created_at": {
+          "description": "创建时间",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "desc": {
+          "description": "描述",
+          "type": "string",
+          "x-go-name": "Desc"
+        },
+        "email": {
+          "description": "邮箱",
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "permission": {
+          "description": "权限",
+          "type": "string",
+          "x-go-name": "Permission"
+        },
+        "updated_at": {
+          "description": "更新时间",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "user_id": {
+          "description": "用户",
+          "type": "string",
+          "x-go-name": "UserID"
+        },
+        "verify": {
+          "description": "是否认证",
+          "type": "integer",
+          "format": "uint8",
+          "x-go-name": "Verify"
+        }
+      },
+      "x-go-package": "cca/pkg/service/account"
+    },
+    "Token": {
+      "type": "object",
+      "required": [
+        "account_id",
+        "user_id",
+        "permission"
+      ],
+      "properties": {
+        "account_id": {
+          "description": "主账号id",
+          "type": "string",
+          "x-go-name": "AccountID"
+        },
+        "permission": {
+          "description": "权限列表",
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "Permission"
+        },
+        "user_id": {
+          "description": "账户id",
+          "type": "string",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "cca/pkg/service/auth"
+    },
+    "VersionResult": {
+      "type": "object",
+      "required": [
+        "version",
+        "status",
+        "release"
+      ],
+      "properties": {
+        "offline": {
+          "description": "下线时间",
+          "type": "string",
+          "x-go-name": "Offline"
+        },
+        "release": {
+          "description": "发布时间",
+          "type": "string",
+          "x-go-name": "Release"
+        },
+        "status": {
+          "description": "状态 pre-release,online,offline",
+          "type": "string",
+          "x-go-name": "Status"
+        },
+        "version": {
+          "description": "版本",
+          "type": "string",
+          "x-go-name": "Version"
+        }
+      },
+      "x-go-package": "cca/api"
+    }
+  },
+  "responses": {
+    "SAPIVersionResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "description": "结果集",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "version",
+                "status",
+                "release"
+              ],
+              "properties": {
+                "offline": {
+                  "description": "下线时间",
+                  "type": "string",
+                  "x-go-name": "Offline"
+                },
+                "release": {
+                  "description": "发布时间",
+                  "type": "string",
+                  "x-go-name": "Release"
+                },
+                "status": {
+                  "description": "状态 pre-release,online,offline",
+                  "type": "string",
+                  "x-go-name": "Status"
+                },
+                "version": {
+                  "description": "版本",
+                  "type": "string",
+                  "x-go-name": "Version"
+                }
+              },
+              "x-go-package": "cca/api"
+            },
+            "x-go-name": "Result"
+          }
+        }
+      }
+    },
+    "SAccountRegisterResponseResult": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "description": "账户",
+            "type": "string",
+            "x-go-name": "Account"
+          },
+          "account_id": {
+            "description": "账户ID",
+            "type": "string",
+            "x-go-name": "AccountID"
+          },
+          "created_at": {
+            "description": "创建时间",
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "CreatedAt"
+          },
+          "desc": {
+            "description": "描述",
+            "type": "string",
+            "x-go-name": "Desc"
+          },
+          "email": {
+            "description": "邮箱",
+            "type": "string",
+            "x-go-name": "Email"
+          },
+          "permission": {
+            "description": "权限",
+            "type": "string",
+            "x-go-name": "Permission"
+          },
+          "primary_account": {
+            "description": "是否主账号",
+            "type": "boolean",
+            "x-go-name": "PrimaryAccount"
+          },
+          "updated_at": {
+            "description": "更新时间",
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "UpdatedAt"
+          },
+          "user_id": {
+            "description": "用户",
+            "type": "string",
+            "x-go-name": "UserID"
+          },
+          "verify": {
+            "description": "是否认证",
+            "type": "integer",
+            "format": "uint8",
+            "x-go-name": "Verify"
+          }
+        }
+      }
+    },
+    "SAccountRetrieveResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "description": "账户",
+            "type": "string",
+            "x-go-name": "Account"
+          },
+          "account_id": {
+            "description": "账户ID",
+            "type": "string",
+            "x-go-name": "AccountID"
+          },
+          "created_at": {
+            "description": "创建时间",
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "CreatedAt"
+          },
+          "desc": {
+            "description": "描述",
+            "type": "string",
+            "x-go-name": "Desc"
+          },
+          "email": {
+            "description": "邮箱",
+            "type": "string",
+            "x-go-name": "Email"
+          },
+          "permission": {
+            "description": "权限",
+            "type": "string",
+            "x-go-name": "Permission"
+          },
+          "updated_at": {
+            "description": "更新时间",
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "UpdatedAt"
+          },
+          "user_id": {
+            "description": "用户",
+            "type": "string",
+            "x-go-name": "UserID"
+          },
+          "verify": {
+            "description": "是否认证",
+            "type": "integer",
+            "format": "uint8",
+            "x-go-name": "Verify"
+          }
+        }
+      }
+    },
+    "SAccountRetrieveResponses": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "结果集",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "description": "账户",
+                  "type": "string",
+                  "x-go-name": "Account"
+                },
+                "account_id": {
+                  "description": "账户ID",
+                  "type": "string",
+                  "x-go-name": "AccountID"
+                },
+                "created_at": {
+                  "description": "创建时间",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "desc": {
+                  "description": "描述",
+                  "type": "string",
+                  "x-go-name": "Desc"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "permission": {
+                  "description": "权限",
+                  "type": "string",
+                  "x-go-name": "Permission"
+                },
+                "updated_at": {
+                  "description": "更新时间",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_id": {
+                  "description": "用户",
+                  "type": "string",
+                  "x-go-name": "UserID"
+                },
+                "verify": {
+                  "description": "是否认证",
+                  "type": "integer",
+                  "format": "uint8",
+                  "x-go-name": "Verify"
+                }
+              },
+              "x-go-package": "cca/pkg/service/account"
+            },
+            "x-go-name": "Result"
+          }
+        }
+      }
+    },
+    "SAuthParseResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "now": {
+            "description": "生成token的时间戳",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Now"
+          },
+          "token": {
+            "type": "object",
+            "required": [
+              "account_id",
+              "user_id",
+              "permission"
+            ],
+            "properties": {
+              "account_id": {
+                "description": "主账号id",
+                "type": "string",
+                "x-go-name": "AccountID"
+              },
+              "permission": {
+                "description": "权限列表",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "format": "uint8"
+                },
+                "x-go-name": "Permission"
+              },
+              "user_id": {
+                "description": "账户id",
+                "type": "string",
+                "x-go-name": "UserID"
+              }
+            },
+            "x-go-package": "cca/pkg/service/auth"
+          }
+        }
+      }
+    },
+    "SAuthSignResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "description": "加密token信息",
+            "type": "string",
+            "x-go-name": "Token"
+          }
+        }
+      }
+    },
+    "SNullResponse": {
+      "description": ""
+    },
+    "SResponseCode": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "description": "返回码",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code",
+            "example": 20000000
+          },
+          "message": {
+            "description": "返回信息描述",
+            "type": "string",
+            "x-go-name": "Msg",
+            "example": "success"
+          },
+          "result": {
+            "description": "具体描述信息",
+            "type": "string",
+            "x-go-name": "Result"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "token": []
+    },
+    {
+      "type": [
+        "apiKey"
+      ]
+    },
+    {
+      "name": [
+        "X-Auth-Token"
+      ]
+    },
+    {
+      "in": [
+        "header"
+      ]
+    },
+    {
+      "ak": []
+    },
+    {
+      "type": [
+        "apiKey"
+      ]
+    },
+    {
+      "name": [
+        "ak"
+      ]
+    },
+    {
+      "in": [
+        "query"
+      ]
+    }
+  ]
+}

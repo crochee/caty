@@ -59,3 +59,11 @@ type SAuthParseRequest struct {
 		auth.APIToken
 	}
 }
+
+// swagger:parameters SAccountLoginRequest
+type SAccountLoginRequest struct {
+	// in: body
+	Body struct {
+		account.LoginRequest
+	}
+}

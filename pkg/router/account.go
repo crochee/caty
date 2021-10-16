@@ -15,4 +15,5 @@ func registerAccount(v1Router *gin.RouterGroup) {
 	v1Router.PATCH("/account/:id", account.Update)
 	v1Router.GET("/account/:id", account.Retrieve)
 	v1Router.DELETE("/account/:id", account.Delete)
+	v1Router.POST("/account/login", account.Login)
 }

@@ -106,6 +106,10 @@ func Update(ctx *gin.Context) {
 		resp.ErrorParam(ctx, err)
 		return
 	}
+	if err := account.ValidPermission(modifyRequest.Permission); err != nil {
+		resp.ErrorParam(ctx, err)
+		return
+	}
 	if err := account.Update(ctx.Request.Context(), &user, &modifyRequest); err != nil {
 		resp.Errors(ctx, err)
 		return

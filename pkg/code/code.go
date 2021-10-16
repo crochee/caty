@@ -10,11 +10,13 @@ const (
 
 	// 100~199为账号类
 
-	ErrRegisterAccount e.Code = 50010100
-	ErrUpdateAccount   e.Code = 50010101
-	ErrRetrieveAccount e.Code = 50010102
-	ErrDeleteAccount   e.Code = 50010103
-	ErrExistAccount    e.Code = 40010104
+	ErrRegisterAccount      e.Code = 50010100
+	ErrUpdateAccount        e.Code = 50010101
+	ErrRetrieveAccount      e.Code = 50010102
+	ErrDeleteAccount        e.Code = 50010103
+	ErrExistAccount         e.Code = 40010104
+	ErrLoginAccount         e.Code = 50010105
+	ErrWrongPasswordAccount e.Code = 40010106
 
 	// 200~299为权限类
 
@@ -30,11 +32,13 @@ func Loading() error {
 		ErrNoAccount: "用户不存在",
 		ErrNoUpdate:  "数据无更新",
 
-		ErrRegisterAccount: "注册账号错误",
-		ErrUpdateAccount:   "编辑账号错误",
-		ErrRetrieveAccount: "查询账号错误",
-		ErrDeleteAccount:   "删除账号错误",
-		ErrExistAccount:    "用户已存在",
+		ErrRegisterAccount:      "注册账号错误",
+		ErrUpdateAccount:        "编辑账号错误",
+		ErrRetrieveAccount:      "查询账号错误",
+		ErrDeleteAccount:        "删除账号错误",
+		ErrExistAccount:         "用户已存在",
+		ErrLoginAccount:         "用户登录错误",
+		ErrWrongPasswordAccount: "用户密码错误",
 
 		ErrCreateAuth:  "生成token",
 		ErrParseAuth:   "解析token错误",

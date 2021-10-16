@@ -115,9 +115,9 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		return nil, err
 	}
 	return &CreateResponseResult{
-		AccountID:      strconv.FormatUint(userModel.AccountID, 10),
+		AccountID:      FormatUint(userModel.AccountID),
 		Account:        userModel.Name,
-		UserID:         strconv.FormatUint(userModel.ID, 10),
+		UserID:         FormatUint(userModel.ID),
 		Email:          userModel.Email,
 		Permission:     userModel.Permission,
 		Verify:         userModel.Verify,
@@ -248,9 +248,9 @@ func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveRespons
 	}
 	for _, v := range userList {
 		responses.Result = append(responses.Result, &RetrieveResponse{
-			AccountID:  strconv.FormatUint(v.AccountID, 10),
+			AccountID:  FormatUint(v.AccountID),
 			Account:    v.Name,
-			UserID:     strconv.FormatUint(v.ID, 10),
+			UserID:     FormatUint(v.ID),
 			Email:      v.Email,
 			Permission: v.Permission,
 			Verify:     v.Verify,
@@ -272,9 +272,9 @@ func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 		return nil, fmt.Errorf("%v.%w", err, code.ErrRetrieveAccount)
 	}
 	return &RetrieveResponse{
-		AccountID:  strconv.FormatUint(user.AccountID, 10),
+		AccountID:  FormatUint(user.AccountID),
 		Account:    user.Name,
-		UserID:     strconv.FormatUint(user.ID, 10),
+		UserID:     FormatUint(user.ID),
 		Email:      user.Email,
 		Permission: user.Permission,
 		Verify:     user.Verify,
@@ -324,4 +324,14 @@ func ValidPassword(password string) error {
 		return fmt.Errorf("password's length is less than %d", PasswordMaxLength)
 	}
 	return nil
+}
+
+// ValidPermission 权限格式校验
+func ValidPermission(permission string) error {
+	data := make(map[string]uint8)
+	return json.Unmarshal([]byte(permission), &data)
+}
+
+func FormatUint(data uint64) string {
+	return strconv.FormatUint(data, 10)
 }
