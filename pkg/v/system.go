@@ -8,6 +8,5 @@ const (
 	ServiceName = "OBS"
 	Version     = "v1.0.0"
 
-	XTraceID   = "X-Trace-Id"
-	XAuthToken = "X-Auth-Token"
+	XTraceID = "X-Trace-Id"
 )

@@ -7,20 +7,33 @@
 package middleware
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/rs/cors"
+	"net/http"
 )
 
 // CrossDomain skip the cross-domain phase
-func CrossDomain(ctx *gin.Context) {
-	if ctx.Request.Method == http.MethodOptions &&
-		ctx.GetHeader("Access-Control-Request-Method") != "" {
-		ctx.Header("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,HEAD,PATCH,OPTIONS")
-		ctx.Header("Access-Control-Allow-Headers", "Content-Type,X-Auth-Token")
-		ctx.Header("Access-Control-Allow-Origin", "*")
-		ctx.AbortWithStatus(http.StatusNoContent)
-		return
+func CrossDomain() gin.HandlerFunc {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{
+			http.MethodHead,
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodPatch,
+			http.MethodDelete,
+			http.MethodOptions,
+		},
+		AllowedHeaders: []string{"Content-Type", "X-Trace-Id", "X-Auth-Token"},
+		MaxAge:         24 * 60 * 60,
+	})
+	return func(ctx *gin.Context) {
+		c.HandlerFunc(ctx.Writer, ctx.Request)
+		if ctx.Request.Method == http.MethodOptions &&
+			ctx.GetHeader("Access-Control-Request-Method") != "" {
+			// Abort processing next Gin middlewares.
+			ctx.AbortWithStatus(http.StatusOK)
+		}
 	}
-	ctx.Next()
 }

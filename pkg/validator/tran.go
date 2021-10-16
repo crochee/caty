@@ -12,22 +12,9 @@ import (
 	translations "github.com/go-playground/validator/v10/translations/zh"
 )
 
-var v *defaultValidator
-
-func Var(field interface{}, tag string) error {
-	if v == nil {
-		return nil
-	}
-	err := v.Validate.Var(field, tag)
-	if err == nil {
-		return nil
-	}
-	return v.Translate(err)
-}
-
 // Init init validator
 func Init() error {
-	v = &defaultValidator{Validate: validator.New()}
+	v := &defaultValidator{Validate: validator.New()}
 	v.Validate.SetTagName("binding")
 	v.translator, _ = ut.New(zh.New()).GetTranslator("zh")
 	if err := translations.RegisterDefaultTranslations(v.Validate, v.translator); err != nil {
@@ -85,7 +72,7 @@ func (v *defaultValidator) defaultValidateStruct(obj interface{}) error {
 		return nil
 	}
 	value := reflect.ValueOf(obj)
-	switch value.Kind() {
+	switch value.Kind() { // nolint:exhaustive
 	case reflect.Ptr:
 		return v.ValidateStruct(value.Elem().Interface())
 	case reflect.Struct:

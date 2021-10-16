@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3"
 
-	"obs/pkg/registry"
+	"cca/pkg/registry"
 )
 
 type etcdWatcher struct {

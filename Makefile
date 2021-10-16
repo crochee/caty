@@ -18,11 +18,7 @@ swag:
 	@swagger generate spec -o ./docs/swagger.json && swagger flatten --with-expand ./docs/swagger.json -o ./docs/swagger.json
 .PHONY: lint
 lint:
-	@hash golangci-lint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		if [ $(GO_VERSION) -gt 16 ]; then \
-            go install  github.com/golangci/golangci-lint/cmd/golangci-lint@v1.42.1; \
-        else \
-            echo "please update go to 1.16+"; \
-        fi \
-	fi
-	@bash ./scripts/ci-lint.sh;
+	@./scripts/ci.sh
+.PHONY: layout
+layout:
+	@./scripts/layout.sh

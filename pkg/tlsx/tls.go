@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/crochee/lib"
-	"github.com/gin-gonic/gin"
 )
 
 type Config struct {
@@ -15,8 +14,8 @@ type Config struct {
 	Key  lib.FileOrContent `json:"key" yaml:"key"`
 }
 
-// TlsConfig output tls
-func TlsConfig(clientAuth tls.ClientAuthType, cfg Config) (*tls.Config, error) {
+// TLSConfig output tls
+func TLSConfig(clientAuth tls.ClientAuthType, cfg Config) (*tls.Config, error) {
 	caPEMBlock, err := cfg.Ca.Read()
 	if err != nil {
 		return nil, err
@@ -45,6 +44,6 @@ func TlsConfig(clientAuth tls.ClientAuthType, cfg Config) (*tls.Config, error) {
 		CipherSuites:       []uint16{tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256},
 		MinVersion:         tls.VersionTLS12,
 		RootCAs:            pool, // 客户端认证服务端
-		InsecureSkipVerify: gin.Mode() == gin.DebugMode,
+		InsecureSkipVerify: false,
 	}, nil
 }

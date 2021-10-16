@@ -3,16 +3,67 @@
 // Package swag
 package swag
 
-import "cca/api/user"
+import (
+	"cca/pkg/service/account"
+	"cca/pkg/service/auth"
+)
 
-// swagger:parameters SwaggerNoneRequest
-type SwaggerNoneRequest struct {
+// swagger:parameters SNullRequest
+type SNullRequest struct {
 }
 
-// swagger:parameters SwaggerRegisterUserRequest
-type SwaggerRegisterUserRequest struct {
+// swagger:parameters SAccountRegisterRequest
+type SAccountRegisterRequest struct {
 	// in: body
 	Body struct {
-		user.RegisterUserRequest
+		account.CreateRequest
+	}
+}
+
+// swagger:parameters SAccountRetrievesRequest
+type SAccountRetrievesRequest struct {
+	account.RetrievesRequest
+}
+
+// swagger:parameters SAccountUpdateRequest
+type SAccountUpdateRequest struct {
+	// in: body
+	Body struct {
+		account.UpdateRequest
+	}
+	account.User
+}
+
+// swagger:parameters SAccountRetrieveRequest
+type SAccountRetrieveRequest struct {
+	account.User
+}
+
+// swagger:parameters SAccountDeleteRequest
+type SAccountDeleteRequest struct {
+	account.User
+}
+
+// swagger:parameters SAuthSignRequest
+type SAuthSignRequest struct {
+	// in: body
+	Body struct {
+		auth.TokenClaims
+	}
+}
+
+// swagger:parameters SAuthParseRequest
+type SAuthParseRequest struct {
+	// in: body
+	Body struct {
+		auth.APIToken
+	}
+}
+
+// swagger:parameters SAccountLoginRequest
+type SAccountLoginRequest struct {
+	// in: body
+	Body struct {
+		account.LoginRequest
 	}
 }

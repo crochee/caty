@@ -1,7 +1,3 @@
-// Author: crochee
-// Date: 2021/9/3
-
-// Package mq
 package mq
 
 import (

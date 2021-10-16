@@ -6,31 +6,31 @@ package v
 
 import "strconv"
 
-func getNextChunk(version string, n, p int) (int, int, error) {
+func getNextChunk(version string, n, p int) (index, part int, err error) {
 	if p > n-1 {
-		return 0, p, nil
+		part = p
+		return
 	}
 	pEnd := p
 	for pEnd < n && version[pEnd] != '.' {
 		pEnd++
 	}
-	var (
-		i   int
-		err error
-	)
+	var i int
 	if pEnd != n-1 {
 		i, err = strconv.Atoi(version[p:pEnd])
 		if err != nil {
-			return 0, 0, err
+			return
 		}
 	} else {
 		i, err = strconv.Atoi(version[p:n])
 		if err != nil {
-			return 0, 0, err
+			return
 		}
 	}
 	p = pEnd + 1
-	return i, p, nil
+	index = i
+	part = p
+	return
 }
 
 func CompareVersion(version1, version2 string) (int, error) {

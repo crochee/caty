@@ -3,16 +3,69 @@
 // Package swag
 package swag
 
-import "cca/pkg/resp"
+import (
+	"cca/api"
+	"cca/pkg/resp"
+	"cca/pkg/service/account"
+	"cca/pkg/service/auth"
+)
 
-// swagger:response SwaggerNoneResponse
-type SwaggerNoneResponse struct {
+// swagger:response SNullResponse
+type SNullResponse struct {
 }
 
-// swagger:response SwaggerResponseError
-type SwaggerResponseError struct {
+// swagger:response SResponseCode
+type SResponseCode struct {
 	// in: body
 	Body struct {
-		resp.ResponseError
+		resp.ResponseCode
+	}
+}
+
+// swagger:response SAPIVersionResponse
+type SAPIVersionResponse struct {
+	// in: body
+	Body struct {
+		api.VersionResponse
+	}
+}
+
+// swagger:response SAccountRegisterResponseResult
+type SAccountRegisterResponseResult struct {
+	// in: body
+	Body struct {
+		account.CreateResponseResult
+	}
+}
+
+// swagger:response SAccountRetrieveResponses
+type SAccountRetrieveResponses struct {
+	// in: body
+	Body struct {
+		account.RetrieveResponses
+	}
+}
+
+// swagger:response SAccountRetrieveResponse
+type SAccountRetrieveResponse struct {
+	// in: body
+	Body struct {
+		account.RetrieveResponse
+	}
+}
+
+// swagger:response SAuthSignResponse
+type SAuthSignResponse struct {
+	// in: body
+	Body struct {
+		auth.APIToken
+	}
+}
+
+// swagger:response SAuthParseResponse
+type SAuthParseResponse struct {
+	// in: body
+	Body struct {
+		auth.TokenClaims
 	}
 }

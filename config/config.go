@@ -1,12 +1,8 @@
-// Copyright 2020, The Go Authors. All rights reserved.
-// Author: OnlyOneFace
-// Date: 2020/6/2
-
 package config
 
 import (
 	"errors"
-	"path/filepath"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -14,7 +10,7 @@ import (
 
 // LoadConfig init Config
 func LoadConfig(path string) error {
-	pathList := strings.Split(path, string(filepath.Separator))
+	pathList := strings.Split(path, "/")
 	lastIndex := len(pathList) - 1
 	index := strings.LastIndexByte(pathList[lastIndex], '.')
 	if index == -1 {
@@ -25,5 +21,8 @@ func LoadConfig(path string) error {
 	viper.SetConfigName(pathList[lastIndex][:index])                          // 设置配置文件名称
 	viper.SetConfigType(strings.TrimPrefix(pathList[lastIndex][index:], ".")) // 设置配置文件类型
 
-	return viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+		return fmt.Errorf("read config failed.%w", err)
+	}
+	return nil
 }

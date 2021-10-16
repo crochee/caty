@@ -14,12 +14,12 @@ func RequestLogger(logger log.Builder) gin.HandlerFunc {
 		ctx := c.Request.Context()
 		if traceID := v.GetTraceID(ctx); traceID != "" {
 			fieldList = append(fieldList, log.Field{
-				Key:   "TraceId",
+				Key:   "TraceID",
 				Value: traceID,
 			})
 		}
 		fieldList = append(fieldList, log.Field{
-			Key:   "ClientIp",
+			Key:   "ClientIP",
 			Value: c.ClientIP(),
 		})
 		c.Request = c.Request.WithContext(log.WithContext(ctx, logger.With(fieldList...)))

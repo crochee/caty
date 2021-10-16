@@ -30,7 +30,7 @@ type Option struct {
 	Context   context.Context
 	Username  string
 	Password  string
-	TTl       time.Duration
+	TTL       time.Duration
 }
 
 func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
@@ -60,7 +60,7 @@ func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 	if e.Option.Secure {
 		if e.Option.TLSConfig == nil {
 			e.Option.TLSConfig = &tls.Config{
-				InsecureSkipVerify: true,
+				InsecureSkipVerify: true, // nolint:gosec
 			}
 		}
 		cf.TLS = e.Option.TLSConfig
@@ -73,7 +73,7 @@ func NewEtcdRegistry(opts ...func(*Option)) (*etcdRegistry, error) {
 	var addrList []string
 
 	for _, address := range e.Option.AddrList {
-		if len(address) == 0 {
+		if address == "" {
 			continue
 		}
 		addr, port, err := net.SplitHostPort(address)
@@ -106,6 +106,7 @@ type etcdRegistry struct {
 	leases   map[string]clientv3.LeaseID
 }
 
+// nolint:funlen,gocyclo
 func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceInstance) error {
 	if len(service.Endpoints) == 0 {
 		return errors.New("require at least one node")
@@ -129,28 +130,29 @@ func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceIn
 
 		// get the existing lease
 		for _, kv := range rsp.Kvs {
-			if kv.Lease > 0 {
-				leaseID = clientv3.LeaseID(kv.Lease)
-
-				// decode the existing node
-				srv := decode(kv.Value)
-				if srv == nil || len(srv.Endpoints) == 0 {
-					continue
-				}
-
-				// create hash of service; uint64
-				h, err := Hash(srv.Endpoints)
-				if err != nil {
-					continue
-				}
-
-				// save the info
-				e.Lock()
-				e.leases[service.Name+service.ID] = leaseID
-				e.register[service.Name+service.ID] = h
-				e.Unlock()
-				break
+			if kv.Lease <= 0 {
+				continue
 			}
+			leaseID = clientv3.LeaseID(kv.Lease)
+
+			// decode the existing node
+			srv := decode(kv.Value)
+			if srv == nil || len(srv.Endpoints) == 0 {
+				continue
+			}
+
+			// create hash of service; uint64
+			h, err := Hash(srv.Endpoints)
+			if err != nil {
+				continue
+			}
+
+			// save the info
+			e.Lock()
+			e.leases[service.Name+service.ID] = leaseID
+			e.register[service.Name+service.ID] = h
+			e.Unlock()
+			break
 		}
 	}
 
@@ -188,14 +190,14 @@ func (e *etcdRegistry) Register(ctx context.Context, service *registry.ServiceIn
 	}
 
 	var lgr *clientv3.LeaseGrantResponse
-	if second := e.Option.TTl.Seconds(); second > 0 {
+	if second := e.Option.TTL.Seconds(); second > 0 {
 		// get a lease used to expire keys since we have a ttl
 		lgr, err = e.client.Grant(newCtx, int64(second))
 		if err != nil {
 			return err
 		}
 		e.client.GetLogger().Debug(fmt.Sprintf("Registering %s id %s with lease %v and leaseID %v and ttl %v",
-			service.Name, service.ID, lgr, lgr.ID, e.Option.TTl))
+			service.Name, service.ID, lgr, lgr.ID, e.Option.TTL))
 	}
 
 	// create an entry for the node

@@ -1,7 +1,3 @@
-// Author: crochee
-// Date: 2021/9/6
-
-// Package mq
 package mq
 
 import (
@@ -51,7 +47,7 @@ func (c *consumer) Subscribe(ctx context.Context, topic string) (<-chan *message
 		return nil, e.Wrap(err, "cannot open channel")
 	}
 	// 获取消费通道,确保rabbitMQ一个一个发送消息
-	if err = channel.Qos(1, 0, true); err != nil {
+	if err = channel.Qos(1, 0, true); err != nil { // nolint:gocritic
 		return nil, err
 	}
 	queueName := c.queueName(topic)
@@ -96,7 +92,7 @@ func (c *consumer) Subscribe(ctx context.Context, topic string) (<-chan *message
 			for {
 				select {
 				case d := <-deliveries:
-					msgStruct, err := c.marshal.Unmarshal(&d)
+					msgStruct, err := c.marshal.Unmarshal(&d) // nolint:govet
 					if err != nil {
 						log.FromContext(ctx).Error(err.Error())
 						// 当requeue为true时，将该消息排队，以在另一个通道上传递给使用者。

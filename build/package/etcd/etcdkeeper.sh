@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e
+
+set -ex
 
 image=docker.io/evildecay/etcdkeeper:latest
 if [ -n "$(docker images -q ${image})" ]; then
