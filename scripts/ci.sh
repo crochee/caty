@@ -10,5 +10,5 @@ if [[ -n $(docker images -q cca:latest) ]]; then
   docker rmi cca:latest
 fi
 
-docker build -f ./build/cca/Dockerfile -t cca:latest .
+docker build --no-cache -f ./build/cca/Dockerfile -t cca:latest .
 docker run -itd -p 8120:8120 --restart=always --name ccasrv cca:latest
