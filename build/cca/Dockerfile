@@ -11,9 +11,9 @@ FROM centos:latest
 ARG Project=/opt/cloud/cca
 WORKDIR ${Project}
 RUN mkdir -p ${Project}/conf
-COPY --from=builder /opt/cloud/cca/cca .
-COPY --from=builder /opt/cloud/cca/conf ./conf
-COPY --from=builder /opt/cloud/cca/build/package/cca/entrypoint.sh .
+COPY --from=builder ${Project}/cca .
+COPY --from=builder ${Project}/conf ./conf
+COPY --from=builder ${Project}/build/cca/entrypoint.sh .
 RUN chmod +x ./cca && chmod +x ./entrypoint.sh
 
 EXPOSE 8120
