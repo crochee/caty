@@ -13,4 +13,5 @@ func TestGetIpByName(t *testing.T) {
 	t.Log(net.InterfaceByName("eth0"))
 	t.Log(GetIPByName("WLAN"))
 	t.Log(ExternalIP())
+	t.Log(net.Interfaces())
 }
