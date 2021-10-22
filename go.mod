@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/json-iterator/go v1.1.12
+	github.com/mitchellh/go-homedir v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.8.0
