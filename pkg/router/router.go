@@ -25,6 +25,7 @@ import (
 
 	"cca/api"
 	"cca/pkg/middleware"
+	"cca/pkg/v"
 )
 
 // New gin router
@@ -37,7 +38,7 @@ func New() *gin.Engine {
 	router.Use(middleware.TraceID, middleware.RequestLogger(log.NewLogger()), middleware.Log, middleware.Recovery)
 
 	router.GET("/", api.Version)
-	v1Router := router.Group("/v1")
+	v1Router := router.Group("/" + v.V1API)
 
 	registerAccount(v1Router)
 	registerAuth(v1Router)

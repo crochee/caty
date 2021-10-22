@@ -5,8 +5,10 @@
 package v
 
 const (
-	ServiceName = "OBS"
+	ServiceName = "cca"
 	Version     = "v1.0.0"
 
 	XTraceID = "X-Trace-Id"
+
+	V1API = "v1"
 )

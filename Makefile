@@ -29,3 +29,6 @@ lint:
 .PHONY: ci
 ci:
 	/bin/bash ./scripts/ci.sh
+.PHONY: cmd
+cmd:
+	/bin/bash ./scripts/cmd.sh
