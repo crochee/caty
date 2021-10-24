@@ -44,7 +44,7 @@ func (d DefaultIP) UrlWithQuery(ctx context.Context, path string, value url.Valu
 func (d DefaultIP) Url(ctx context.Context, path string) string {
 	host := v.GetHost(ctx)
 	if host == "" {
-		host = "127.0.0.1:81500"
+		host = "127.0.0.1:8120"
 	}
-	return fmt.Sprintf("http://%s/%s", host, path)
+	return fmt.Sprintf("http://%s%s", host, path)
 }
