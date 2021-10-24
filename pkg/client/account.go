@@ -5,7 +5,6 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -57,7 +56,7 @@ func (a *AccountClient) Register(ctx context.Context,
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		var result resp.ResponseCode
-		if err = json.NewDecoder(response.Body).Decode(&result); err != nil {
+		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
 			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
 		}
 		return nil, &result
@@ -97,7 +96,7 @@ func (a *AccountClient) Retrieves(ctx context.Context,
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		var result resp.ResponseCode
-		if err = json.NewDecoder(response.Body).Decode(&result); err != nil {
+		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
 			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
 		}
 		return nil, &result

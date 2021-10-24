@@ -65,7 +65,7 @@ func Parse(ctx *gin.Context) {
 		resp.ErrorParam(ctx, err)
 		return
 	}
-	token, err := auth.Parse(ctx.Request.Context(), apiToken.Token)
+	token, err := auth.Parse(ctx.Request.Context(), &apiToken)
 	if err != nil {
 		resp.Errors(ctx, err)
 		return

@@ -27,9 +27,9 @@ func Create(_ context.Context, token *TokenClaims) (*APIToken, error) {
 }
 
 // Parse 解析token
-func Parse(_ context.Context, token string) (*TokenClaims, error) {
+func Parse(_ context.Context, token *APIToken) (*TokenClaims, error) {
 	tokenImpl := &TokenClaims{}
-	if err := tokenImpl.Parse(token); err != nil {
+	if err := tokenImpl.Parse(token.Token); err != nil {
 		return nil, err
 	}
 	return tokenImpl, nil
