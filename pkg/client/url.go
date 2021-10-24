@@ -18,6 +18,10 @@ type URLHandler interface {
 	Header(ctx context.Context) http.Header
 }
 
+func NewURLHandler() URLHandler {
+	return DefaultIP{}
+}
+
 type DefaultIP struct {
 }
 
@@ -38,5 +42,9 @@ func (d DefaultIP) UrlWithQuery(ctx context.Context, path string, value url.Valu
 }
 
 func (d DefaultIP) Url(ctx context.Context, path string) string {
-	return fmt.Sprintf("http://%s:%d/%s", "127.0.0.1", 81500, path)
+	host := v.GetHost(ctx)
+	if host == "" {
+		host = "127.0.0.1:81500"
+	}
+	return fmt.Sprintf("http://%s/%s", host, path)
 }
