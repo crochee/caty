@@ -2,6 +2,7 @@ package resp
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/crochee/lib/e"
 	"github.com/crochee/lib/log"
@@ -19,6 +20,10 @@ type ResponseCode struct {
 	Msg string `json:"message"`
 	// 具体描述信息
 	Result string `json:"result"`
+}
+
+func (r *ResponseCode) Error() string {
+	return fmt.Sprintf("{code:%d,message:%s,result:%s}", r.Code, r.Msg, r.Result)
 }
 
 // Error gin response with Code
