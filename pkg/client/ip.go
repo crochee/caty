@@ -4,14 +4,15 @@
 package client
 
 import (
-	"cca/pkg/v"
 	"context"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"cca/pkg/v"
 )
 
-type IPHandler interface {
+type URLHandler interface {
 	Url(ctx context.Context, path string) string
 	UrlWithQuery(ctx context.Context, path string, value url.Values) string
 	Header(ctx context.Context) http.Header

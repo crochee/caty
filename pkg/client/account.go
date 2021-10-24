@@ -26,7 +26,7 @@ type Account interface {
 
 type AccountClient struct {
 	client.Client
-	IPHandler
+	URLHandler
 }
 
 func (a *AccountClient) Register(ctx context.Context, request *account.CreateRequest) (*account.CreateResponseResult, error) {
