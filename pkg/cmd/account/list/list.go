@@ -5,6 +5,7 @@ package list
 
 import (
 	"github.com/crochee/lib"
+	"github.com/crochee/lib/log"
 	"github.com/crochee/lib/table"
 	"github.com/spf13/cobra"
 
@@ -50,8 +51,18 @@ func do(cmd *cobra.Command, _ []string) error {
 	}
 	opt.Email = email
 
-	response, err := client.New(client.AccountService).Retrieves(cmd.Context(), opt)
-	if err != nil {
+	var debug bool
+	if debug, err = flags.GetBool("debug"); err != nil {
+		return err
+	}
+	ctx := cmd.Context()
+	if debug {
+		ctx = log.WithContext(ctx, log.NewLogger(func(option *log.Option) {
+			option.Level = log.DEBUG
+		}))
+	}
+	var response *account.RetrieveResponses
+	if response, err = client.New(client.AccountService).Retrieves(ctx, opt); err != nil {
 		return err
 	}
 	listMap := make([]map[string]interface{}, len(response.Result))

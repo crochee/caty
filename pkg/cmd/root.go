@@ -29,7 +29,7 @@ func NewCmd() (*cobra.Command, error) {
 	// will be global for your application.
 	persistentFlags := rootCmd.PersistentFlags()
 	persistentFlags.StringP("config", "c", "", "config file (default is $HOME/.cca.yaml)")
-	persistentFlags.StringP("ip", "i", "127.0.0.1", "service ip (if do not provided, will lookup from config file or environment)")
+	persistentFlags.StringP("ip", "i", "127.0.0.1:8120", "service ip (if do not provided, will lookup from config file or environment)")
 	if err := viper.BindPFlag("ip", persistentFlags.Lookup("ip")); err != nil {
 		return nil, err
 	}
