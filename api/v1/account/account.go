@@ -4,6 +4,7 @@
 package account
 
 import (
+	"cca/pkg/model"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -62,12 +63,14 @@ func Register(ctx *gin.Context) {
 //     type: object
 //     "$ref": "#/responses/SResponseCode"
 func Retrieves(ctx *gin.Context) {
-	var retrieveRequest account.RetrievesRequest
-	if err := ctx.BindQuery(&retrieveRequest); err != nil {
+	retrieveRequest := &account.RetrievesRequest{
+		Page: *model.DefaultPage(),
+	}
+	if err := ctx.BindQuery(retrieveRequest); err != nil {
 		resp.ErrorParam(ctx, err)
 		return
 	}
-	response, err := account.Retrieves(ctx.Request.Context(), &retrieveRequest)
+	response, err := account.Retrieves(ctx.Request.Context(), retrieveRequest)
 	if err != nil {
 		resp.Errors(ctx, err)
 		return
