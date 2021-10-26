@@ -185,6 +185,7 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 }
 
 type RetrievesRequest struct {
+	model.Page
 	// 账户ID
 	// in: query
 	AccountID string `json:"account-id" form:"account-id" binding:"omitempty,numeric"`
@@ -200,6 +201,7 @@ type RetrievesRequest struct {
 }
 
 type RetrieveResponses struct {
+	model.Page
 	// 结果集
 	Result []*RetrieveResponse `json:"result"`
 }
@@ -241,10 +243,15 @@ func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveRespons
 		query = query.Where("email = ?", request.Email)
 	}
 	var userList []*model.User
-	if err := query.Find(&userList).Error; err != nil {
+	if err := query.Limit(request.Size).Offset((request.Index - 1) * request.Size).Find(&userList).Error; err != nil {
 		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, code.ErrRetrieveAccount)
 	}
 	responses := &RetrieveResponses{
+		Page: model.Page{
+			Index: request.Index,
+			Size:  request.Size,
+			Total: len(userList),
+		},
 		Result: make([]*RetrieveResponse, 0, len(userList)),
 	}
 	for _, v := range userList {
