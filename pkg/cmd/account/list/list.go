@@ -4,9 +4,13 @@
 package list
 
 import (
-	"fmt"
-
+	"github.com/crochee/lib"
+	"github.com/crochee/lib/log"
+	"github.com/crochee/lib/table"
 	"github.com/spf13/cobra"
+
+	"cca/pkg/client"
+	"cca/pkg/service/account"
 )
 
 func NewCmd() *cobra.Command {
@@ -15,11 +19,67 @@ func NewCmd() *cobra.Command {
 		Short: "List account",
 		RunE:  do,
 	}
+	cmd.Flags().StringP("account-id", "", "", "根据账户id进行搜索")
+	cmd.Flags().StringP("id", "", "", "根据id进行搜索")
+	cmd.Flags().StringP("account", "", "", "根据账户名进行搜索")
+	cmd.Flags().StringP("email", "", "", "根据邮箱进行搜索")
 
 	return cmd
 }
 
-func do(cmd *cobra.Command, args []string) error {
-	fmt.Println(args)
+func do(cmd *cobra.Command, _ []string) error {
+	flags := cmd.Flags()
+	opt := &account.RetrievesRequest{}
+	accountID, err := flags.GetString("account-id")
+	if err != nil {
+		return err
+	}
+	opt.AccountID = accountID
+	var ID string
+	if ID, err = flags.GetString("id"); err != nil {
+		return err
+	}
+	opt.ID = ID
+	var a string
+	if a, err = flags.GetString("account"); err != nil {
+		return err
+	}
+	opt.Account = a
+	var email string
+	if email, err = flags.GetString("email"); err != nil {
+		return err
+	}
+	opt.Email = email
+
+	var debug bool
+	if debug, err = flags.GetBool("debug"); err != nil {
+		return err
+	}
+	ctx := cmd.Context()
+	if debug {
+		ctx = log.WithContext(ctx, log.NewLogger(func(option *log.Option) {
+			option.Level = log.DEBUG
+		}))
+	}
+	var response *account.RetrieveResponses
+	if response, err = client.New(client.AccountService).Retrieves(ctx, opt); err != nil {
+		return err
+	}
+	listMap := make([]map[string]interface{}, len(response.Result))
+	for index, value := range response.Result {
+		listMap[index] = lib.Struct2Map(value)
+	}
+	fields := []string{
+		"Verify",
+		"AccountID",
+		"Account",
+		"UserID",
+		"Email",
+		"Permission",
+		"Desc",
+		"CreatedAt",
+		"UpdatedAt",
+	}
+	table.RenderAsTable(listMap, fields)
 	return nil
 }

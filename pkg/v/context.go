@@ -20,3 +20,19 @@ func GetTraceID(ctx context.Context) string {
 	}
 	return traceID
 }
+
+type hostKey struct{}
+
+// SetHost Add host to context.Context.
+func SetHost(ctx context.Context, host string) context.Context {
+	return context.WithValue(ctx, hostKey{}, host)
+}
+
+// GetHost Get the host from context.Context.
+func GetHost(ctx context.Context) string {
+	host, ok := ctx.Value(hostKey{}).(string)
+	if !ok {
+		return ""
+	}
+	return host
+}

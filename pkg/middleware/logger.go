@@ -8,7 +8,7 @@ import (
 )
 
 // RequestLogger 设置请求日志
-func RequestLogger(logger log.Builder) gin.HandlerFunc {
+func RequestLogger(logger log.Interface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var fieldList []log.Field
 		ctx := c.Request.Context()
