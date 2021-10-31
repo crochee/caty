@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crochee/lib"
-	"github.com/crochee/lib/db"
-	"github.com/crochee/lib/e"
+	"github.com/crochee/lirity"
+	"github.com/crochee/lirity/db"
+	"github.com/crochee/lirity/e"
 	"gorm.io/gorm"
 
 	"cca/pkg/code"
@@ -77,7 +77,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		Name:       request.Account,
 		Password:   request.Password,
 		Email:      request.Email,
-		Permission: lib.String(permission),
+		Permission: lirity.String(permission),
 		Desc:       request.Desc,
 	}
 	err = dbx.With(ctx).Transaction(func(tx *gorm.DB) error {

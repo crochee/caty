@@ -3,8 +3,8 @@ package dbx
 import (
 	"context"
 
-	"github.com/crochee/lib"
-	"github.com/crochee/lib/db"
+	"github.com/crochee/lirity"
+	"github.com/crochee/lirity/db"
 	"github.com/spf13/viper"
 
 	"time"
@@ -30,7 +30,7 @@ func Init(ctx context.Context) (err error) {
 }
 
 func Close() {
-	lib.Close(dbClient)
+	lirity.Close(dbClient)
 }
 
 func With(ctx context.Context) *db.DB {

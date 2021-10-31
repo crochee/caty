@@ -4,9 +4,9 @@
 package list
 
 import (
-	"github.com/crochee/lib"
-	"github.com/crochee/lib/log"
-	"github.com/crochee/lib/table"
+	"github.com/crochee/lirity"
+	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/table"
 	"github.com/spf13/cobra"
 
 	"cca/pkg/client"
@@ -67,7 +67,7 @@ func do(cmd *cobra.Command, _ []string) error {
 	}
 	listMap := make([]map[string]interface{}, len(response.Result))
 	for index, value := range response.Result {
-		listMap[index] = lib.Struct2Map(value)
+		listMap[index] = lirity.Struct2Map(value)
 	}
 	fields := []string{
 		"Verify",

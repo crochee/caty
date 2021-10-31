@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/log"
 
 	"cca/config"
 )

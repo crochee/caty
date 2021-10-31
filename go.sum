@@ -78,8 +78,8 @@ github.com/coreos/go-systemd/v22 v22.3.2/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSV
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creack/pty v1.1.11/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
-github.com/crochee/lib v1.0.2 h1:3E1wKHwj2IetnwsYlqR27Sm1BmbWOGc+AbLaa6d7RZ0=
-github.com/crochee/lib v1.0.2/go.mod h1:WGH4ji8yW8R2XXSiJn5XRQmf3lmWE1W5+rWAVHaJocM=
+github.com/crochee/lirity v1.1.0 h1:vG6nHycYiBJfKn9BCrI0UpBMrON0/cCivDNNx+f9BGE=
+github.com/crochee/lirity v1.1.0/go.mod h1:4CQ50Ei0K/Z6kmVeCLaI9oYH6xC3g1vwfORzwPKwlk0=
 github.com/crochee/uid v1.0.2 h1:AccIj/kHxyy3mZ0Ah19N54TLPIoYpihuQDQCSdzhJcg=
 github.com/crochee/uid v1.0.2/go.mod h1:HSVyqeQKP9KwMGqrPvrhYjsESA5JJ25kBtR7Hz0oVd8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

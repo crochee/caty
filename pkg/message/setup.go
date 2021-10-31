@@ -9,7 +9,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/crochee/lib"
+	"github.com/crochee/lirity"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
@@ -43,5 +43,5 @@ func Close() {
 	if router == nil {
 		return
 	}
-	lib.Close(router)
+	lirity.Close(router)
 }

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/crochee/lib/e"
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/e"
+	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,10 +27,10 @@ func (r *ResponseCode) Error() string {
 }
 
 // Error gin response with Code
-func Error(ctx *gin.Context, code e.Code) {
+func Error(ctx *gin.Context, code e.ErrorCode) {
 	ctx.JSON(code.StatusCode(), ResponseCode{
 		Code: code.Code(),
-		Msg:  code.Error(),
+		Msg:  code.Message(),
 	})
 }
 
@@ -55,7 +55,7 @@ func Errors(ctx *gin.Context, err error) {
 		Error(ctx, e.ErrInternalServerError)
 		return
 	}
-	var errorCode e.Code
+	var errorCode *e.ErrCode
 	if errors.As(err, &errorCode) {
 		Error(ctx, errorCode)
 		return
@@ -65,9 +65,9 @@ func Errors(ctx *gin.Context, err error) {
 
 func ErrorParam(ctx *gin.Context, err error) {
 	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.%+v", err)
-	ctx.JSON(e.ErrInvalidParam.StatusCode(), ResponseCode{
+	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseCode{
 		Code:   e.ErrInvalidParam.Code(),
-		Msg:    e.ErrInvalidParam.Error(),
+		Msg:    e.ErrInvalidParam.Message(),
 		Result: err.Error(),
 	})
 }

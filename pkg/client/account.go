@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/crochee/lib/client"
+	"github.com/crochee/lirity/client"
 	"github.com/json-iterator/go"
 
 	"cca/pkg/resp"

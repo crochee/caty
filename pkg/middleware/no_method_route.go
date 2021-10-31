@@ -5,7 +5,7 @@
 package middleware
 
 import (
-	"github.com/crochee/lib/e"
+	"github.com/crochee/lirity/e"
 	"github.com/gin-gonic/gin"
 
 	"cca/pkg/resp"

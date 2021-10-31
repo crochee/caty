@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/crochee/lib/db"
-	"github.com/crochee/lib/e"
+	"github.com/crochee/lirity/db"
+	"github.com/crochee/lirity/e"
 
 	"cca/pkg/code"
 	"cca/pkg/dbx"

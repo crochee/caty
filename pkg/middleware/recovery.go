@@ -13,8 +13,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/crochee/lib/e"
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/e"
+	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
@@ -49,9 +49,9 @@ func Recovery(ctx *gin.Context) {
 			headersToStr := strings.Join(headers, "\r\n")
 			log.FromContext(c).Errorf("[Recovery] %s\n%v\n%s",
 				headersToStr, r, internal.Stack(3))
-			extra := fmt.Sprint(err)
+			extra := fmt.Sprint(r)
 			if brokenPipe {
-				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", err)
+				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", r)
 			}
 			ctx.AbortWithStatusJSON(e.ErrInternalServerError.StatusCode(), resp.ResponseCode{
 				Code:   e.ErrInternalServerError.Code(),
