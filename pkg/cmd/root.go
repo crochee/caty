@@ -10,15 +10,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"cca/pkg/cmd/account"
-	"cca/pkg/v"
+	"caty/pkg/cmd/account"
+	"caty/pkg/v"
 )
 
 func NewCmd() (*cobra.Command, error) {
 	rootCmd := &cobra.Command{
 		Use:               v.ServiceName,
-		Short:             "cca cli",
-		Long:              "a command line tool for cca",
+		Short:             "caty cli",
+		Long:              "a command line tool for caty",
 		SilenceErrors:     true,
 		SilenceUsage:      true,
 		PersistentPreRunE: initConfig,
@@ -28,7 +28,7 @@ func NewCmd() (*cobra.Command, error) {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	persistentFlags := rootCmd.PersistentFlags()
-	persistentFlags.StringP("config", "c", "", "config file (default is $HOME/.cca.yaml)")
+	persistentFlags.StringP("config", "c", "", "config file (default is $HOME/.caty.yaml)")
 	persistentFlags.StringP("ip", "i", "127.0.0.1:8120", "service ip (if do not provided, will lookup from config file or environment)")
 	if err := viper.BindPFlag("ip", persistentFlags.Lookup("ip")); err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func initConfig(cmd *cobra.Command, _ []string) error {
 		}
 		// Search config in home directory with name ".woden_client" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".cca")
+		viper.SetConfigName(".caty")
 	}
 
 	viper.SetEnvPrefix("cloud") // set environment variables prefix to avoid conflict

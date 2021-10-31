@@ -5,7 +5,7 @@
 package v
 
 const (
-	ServiceName = "cca"
+	ServiceName = "caty"
 	Version     = "v1.0.0"
 
 	XTraceID = "X-Trace-Id"

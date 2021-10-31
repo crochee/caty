@@ -4,14 +4,14 @@
 package account
 
 import (
-	"cca/pkg/model"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"cca/pkg/resp"
-	"cca/pkg/service/account"
+	"caty/pkg/model"
+	"caty/pkg/resp"
+	"caty/pkg/service/account"
 )
 
 // Register godoc

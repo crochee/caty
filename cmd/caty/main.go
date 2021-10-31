@@ -15,16 +15,16 @@ import (
 	"github.com/spf13/viper"
 	_ "go.uber.org/automaxprocs"
 
-	"cca/config"
-	"cca/pkg/code"
-	"cca/pkg/dbx"
-	"cca/pkg/message"
-	"cca/pkg/transport/httpx"
-	"cca/pkg/v"
-	"cca/pkg/validator"
+	"caty/config"
+	"caty/pkg/code"
+	"caty/pkg/dbx"
+	"caty/pkg/message"
+	"caty/pkg/transport/httpx"
+	"caty/pkg/v"
+	"caty/pkg/validator"
 )
 
-var configFile = flag.String("f", "./conf/cca.yml", "the config file")
+var configFile = flag.String("f", "./conf/caty.yml", "the config file")
 
 func main() {
 	flag.Parse()

@@ -5,8 +5,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "The purpose of this service is to provide an application\nthat is using object\n\ntitle: cca",
-    "title": "cca",
+    "description": "The purpose of this service is to provide an application\nthat is using auth\n\ntitle: caty",
+    "title": "caty",
     "version": "1.0.1"
   },
   "host": "localhost:8120",
@@ -63,7 +63,7 @@
                         "x-go-name": "Version"
                       }
                     },
-                    "x-go-package": "cca/api"
+                    "x-go-package": "caty/api"
                   },
                   "x-go-name": "Result"
                 }
@@ -85,6 +85,30 @@
         "summary": "查询账户",
         "operationId": "SAccountRetrievesRequest",
         "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Index",
+            "description": "分页索引",
+            "name": "num",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Size",
+            "description": "分页大小",
+            "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Total",
+            "description": "总数",
+            "name": "total",
+            "in": "query"
+          },
           {
             "type": "string",
             "x-go-name": "AccountID",
@@ -120,6 +144,12 @@
             "schema": {
               "type": "object",
               "properties": {
+                "num": {
+                  "description": "分页索引",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Index"
+                },
                 "result": {
                   "description": "结果集",
                   "type": "array",
@@ -175,9 +205,21 @@
                         "x-go-name": "Verify"
                       }
                     },
-                    "x-go-package": "cca/pkg/service/account"
+                    "x-go-package": "caty/pkg/service/account"
                   },
                   "x-go-name": "Result"
+                },
+                "size": {
+                  "description": "分页大小",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Size"
+                },
+                "total": {
+                  "description": "总数",
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "Total"
                 }
               }
             }
@@ -792,7 +834,7 @@
                       "x-go-name": "UserID"
                     }
                   },
-                  "x-go-package": "cca/pkg/service/auth"
+                  "x-go-package": "caty/pkg/service/auth"
                 }
               }
             }
@@ -885,7 +927,7 @@
                       "x-go-name": "UserID"
                     }
                   },
-                  "x-go-package": "cca/pkg/service/auth"
+                  "x-go-package": "caty/pkg/service/auth"
                 }
               }
             }
@@ -995,7 +1037,7 @@
           "x-go-name": "Verify"
         }
       },
-      "x-go-package": "cca/pkg/service/account"
+      "x-go-package": "caty/pkg/service/account"
     },
     "Token": {
       "type": "object",
@@ -1025,7 +1067,7 @@
           "x-go-name": "UserID"
         }
       },
-      "x-go-package": "cca/pkg/service/auth"
+      "x-go-package": "caty/pkg/service/auth"
     },
     "VersionResult": {
       "type": "object",
@@ -1056,7 +1098,7 @@
           "x-go-name": "Version"
         }
       },
-      "x-go-package": "cca/api"
+      "x-go-package": "caty/api"
     }
   },
   "responses": {
@@ -1100,7 +1142,7 @@
                   "x-go-name": "Version"
                 }
               },
-              "x-go-package": "cca/api"
+              "x-go-package": "caty/api"
             },
             "x-go-name": "Result"
           }
@@ -1229,6 +1271,12 @@
       "schema": {
         "type": "object",
         "properties": {
+          "num": {
+            "description": "分页索引",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Index"
+          },
           "result": {
             "description": "结果集",
             "type": "array",
@@ -1284,9 +1332,21 @@
                   "x-go-name": "Verify"
                 }
               },
-              "x-go-package": "cca/pkg/service/account"
+              "x-go-package": "caty/pkg/service/account"
             },
             "x-go-name": "Result"
+          },
+          "size": {
+            "description": "分页大小",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Size"
+          },
+          "total": {
+            "description": "总数",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Total"
           }
         }
       }
@@ -1330,7 +1390,7 @@
                 "x-go-name": "UserID"
               }
             },
-            "x-go-package": "cca/pkg/service/auth"
+            "x-go-package": "caty/pkg/service/auth"
           }
         }
       }

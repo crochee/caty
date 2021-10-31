@@ -16,7 +16,7 @@ func TestCreateToken(t *testing.T) {
 			AccountID: "123",
 			UserID:    "test123",
 			Permission: map[string]uint8{
-				"cca": Admin,
+				"caty": Admin,
 			},
 		},
 	}

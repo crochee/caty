@@ -12,7 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- 导出  表 cca.user 结构
+-- 导出  表 caty.user 结构
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   KEY `idx_user_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=373746917676511096 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='账户信息表';
 
--- 正在导出表  cca.user 的数据：~1 rows (大约)
+-- 正在导出表  caty.user 的数据：~1 rows (大约)
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 INSERT INTO `user` (`id`, `account_id`, `account`, `user_id`, `pass_word`, `email`, `permission`, `verify`, `desc`, `deleted`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(373746917676511095, '373746917676445559', 'crochee', '373746917676445559', '123456', 'crochee@139.com', '{"*":4}', 0, '{"detail":"some unknown"}', 0, '2021-09-22 08:42:02.647', '2021-09-22 08:42:02.647', NULL);

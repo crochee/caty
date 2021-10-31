@@ -7,7 +7,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"cca/pkg/code"
+	"caty/pkg/code"
 )
 
 type Authentication interface {

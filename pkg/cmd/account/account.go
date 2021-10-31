@@ -6,8 +6,8 @@ package account
 import (
 	"github.com/spf13/cobra"
 
-	"cca/pkg/cmd/account/list"
-	"cca/pkg/cmd/account/show"
+	"caty/pkg/cmd/account/list"
+	"caty/pkg/cmd/account/show"
 )
 
 func NewCmd() *cobra.Command {

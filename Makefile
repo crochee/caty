@@ -1,5 +1,5 @@
 OUT_DIR = ./out
-PROJECT = cca
+PROJECT = caty
 GO_VERSION=$(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
 
 .PHONY: all

@@ -18,8 +18,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"cca/internal"
-	"cca/pkg/resp"
+	"caty/internal"
+	"caty/pkg/resp"
 )
 
 // Recovery panic logx

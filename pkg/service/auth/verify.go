@@ -7,6 +7,7 @@ package auth
 import (
 	"errors"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 

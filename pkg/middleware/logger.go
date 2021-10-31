@@ -4,7 +4,7 @@ import (
 	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
 
-	"cca/pkg/v"
+	"caty/pkg/v"
 )
 
 // RequestLogger 设置请求日志

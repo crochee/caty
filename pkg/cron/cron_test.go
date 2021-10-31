@@ -11,11 +11,11 @@ import (
 
 	"github.com/crochee/lirity/log"
 
-	"cca/config"
+	"caty/config"
 )
 
 func TestCronSetup(t *testing.T) {
-	config.LoadConfig("../conf/cca.yml")
+	config.LoadConfig("../conf/caty.yml")
 	log.InitSystemLogger()
 	Setup()
 	// 0 0/5 * * * ?

@@ -11,8 +11,8 @@ import (
 	"github.com/crochee/lirity/client"
 	"github.com/json-iterator/go"
 
-	"cca/pkg/resp"
-	"cca/pkg/service/auth"
+	"caty/pkg/resp"
+	"caty/pkg/service/auth"
 )
 
 type Auth interface {

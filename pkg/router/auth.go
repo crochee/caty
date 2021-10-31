@@ -6,7 +6,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
-	"cca/api/v1/auth"
+	"caty/api/v1/auth"
 )
 
 func registerAuth(v1Router *gin.RouterGroup) {

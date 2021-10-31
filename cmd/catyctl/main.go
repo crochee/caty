@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"cca/pkg/cmd"
+	"caty/pkg/cmd"
 )
 
 //go:generate go install github.com/spf13/cobra/cobra@v1.1.3

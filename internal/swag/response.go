@@ -4,10 +4,10 @@
 package swag
 
 import (
-	"cca/api"
-	"cca/pkg/resp"
-	"cca/pkg/service/account"
-	"cca/pkg/service/auth"
+	"caty/api"
+	"caty/pkg/resp"
+	"caty/pkg/service/account"
+	"caty/pkg/service/auth"
 )
 
 // swagger:response SNullResponse

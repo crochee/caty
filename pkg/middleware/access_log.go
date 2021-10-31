@@ -8,7 +8,7 @@ import (
 	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
 
-	"cca/pkg/v"
+	"caty/pkg/v"
 )
 
 // Log request logx
@@ -47,7 +47,7 @@ func Log(ctx *gin.Context) {
 	log.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
 }
 
-// defaultLogFormatter is the default logx format function Logger middleware uses.
+// defaultLogFormatter is the default log format function Logger middleware uses.
 var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 	var statusColor, methodColor, resetColor string
 	if param.IsOutputColor() {

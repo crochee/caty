@@ -4,8 +4,8 @@
 package swag
 
 import (
-	"cca/pkg/service/account"
-	"cca/pkg/service/auth"
+	"caty/pkg/service/account"
+	"caty/pkg/service/auth"
 )
 
 // swagger:parameters SNullRequest

@@ -1,23 +1,23 @@
 FROM centos-go:latest as builder
-ARG Project=cca
+ARG Project=caty
 ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
 RUN git clone ${URL} &&\
     cd ${Project} &&\
     go mod tidy &&\
-    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -o cca -tags jsoniter ./cmd/${Project}
+    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -o caty -tags jsoniter ./cmd/${Project}
 
 FROM centos:latest
-ARG Project=/opt/cloud/cca
+ARG Project=/opt/cloud/caty
 WORKDIR ${Project}
 RUN mkdir -p ${Project}/conf
-COPY --from=builder ${Project}/cca .
+COPY --from=builder ${Project}/caty .
 COPY --from=builder ${Project}/conf ./conf
-COPY --from=builder ${Project}/build/cca/entrypoint.sh .
-RUN chmod +x ./cca && chmod +x ./entrypoint.sh
+COPY --from=builder ${Project}/build/caty/entrypoint.sh .
+RUN chmod +x ./caty && chmod +x ./entrypoint.sh
 
 EXPOSE 8120
 STOPSIGNAL 2
 
 ENTRYPOINT ["./entrypoint.sh"]
-CMD ["./cca"]
+CMD ["./caty"]
