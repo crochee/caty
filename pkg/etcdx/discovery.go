@@ -6,7 +6,7 @@ import (
 
 	"go.etcd.io/etcd/client/v3"
 
-	"cca/pkg/registry"
+	"caty/pkg/registry"
 )
 
 func (e *etcdRegistry) GetService(ctx context.Context, serviceName string) ([]*registry.ServiceInstance, error) {

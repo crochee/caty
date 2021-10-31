@@ -13,10 +13,10 @@ import (
 	"github.com/crochee/lirity/db"
 	"github.com/crochee/lirity/e"
 
-	"cca/pkg/code"
-	"cca/pkg/dbx"
-	"cca/pkg/model"
-	"cca/pkg/service/auth"
+	"caty/pkg/code"
+	"caty/pkg/dbx"
+	"caty/pkg/model"
+	"caty/pkg/service/auth"
 )
 
 type LoginRequest struct {

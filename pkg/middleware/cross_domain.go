@@ -7,9 +7,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
-	"net/http"
 )
 
 // CrossDomain skip the cross-domain phase

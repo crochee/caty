@@ -18,12 +18,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
-	"cca/internal/host"
-	"cca/pkg/etcdx"
-	"cca/pkg/registry"
-	"cca/pkg/router"
-	"cca/pkg/tlsx"
-	"cca/pkg/v"
+	"caty/internal/host"
+	"caty/pkg/etcdx"
+	"caty/pkg/registry"
+	"caty/pkg/router"
+	"caty/pkg/tlsx"
+	"caty/pkg/v"
 )
 
 func NewServer(ctx context.Context) (*HTTPServer, error) {

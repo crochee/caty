@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"cca/pkg/resp"
-	"cca/pkg/service/auth"
+	"caty/pkg/resp"
+	"caty/pkg/service/auth"
 )
 
 // Sign godoc

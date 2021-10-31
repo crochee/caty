@@ -17,7 +17,7 @@ import (
 	"go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 
-	"cca/pkg/registry"
+	"caty/pkg/registry"
 )
 
 type Option struct {

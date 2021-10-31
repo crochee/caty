@@ -7,7 +7,7 @@ import (
 
 	"go.etcd.io/etcd/client/v3"
 
-	"cca/pkg/registry"
+	"caty/pkg/registry"
 )
 
 type etcdWatcher struct {

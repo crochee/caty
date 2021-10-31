@@ -7,13 +7,13 @@ import (
 	"context"
 	"testing"
 
-	"cca/config"
-	"cca/pkg/dbx"
+	"caty/config"
+	"caty/pkg/dbx"
 )
 
 func TestAccount_TableName(t *testing.T) {
 	ctx := context.Background()
-	err := config.LoadConfig("E:/project/cca/conf/cca.yml")
+	err := config.LoadConfig("E:/project/caty/conf/caty.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

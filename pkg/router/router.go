@@ -1,9 +1,9 @@
-// Package router cca
+// Package router caty
 //
 // The purpose of this service is to provide an application
-// that is using object
+// that is using auth
 //
-// title: cca
+// title: caty
 // Schemes: http, https
 // Host: localhost:8120
 // Version: 1.0.1
@@ -23,9 +23,9 @@ import (
 	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
 
-	"cca/api"
-	"cca/pkg/middleware"
-	"cca/pkg/v"
+	"caty/api"
+	"caty/pkg/middleware"
+	"caty/pkg/v"
 )
 
 // New gin router
@@ -37,7 +37,7 @@ func New() *gin.Engine {
 
 	router.Use(middleware.TraceID, middleware.RequestLogger(log.NewLogger()), middleware.Log, middleware.Recovery)
 
-	router.GET("/", api.Version)
+	router.GET("/version", api.Version)
 	v1Router := router.Group("/" + v.V1API)
 
 	registerAccount(v1Router)

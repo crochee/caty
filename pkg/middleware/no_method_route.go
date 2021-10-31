@@ -8,7 +8,7 @@ import (
 	"github.com/crochee/lirity/e"
 	"github.com/gin-gonic/gin"
 
-	"cca/pkg/resp"
+	"caty/pkg/resp"
 )
 
 // NoRoute 404

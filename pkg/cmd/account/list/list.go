@@ -9,8 +9,8 @@ import (
 	"github.com/crochee/lirity/table"
 	"github.com/spf13/cobra"
 
-	"cca/pkg/client"
-	"cca/pkg/service/account"
+	"caty/pkg/client"
+	"caty/pkg/service/account"
 )
 
 func NewCmd() *cobra.Command {

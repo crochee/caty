@@ -8,7 +8,7 @@ import (
 	"github.com/crochee/lirity/id"
 	"github.com/gin-gonic/gin"
 
-	"cca/pkg/v"
+	"caty/pkg/v"
 )
 
 // TraceID add trace_id

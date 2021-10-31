@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
-	"cca/pkg/message/mq"
+	"caty/pkg/message/mq"
 )
 
 var router *message.Router
