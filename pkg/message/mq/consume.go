@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/crochee/lib/e"
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/e"
+	"github.com/crochee/lirity/log"
 )
 
 type consumer struct {

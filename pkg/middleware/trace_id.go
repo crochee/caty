@@ -5,7 +5,7 @@
 package middleware
 
 import (
-	"github.com/crochee/lib/id"
+	"github.com/crochee/lirity/id"
 	"github.com/gin-gonic/gin"
 
 	"cca/pkg/v"
@@ -15,7 +15,7 @@ import (
 func TraceID(ctx *gin.Context) {
 	tracedID := ctx.Request.Header.Get(v.XTraceID)
 	if tracedID == "" {
-		tracedID = id.Uuid()
+		tracedID = id.UUID()
 	}
 	ctx.Request.Header.Set(v.XTraceID, tracedID)  // 请求头
 	ctx.Writer.Header().Set(v.XTraceID, tracedID) // 响应头

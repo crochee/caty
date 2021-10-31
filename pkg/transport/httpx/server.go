@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/log"
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"

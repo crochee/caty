@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/log"
 	"github.com/robfig/cron/v3"
 )
 

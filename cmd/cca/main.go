@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/crochee/lib/log"
-	"github.com/crochee/lib/routine"
+	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/routine"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	_ "go.uber.org/automaxprocs"

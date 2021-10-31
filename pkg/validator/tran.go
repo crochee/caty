@@ -4,7 +4,7 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/crochee/lib/e"
+	"github.com/crochee/lirity/e"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"

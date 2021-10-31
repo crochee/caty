@@ -5,13 +5,13 @@ import (
 	"crypto/x509"
 	"errors"
 
-	"github.com/crochee/lib"
+	"github.com/crochee/lirity"
 )
 
 type Config struct {
-	Ca   lib.FileOrContent `json:"ca" yaml:"ca"`
-	Cert lib.FileOrContent `json:"cert" yaml:"cert"`
-	Key  lib.FileOrContent `json:"key" yaml:"key"`
+	Ca   lirity.FileOrContent `json:"ca" yaml:"ca"`
+	Cert lirity.FileOrContent `json:"cert" yaml:"cert"`
+	Key  lirity.FileOrContent `json:"key" yaml:"key"`
 }
 
 // TLSConfig output tls

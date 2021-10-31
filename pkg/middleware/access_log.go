@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crochee/lib/log"
+	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
 
 	"cca/pkg/v"
