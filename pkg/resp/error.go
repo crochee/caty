@@ -63,11 +63,21 @@ func Errors(ctx *gin.Context, err error) {
 	Error(ctx, e.ErrInternalServerError)
 }
 
+// ErrorParam return error  with 404
 func ErrorParam(ctx *gin.Context, err error) {
 	log.FromContext(ctx.Request.Context()).Errorf("parse param failed.%+v", err)
 	ctx.AbortWithStatusJSON(e.ErrInvalidParam.StatusCode(), ResponseCode{
 		Code:   e.ErrInvalidParam.Code(),
 		Msg:    e.ErrInvalidParam.Message(),
 		Result: err.Error(),
+	})
+}
+
+// Abort advance return error
+func Abort(ctx *gin.Context, code e.ErrorCode, msg string) {
+	ctx.AbortWithStatusJSON(code.StatusCode(), ResponseCode{
+		Code:   code.Code(),
+		Msg:    code.Message(),
+		Result: msg,
 	})
 }
