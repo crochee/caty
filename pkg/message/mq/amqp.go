@@ -18,20 +18,20 @@ type Option struct {
 	RoutingKey    string
 }
 
-type rabbitMq struct {
+type Client struct {
 	*amqp.Connection
 	connected uint32
 }
 
 // NewMq create a mq client
-func NewMq(opts ...func(*Option)) (*rabbitMq, error) {
+func NewMq(opts ...func(*Option)) (*Client, error) {
 	option := Option{
 		URI: "amqp://guest:guest@localhost:5672/",
 	}
 	for _, opt := range opts {
 		opt(&option)
 	}
-	r := &rabbitMq{}
+	r := &Client{}
 	var err error
 	if option.Config == nil {
 		r.Connection, err = amqp.Dial(option.URI)
@@ -45,7 +45,7 @@ func NewMq(opts ...func(*Option)) (*rabbitMq, error) {
 	return r, nil
 }
 
-func (r *rabbitMq) IsConnected() bool {
+func (r *Client) IsConnected() bool {
 	return atomic.LoadUint32(&r.connected) == 1
 }
 

@@ -11,17 +11,17 @@ import (
 )
 
 type producer struct {
-	transactional bool
-	mq            *rabbitMq
 	exchange      string
 	routingKey    string
-	wg            sync.WaitGroup
 	marshal       MarshalAPI
+	mq            *Client
 	queueName     func(string) string
+	wg            sync.WaitGroup
+	transactional bool
 }
 
 // NewProducer create message.Publisher
-func NewProducer(mq *rabbitMq, opts ...func(*Option)) message.Publisher {
+func NewProducer(mq *Client, opts ...func(*Option)) message.Publisher {
 	option := Option{
 		Marshal: DefaultMarshal{},
 		QueueName: func(topic string) string {
