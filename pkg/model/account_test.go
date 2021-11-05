@@ -13,7 +13,7 @@ import (
 
 func TestAccount_TableName(t *testing.T) {
 	ctx := context.Background()
-	err := config.LoadConfig("E:/project/caty/conf/caty.yml")
+	err := config.LoadConfig("../../conf/caty.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,6 +1,6 @@
 FROM centos-go:latest as builder
 ARG Project=caty
-ARG URL=https://github.com/crochee/${Project}.git
+ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
 RUN git clone ${URL} &&\
     cd ${Project} &&\
