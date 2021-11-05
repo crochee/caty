@@ -48,7 +48,7 @@ func Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-// Retrieves godoc
+// List godoc
 // swagger:operation GET /v1/account 账户 SAccountRetrievesRequest
 // ---
 // summary: 查询账户
@@ -62,7 +62,7 @@ func Register(ctx *gin.Context) {
 //   default:
 //     type: object
 //     "$ref": "#/responses/SResponseCode"
-func Retrieves(ctx *gin.Context) {
+func List(ctx *gin.Context) {
 	retrieveRequest := &account.RetrievesRequest{
 		Page: *model.DefaultPage(),
 	}
@@ -70,7 +70,7 @@ func Retrieves(ctx *gin.Context) {
 		resp.ErrorParam(ctx, err)
 		return
 	}
-	response, err := account.Retrieves(ctx.Request.Context(), retrieveRequest)
+	response, err := account.List(ctx.Request.Context(), retrieveRequest)
 	if err != nil {
 		resp.Errors(ctx, err)
 		return

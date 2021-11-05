@@ -13,8 +13,8 @@ import (
 )
 
 type URLHandler interface {
-	Url(ctx context.Context, path string) string
-	UrlWithQuery(ctx context.Context, path string, value url.Values) string
+	URL(ctx context.Context, path string) string
+	URLWithQuery(ctx context.Context, path string, value url.Values) string
 	Header(ctx context.Context) http.Header
 }
 
@@ -34,14 +34,14 @@ func (d DefaultIP) Header(ctx context.Context) http.Header {
 	return header
 }
 
-func (d DefaultIP) UrlWithQuery(ctx context.Context, path string, value url.Values) string {
+func (d DefaultIP) URLWithQuery(ctx context.Context, path string, value url.Values) string {
 	if len(value) == 0 {
-		return d.Url(ctx, path)
+		return d.URL(ctx, path)
 	}
-	return d.Url(ctx, path) + "?" + value.Encode()
+	return d.URL(ctx, path) + "?" + value.Encode()
 }
 
-func (d DefaultIP) Url(ctx context.Context, path string) string {
+func (d DefaultIP) URL(ctx context.Context, path string) string {
 	host := v.GetHost(ctx)
 	if host == "" {
 		host = "127.0.0.1:8120"

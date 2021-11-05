@@ -22,6 +22,7 @@ package router
 import (
 	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 
 	"caty/api"
 	"caty/pkg/middleware"
@@ -35,7 +36,14 @@ func New() *gin.Engine {
 	router.NoRoute(middleware.NoRoute)
 	router.NoMethod(middleware.NoMethod)
 
-	router.Use(middleware.TraceID, middleware.RequestLogger(log.NewLogger()), middleware.Log, middleware.Recovery)
+	router.Use(middleware.TraceID,
+		middleware.RequestLogger(log.NewLogger(func(option *log.Option) {
+			option.Path = viper.GetString("path")
+			option.Level = log.JudgeLevel(viper.GetString("level"), gin.Mode())
+		})),
+		middleware.Log,
+		middleware.Recovery,
+	)
 
 	router.GET("/version", api.Version)
 	v1Router := router.Group("/" + v.V1API)

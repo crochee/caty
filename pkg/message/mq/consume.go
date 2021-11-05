@@ -11,14 +11,14 @@ import (
 )
 
 type consumer struct {
-	mq        *rabbitMq
+	mq        *Client
 	wg        sync.WaitGroup
 	marshal   MarshalAPI
 	queueName func(string) string
 }
 
 // NewConsumer create message.Subscriber
-func NewConsumer(mq *rabbitMq, opts ...func(*Option)) message.Subscriber {
+func NewConsumer(mq *Client, opts ...func(*Option)) message.Subscriber {
 	option := Option{
 		Marshal: DefaultMarshal{},
 		QueueName: func(topic string) string {

@@ -40,7 +40,7 @@ func (a *AuthClient) Sign(ctx context.Context, request *auth.TokenClaims) (*auth
 		return nil, err
 	}
 	var req *http.Request
-	if req, err = client.NewRequest(ctx, http.MethodPost, a.Url(ctx, "/v1/auth/sign"),
+	if req, err = client.NewRequest(ctx, http.MethodPost, a.URL(ctx, "/v1/auth/sign"),
 		body, a.Header(ctx)); err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (a *AuthClient) Parse(ctx context.Context, request *auth.APIToken) (*auth.T
 		return nil, err
 	}
 	var req *http.Request
-	if req, err = client.NewRequest(ctx, http.MethodPost, a.Url(ctx, "/v1/auth/parse"),
+	if req, err = client.NewRequest(ctx, http.MethodPost, a.URL(ctx, "/v1/auth/parse"),
 		body, a.Header(ctx)); err != nil {
 		return nil, err
 	}

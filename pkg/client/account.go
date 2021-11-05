@@ -45,7 +45,7 @@ func (a *AccountClient) Register(ctx context.Context,
 		return nil, err
 	}
 	var req *http.Request
-	if req, err = client.NewRequest(ctx, http.MethodPost, a.Url(ctx, "/v1/account"),
+	if req, err = client.NewRequest(ctx, http.MethodPost, a.URL(ctx, "/v1/account"),
 		body, a.Header(ctx)); err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (a *AccountClient) Retrieves(ctx context.Context,
 		params.Add("email", request.Email)
 	}
 
-	req, err := client.NewRequest(ctx, http.MethodGet, a.UrlWithQuery(ctx, "/v1/account", params),
+	req, err := client.NewRequest(ctx, http.MethodGet, a.URLWithQuery(ctx, "/v1/account", params),
 		nil, a.Header(ctx))
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (a *AccountClient) Update(ctx context.Context, user *account.User, request 
 		return err
 	}
 	var req *http.Request
-	if req, err = client.NewRequest(ctx, http.MethodPatch, a.Url(ctx, "/v1/account"+user.ID),
+	if req, err = client.NewRequest(ctx, http.MethodPatch, a.URL(ctx, "/v1/account"+user.ID),
 		body, a.Header(ctx)); err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func (a *AccountClient) Update(ctx context.Context, user *account.User, request 
 }
 
 func (a *AccountClient) Retrieve(ctx context.Context, user *account.User) (*account.RetrieveResponse, error) {
-	req, err := client.NewRequest(ctx, http.MethodGet, a.Url(ctx, "/v1/account"+user.ID), nil, a.Header(ctx))
+	req, err := client.NewRequest(ctx, http.MethodGet, a.URL(ctx, "/v1/account"+user.ID), nil, a.Header(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (a *AccountClient) Retrieve(ctx context.Context, user *account.User) (*acco
 }
 
 func (a *AccountClient) Delete(ctx context.Context, user *account.User) error {
-	req, err := client.NewRequest(ctx, http.MethodDelete, a.Url(ctx, "/v1/account"+user.ID), nil, a.Header(ctx))
+	req, err := client.NewRequest(ctx, http.MethodDelete, a.URL(ctx, "/v1/account"+user.ID), nil, a.Header(ctx))
 	if err != nil {
 		return err
 	}

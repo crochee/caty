@@ -1,11 +1,10 @@
-mode: release
+GIN_MODE: release
 path:
 level: debug
-storage_path: /data/
 mysql:
   user: root
   password: 123456
-  ip: 192.168.1.53
+  ip: 192.168.31.6
   port: 3306
   database: caty
   charset: utf8
@@ -14,4 +13,4 @@ mysql:
   conn_max_lifetime: 500
 etcd:
   url:
-    - "192.168.1.53:2379"
+    - "192.168.31.6:2379"

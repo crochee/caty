@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/crochee/lirity/v"
 	"strconv"
 	"strings"
 	"time"
@@ -227,20 +228,21 @@ type RetrieveResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// Retrieves 查询、获取账户信息
-func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, error) {
+// List 查询、获取账户信息
+func List(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, error) {
 	query := dbx.With(ctx).Model(&model.User{})
-	if request.AccountID != "" {
-		query = query.Where("account_id = ?", request.AccountID)
-	}
 	if request.ID != "" {
 		query = query.Where("id = ?", request.ID)
-	}
-	if request.Account != "" {
-		query = query.Where("name = ?", request.Account)
-	}
-	if request.Email != "" {
-		query = query.Where("email = ?", request.Email)
+	} else {
+		if request.AccountID != "" {
+			query = query.Where("account_id = ?", request.AccountID)
+		}
+		if request.Account != "" {
+			query = query.Where("name = ?", request.Account)
+		}
+		if request.Email != "" {
+			query = query.Where("email = ?", request.Email)
+		}
 	}
 	var userList []*model.User
 	if err := query.Limit(request.Size).Offset((request.Index - 1) * request.Size).Find(&userList).Error; err != nil {
@@ -254,17 +256,17 @@ func Retrieves(ctx context.Context, request *RetrievesRequest) (*RetrieveRespons
 		},
 		Result: make([]*RetrieveResponse, 0, len(userList)),
 	}
-	for _, v := range userList {
+	for _, user := range userList {
 		responses.Result = append(responses.Result, &RetrieveResponse{
-			AccountID:  FormatUint(v.AccountID),
-			Account:    v.Name,
-			UserID:     FormatUint(v.ID),
-			Email:      v.Email,
-			Permission: v.Permission,
-			Verify:     v.Verify,
-			Desc:       v.Desc,
-			CreatedAt:  v.CreatedAt,
-			UpdatedAt:  v.UpdatedAt,
+			AccountID:  FormatUint(user.AccountID),
+			Account:    user.Name,
+			UserID:     FormatUint(user.ID),
+			Email:      user.Email,
+			Permission: user.Permission,
+			Verify:     user.Verify,
+			Desc:       user.Desc,
+			CreatedAt:  user.CreatedAt,
+			UpdatedAt:  user.UpdatedAt,
 		})
 	}
 	return responses, nil
@@ -341,5 +343,5 @@ func ValidPermission(permission string) error {
 }
 
 func FormatUint(data uint64) string {
-	return strconv.FormatUint(data, 10)
+	return strconv.FormatUint(data, v.DecimalSystem)
 }

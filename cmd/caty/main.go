@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/crochee/lirity/log"
@@ -35,11 +36,13 @@ func main() {
 	if err := code.Loading(); err != nil {
 		panic(err)
 	}
-	gin.SetMode(viper.GetString("mode"))
+	if mode := strings.ToLower(viper.GetString("GIN_MODE")); mode != "" {
+		gin.SetMode(mode)
+	}
 	// 初始化系统日志
 	log.InitSystemLogger(func(option *log.Option) {
 		option.Path = viper.GetString("path")
-		option.Level = viper.GetString("level")
+		option.Level = log.JudgeLevel(viper.GetString("level"), gin.Mode())
 	})
 
 	if err := run(); err != nil && !errors.Is(err, http.ErrServerClosed) {

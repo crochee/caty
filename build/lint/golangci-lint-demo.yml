@@ -98,6 +98,7 @@ linters:
     - unused
     - varcheck
     - whitespace
+    - maligned
   #  - gofmt
   # don't enable:
   # - asciicheck
@@ -108,7 +109,6 @@ linters:
   # - godox
   # - goerr113
   # - interfacer
-  # - maligned
   # - nestif
   # - prealloc
   # - testpackage
