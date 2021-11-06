@@ -4,16 +4,14 @@ ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
 # 下载git 修改配置
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories &&\
-    apk add --no-cache ca-certificates git tzdata
+    apk add --no-cache ca-certificates git tzdata dos2unix
 # 设置代理环境变量
 RUN go env -w GOPROXY=https://goproxy.io,https://goproxy.cn,direct &&\
     go env -w GO111MODULE=on
 # 拉去代码
 RUN git clone ${URL}
 # 文件dos->unix
-RUN sed -e 's/.$//' ./${Project}/build/caty/entrypoint.sh > ./entrypoint.sh &&\
-    rm -rf ./${Project}/build/caty/entrypoint.sh &&\
-    mv ./entrypoint.sh ./${Project}/build/caty/entrypoint.sh
+RUN dos2unix  ./${Project}/build/caty/entrypoint.sh
 # 代码编译
 RUN cd ${Project} &&\
     go mod tidy &&\
@@ -33,5 +31,5 @@ RUN chmod +x /usr/local/bin/caty && chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 8120
 STOPSIGNAL 2
 
-ENTRYPOINT ["entrypoint.sh"]
+#ENTRYPOINT ["entrypoint.sh"]
 CMD ["caty"]
