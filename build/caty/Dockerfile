@@ -17,7 +17,7 @@ RUN sed -e 's/.$//' ./${Project}/build/caty/entrypoint.sh > ./entrypoint.sh &&\
 # 代码编译
 RUN cd ${Project} &&\
     go mod tidy &&\
-    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -gcflags="all=-trimpath=/opt/cloud/${Project}" -asmflags="all=-trimpath=/opt/cloud/${Project}" -o ${Project} -tags jsoniter ./cmd/${Project}
+    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ${Project} -tags jsoniter ./cmd/${Project}
 
 FROM alpine:latest as runner
 ARG Project=/opt/cloud/caty

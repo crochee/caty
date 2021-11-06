@@ -1,4 +1,4 @@
-GIN_MODE: release
+GIN_MODE: debug
 path:
 level: debug
 mysql:
