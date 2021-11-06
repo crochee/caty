@@ -48,3 +48,5 @@ EXPOSE 8120
 STOPSIGNAL 2
 
 ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["caty"]
