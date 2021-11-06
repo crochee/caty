@@ -62,18 +62,18 @@ func do(cmd *cobra.Command, _ []string) error {
 		}))
 	}
 	var response *account.RetrieveResponses
-	if response, err = client.New(client.AccountService).Retrieves(ctx, opt); err != nil {
+	if response, err = client.New(client.AccountService).List(ctx, opt); err != nil {
 		return err
 	}
 	listMap := make([]map[string]interface{}, len(response.Result))
 	for index, value := range response.Result {
-		listMap[index] = lirity.Struct2Map(value)
+		listMap[index] = lirity.Struct2MapTag(value, "")
 	}
 	fields := []string{
-		"Verify",
+		"UserID",
 		"AccountID",
 		"Account",
-		"UserID",
+		"Verify",
 		"Email",
 		"Permission",
 		"Desc",

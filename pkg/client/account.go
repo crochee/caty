@@ -18,7 +18,7 @@ import (
 
 type Account interface {
 	Register(ctx context.Context, request *account.CreateRequest) (*account.CreateResponseResult, error)
-	Retrieves(ctx context.Context, request *account.RetrievesRequest) (*account.RetrieveResponses, error)
+	List(ctx context.Context, request *account.RetrievesRequest) (*account.RetrieveResponses, error)
 	Update(ctx context.Context, user *account.User, request *account.UpdateRequest) error
 	Retrieve(ctx context.Context, user *account.User) (*account.RetrieveResponse, error)
 	Delete(ctx context.Context, user *account.User) error
@@ -68,7 +68,7 @@ func (a *AccountClient) Register(ctx context.Context,
 	return &result, nil
 }
 
-func (a *AccountClient) Retrieves(ctx context.Context,
+func (a *AccountClient) List(ctx context.Context,
 	request *account.RetrievesRequest) (*account.RetrieveResponses, error) {
 	params := url.Values{}
 	if request.AccountID != "" {
@@ -114,7 +114,7 @@ func (a *AccountClient) Update(ctx context.Context, user *account.User, request 
 		return err
 	}
 	var req *http.Request
-	if req, err = client.NewRequest(ctx, http.MethodPatch, a.URL(ctx, "/v1/account"+user.ID),
+	if req, err = client.NewRequest(ctx, http.MethodPatch, a.URL(ctx, "/v1/account/"+user.ID),
 		body, a.Header(ctx)); err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func (a *AccountClient) Update(ctx context.Context, user *account.User, request 
 }
 
 func (a *AccountClient) Retrieve(ctx context.Context, user *account.User) (*account.RetrieveResponse, error) {
-	req, err := client.NewRequest(ctx, http.MethodGet, a.URL(ctx, "/v1/account"+user.ID), nil, a.Header(ctx))
+	req, err := client.NewRequest(ctx, http.MethodGet, a.URL(ctx, "/v1/account/"+user.ID), nil, a.Header(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (a *AccountClient) Retrieve(ctx context.Context, user *account.User) (*acco
 }
 
 func (a *AccountClient) Delete(ctx context.Context, user *account.User) error {
-	req, err := client.NewRequest(ctx, http.MethodDelete, a.URL(ctx, "/v1/account"+user.ID), nil, a.Header(ctx))
+	req, err := client.NewRequest(ctx, http.MethodDelete, a.URL(ctx, "/v1/account/"+user.ID), nil, a.Header(ctx))
 	if err != nil {
 		return err
 	}
