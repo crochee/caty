@@ -2,8 +2,10 @@ FROM golang:1.17.1-alpine as builder
 ARG Project=caty
 ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
+# 下载git
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
-  apk add --no-cache git
+  apk add --no-cache git \
+# 设置代理环境变量
 RUN go env -w GOPROXY=https://goproxy.io,direct &&\
     go env -w GO111MODULE=on
 # 拉去代码
