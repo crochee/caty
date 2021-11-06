@@ -1,5 +1,5 @@
 #!/bin/sh
-
+# alpine不支持bash
 set -ex
 
 # docker build --no-cache -t caty .
