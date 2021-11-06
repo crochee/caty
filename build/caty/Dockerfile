@@ -50,5 +50,5 @@ RUN chmod -R ug=r,o-rwx ${WorkDir}/conf
 EXPOSE 8120
 STOPSIGNAL 2
 
-#ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["caty"]

@@ -12,7 +12,6 @@ fi
 # allow the container to be started with `--user`
 if [ "$(id -u)" = "0" ]; then
 	echo "switch to user 'dev'"
-	find . \! -user dev -exec chown dev '{}' +
 	exec gosu dev "$BASH_SOURCE" "$@"
 fi
 
