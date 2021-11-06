@@ -45,10 +45,11 @@ RUN chown -R  dev:cloud ${WorkDir}
 # 日志文件夹0744
 RUN chmod u=rwx,g=r,o=r ${WorkDir}/log
 # 配置文件目录和文件0440,只有读权限
-RUN chmod -R ug=r,o-rwx ${WorkDir}/conf
+RUN chown -R  dev:cloud ${WorkDir}/conf &&\
+    chmod -R +r ${WorkDir}/conf
 
 EXPOSE 8120
 STOPSIGNAL 2
 
-ENTRYPOINT ["entrypoint.sh"]
+#ENTRYPOINT ["entrypoint.sh"]
 CMD ["caty"]
