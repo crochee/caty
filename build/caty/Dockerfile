@@ -27,11 +27,11 @@ COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder ${Project}/caty .
 COPY --from=builder ${Project}/conf ./conf
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder ${Project}/build/caty/entrypoint.sh .
-RUN chmod +x ./caty && chmod +x ./entrypoint.sh
+COPY --from=builder ${Project}/build/caty/entrypoint.sh /usr/local/bin/
+RUN chmod +x ./caty && chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 8120
 STOPSIGNAL 2
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["./caty"]
