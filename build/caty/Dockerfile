@@ -1,11 +1,11 @@
-FROM golang:1.17.1-alpine as builder
+FROM centos-go:latest as builder
 ARG Project=caty
 ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
 RUN git clone ${URL} &&\
     cd ${Project} &&\
     go mod tidy &&\
-    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o caty -tags jsoniter ./cmd/${Project}
+    GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -gcflags="all=-trimpath=${PWD}" -asmflags="all=-trimpath=${PWD}" -o ${Project} -tags jsoniter ./cmd/${Project}
 
 FROM busybox:latest as runner
 ARG Project=/opt/cloud/caty
