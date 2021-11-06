@@ -14,7 +14,7 @@ fi
 # If container is started as root user, restart as dedicated dev user
 # allow the container to be started with `--user`
 if [ "$(id -u)" = '0' ]; then
-	find . \! -user dev -exec chown dev '{}' +
+	#find . \! -user dev -exec chown dev '{}' +
 	echo "switch to user 'dev'"
 	exec gosu dev "$0" "$@"
 fi
