@@ -32,23 +32,23 @@ WORKDIR ${WorkDir}
 RUN addgroup -g 10000 cloud && adduser -g cloud dev -u 5000 -D -H
 # 预创建文件夹
 RUN mkdir -p ${WorkDir}/conf ${WorkDir}/log
-# 将工作目录加入用户组
-RUN chown -R  dev:cloud ${WorkDir}
-# 日志文件夹0744
-RUN chmod u=rwx,g=r,o=r ${WorkDir}/log
-
+# 资源拷贝
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /opt/cloud/gosu /usr/local/bin/
 COPY --from=builder /opt/cloud/out/caty /usr/local/bin/
 COPY --from=builder /opt/cloud/entrypoint.sh /usr/local/bin/
-COPY --from=builder --chown=dev:cloud /opt/cloud/conf ${WorkDir}/conf
+COPY --from=builder /opt/cloud/conf ${WorkDir}/conf
 # 赋予执行权限
 RUN chmod +x /usr/local/bin/caty /usr/local/bin/entrypoint.sh /usr/local/bin/gosu
+# 将工作目录加入用户组
+RUN chown -R  dev:cloud ${WorkDir}
+# 日志文件夹0744
+RUN chmod u=rwx,g=r,o=r ${WorkDir}/log
 # 配置文件目录和文件0440,只有读权限
 RUN chmod -R ug=r,o-rwx ${WorkDir}/conf
 
 EXPOSE 8120
 STOPSIGNAL 2
 
-ENTRYPOINT ["entrypoint.sh"]
+#ENTRYPOINT ["entrypoint.sh"]
 CMD ["caty"]

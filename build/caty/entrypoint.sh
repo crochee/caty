@@ -13,7 +13,7 @@ fi
 if [ "$(id -u)" = "0" ]; then
 	echo "switch to user 'dev'"
 	find . \! -user dev -exec chown dev '{}' +
-	exec gosu dev "$0" "$@"
+	exec gosu dev "$BASH_SOURCE" "$@"
 fi
 
 exec "$@"
