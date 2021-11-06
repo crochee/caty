@@ -21,8 +21,7 @@ RUN cd ${Project} &&\
     cp ${GOPATH}/bin/gosu ./ &&\
     gosu --version &&\
     gosu nobody true
-# 下载gosu
-RUN https://github.com/tianon/gosu
+
 FROM alpine:latest as runner
 ARG Project=/opt/cloud/caty
 WORKDIR ${Project}
