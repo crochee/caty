@@ -2,7 +2,7 @@ FROM golang:1.17.1-alpine as builder
 ARG Project=caty
 ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
-# 下载git 修改配置提交时换行转换为LF，检出时不转换
+# 下载git 修改配置
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories &&\
     apk add --no-cache ca-certificates git tzdata
 # 设置代理环境变量
@@ -19,19 +19,19 @@ RUN cd ${Project} &&\
     go mod tidy &&\
     GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -gcflags="all=-trimpath=${PWD}" -asmflags="all=-trimpath=${PWD}" -o ${Project} -tags jsoniter ./cmd/${Project}
 
-FROM alpine:latest as runner
+FROM centos:latest as runner
 ARG Project=/opt/cloud/caty
 WORKDIR ${Project}
 RUN mkdir -p ${Project}/conf
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=builder ${Project}/caty .
+COPY --from=builder ${Project}/caty /usr/local/bin/
 COPY --from=builder ${Project}/conf ./conf
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder ${Project}/build/caty/entrypoint.sh /usr/local/bin/
-RUN chmod +x ./caty && chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/caty && chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 8120
 STOPSIGNAL 2
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["./caty"]
+CMD ["caty"]
