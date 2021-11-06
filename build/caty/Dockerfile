@@ -1,13 +1,18 @@
-FROM centos-go:latest as builder
+FROM golang:1.17.1-alpine as builder
 ARG Project=caty
 ARG URL=https://gitee.com/crochee/${Project}.git
 WORKDIR /opt/cloud
-RUN git clone ${URL} &&\
-    cd ${Project} &&\
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+  apk add --no-cache git
+RUN go env -w GOPROXY=https://goproxy.io,direct &&\
+    go env -w GO111MODULE=on
+# 拉去代码
+RUN git clone ${URL}
+# 代码编译
+RUN cd ${Project} &&\
     go mod tidy &&\
     GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -gcflags="all=-trimpath=${PWD}" -asmflags="all=-trimpath=${PWD}" -o ${Project} -tags jsoniter ./cmd/${Project}
-
-FROM busybox:latest as runner
+FROM alpine:latest as runner
 ARG Project=/opt/cloud/caty
 WORKDIR ${Project}
 RUN mkdir -p ${Project}/conf
