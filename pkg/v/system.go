@@ -11,4 +11,8 @@ const (
 	XTraceID = "X-Trace-Id"
 
 	V1API = "v1"
+
+	DefaultPageIndex = 1
+	DefaultPageSize  = 20
+	PageAll          = -1
 )

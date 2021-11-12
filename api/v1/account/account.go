@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"caty/pkg/model"
 	"caty/pkg/resp"
 	"caty/pkg/service/account"
 )
@@ -63,9 +62,7 @@ func Register(ctx *gin.Context) {
 //     type: object
 //     "$ref": "#/responses/SResponseCode"
 func List(ctx *gin.Context) {
-	retrieveRequest := &account.RetrievesRequest{
-		Page: *model.DefaultPage(),
-	}
+	retrieveRequest := &account.RetrievesRequest{}
 	if err := ctx.BindQuery(retrieveRequest); err != nil {
 		resp.ErrorParam(ctx, err)
 		return
