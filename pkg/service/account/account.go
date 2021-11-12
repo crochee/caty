@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/crochee/lirity/v"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +21,7 @@ import (
 	"caty/pkg/dbx"
 	"caty/pkg/model"
 	"caty/pkg/service/auth"
+	"github.com/crochee/lirity/variable"
 )
 
 type CreateRequest struct {
@@ -244,8 +244,9 @@ func List(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, e
 			query = query.Where("email = ?", request.Email)
 		}
 	}
+	query = model.HandlePage(query, request.Page)
 	var userList []*model.User
-	if err := query.Limit(request.Size).Offset((request.Index - 1) * request.Size).Find(&userList).Error; err != nil {
+	if err := query.Find(&userList).Error; err != nil {
 		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, code.ErrRetrieveAccount)
 	}
 	responses := &RetrieveResponses{
@@ -343,5 +344,5 @@ func ValidPermission(permission string) error {
 }
 
 func FormatUint(data uint64) string {
-	return strconv.FormatUint(data, v.DecimalSystem)
+	return strconv.FormatUint(data, variable.DecimalSystem)
 }
