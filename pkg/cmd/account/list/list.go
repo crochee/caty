@@ -67,7 +67,7 @@ func do(cmd *cobra.Command, _ []string) error {
 	}
 	listMap := make([]map[string]interface{}, len(response.Result))
 	for index, value := range response.Result {
-		listMap[index] = lirity.Struct2MapTag(value, "")
+		listMap[index] = lirity.Struct2MapWithTag(value, "")
 	}
 	fields := []string{
 		"UserID",

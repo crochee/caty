@@ -39,7 +39,7 @@ func do(cmd *cobra.Command, args []string) error {
 	if detail, err = client.New(client.AccountService).Retrieve(ctx, &account.User{ID: args[0]}); err != nil {
 		return err
 	}
-	struct2Map := lirity.Struct2MapTag(detail, "")
+	struct2Map := lirity.Struct2MapWithTag(detail, "")
 	fields := []string{
 		"UserID",
 		"AccountID",
