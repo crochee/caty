@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"strings"
@@ -29,6 +30,30 @@ func TestStringName(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("%s", data)
+	if data, err = json.Marshal(&TestString{
+		ID: 787446465166,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%s", data)
+	var t1 TestString
+	originData := []byte(`{"id":"","pid":0,"PartID":""}`)
+	if err = jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(originData, &t1); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%v", t1)
+	var t2 TestString
+	originData = []byte(`{"id":"787446465166","pid":0,"PartID":""}`)
+	if err = jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(originData, &t2); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%v", t2)
+	var t3 TestString
+	originData = []byte(`{"id":"787446465166","pid":0,"PartID":"0"}`)
+	if err = jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(originData, &t3); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%v", t3)
 }
 
 type u64AsStringCodec struct {
@@ -52,6 +77,11 @@ func (extension *u64AsStringCodec) UpdateStructDescriptor(structDescriptor *json
 							stream.Write([]byte(strconv.FormatUint(val, 10)))
 						}
 					}}
+					binding.Decoder = &funcDecoder{func(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+						if iter.WhatIsNext() != jsoniter.StringValue {
+							*((*uint64)(ptr)) = iter.ReadUint64()
+						}
+					}}
 					break
 				}
 			}
@@ -73,4 +103,12 @@ func (encoder *funcEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 		return false
 	}
 	return encoder.isEmptyFunc(ptr)
+}
+
+type funcDecoder struct {
+	fun jsoniter.DecoderFunc
+}
+
+func (decoder *funcDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	decoder.fun(ptr, iter)
 }
