@@ -1,59 +1,16 @@
-package internal
+package extension
 
 import (
-	"encoding/json"
 	"reflect"
 	"strconv"
 	"strings"
-	"testing"
 	"unsafe"
 
 	"github.com/json-iterator/go"
 )
 
-type TestString struct {
-	ID     uint64 `json:"id,string"`
-	PID    uint64 `json:"pid"`
-	PartID uint64 `json:",string"`
-}
-
-func TestStringName(t *testing.T) {
+func init() {
 	jsoniter.ConfigCompatibleWithStandardLibrary.RegisterExtension(&u64AsStringCodec{})
-	data, err := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(&TestString{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%s", data)
-	if data, err = jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(&TestString{
-		ID: 787446465166,
-	}); err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%s", data)
-	if data, err = json.Marshal(&TestString{
-		ID: 787446465166,
-	}); err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%s", data)
-	var t1 TestString
-	originData := []byte(`{"id":"","pid":0,"PartID":""}`)
-	if err = jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(originData, &t1); err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%v", t1)
-	var t2 TestString
-	originData = []byte(`{"id":"787446465166","pid":0,"PartID":""}`)
-	if err = jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(originData, &t2); err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%v", t2)
-	var t3 TestString
-	originData = []byte(`{"id":"787446465166","pid":0,"PartID":"0"}`)
-	if err = jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal(originData, &t3); err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%v", t3)
 }
 
 type u64AsStringCodec struct {
@@ -72,9 +29,9 @@ func (extension *u64AsStringCodec) UpdateStructDescriptor(structDescriptor *json
 					binding.Encoder = &funcEncoder{fun: func(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 						val := *((*uint64)(ptr))
 						if val == 0 {
-							stream.Write([]byte(nil))
+							_, _ = stream.Write([]byte(nil))
 						} else {
-							stream.Write([]byte(strconv.FormatUint(val, 10)))
+							_, _ = stream.Write([]byte(strconv.FormatUint(val, 10)))
 						}
 					}}
 					binding.Decoder = &funcDecoder{func(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
