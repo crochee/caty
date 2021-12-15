@@ -9,6 +9,16 @@ import (
 	"github.com/crochee/lirity/routine"
 )
 
+type ManagerExecutor interface {
+	Register(executors ...Executor) error
+	Run(name string) error
+}
+
+type Executor interface {
+	SafeCopy() Executor
+	Run(ctx context.Context, data []byte) error
+}
+
 type Manager struct {
 	model map[string]Executor
 }
@@ -47,18 +57,13 @@ func (m *Manager) Run(name string) error {
 	if !ok {
 		return fmt.Errorf("must register model %s", name)
 	}
-	return v.Copy().Run(context.Background(), nil)
-}
-
-type Executor interface {
-	Copy() Executor
-	Run(ctx context.Context, data []byte) error
+	return v.SafeCopy().Run(context.Background(), nil)
 }
 
 type test struct {
 }
 
-func (t test) Copy() Executor {
+func (t test) SafeCopy() Executor {
 	return t
 }
 
@@ -71,7 +76,7 @@ type test1 struct {
 	i uint
 }
 
-func (t *test1) Copy() Executor {
+func (t *test1) SafeCopy() Executor {
 	tmp := *t
 	return &tmp
 }
@@ -87,10 +92,10 @@ type multiTest struct {
 	list []Executor
 }
 
-func (m *multiTest) Copy() Executor {
+func (m *multiTest) SafeCopy() Executor {
 	tmp := &multiTest{list: make([]Executor, 0, len(m.list))}
 	for _, e := range m.list {
-		tmp.list = append(tmp.list, e.Copy())
+		tmp.list = append(tmp.list, e.SafeCopy())
 	}
 	return tmp
 }
