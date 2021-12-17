@@ -117,3 +117,9 @@ echo "${id}"
 #rabbitmqctl stop
 ##在一个正常的节点上移除有问题的节点
 #rabbitmqctl  -n rabbit@rabbit1 forget_cluster_node rabbit@rabbit2
+
+#Stats in management UI are disabled on this node
+#docker exec -it adc292b90f88 /bin/bash
+#cd /etc/rabbitmq/conf.d/
+#/etc/rabbitmq/conf.d# echo management_agent.disable_metrics_collector = false > management_agent.disable_metrics_collector.conf
+#docker restart adc292b90f88
