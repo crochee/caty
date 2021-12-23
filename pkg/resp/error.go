@@ -1,8 +1,12 @@
 package resp
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/spf13/afero/mem"
+	"net/http"
+	"strings"
 
 	"github.com/crochee/lirity/e"
 	"github.com/crochee/lirity/log"
@@ -80,4 +84,27 @@ func Abort(ctx *gin.Context, code e.ErrorCode, msg string) {
 		Msg:    code.Message(),
 		Result: msg,
 	})
+}
+
+func Success(ctx *gin.Context, data ...interface{}) {
+	if len(data) == 0 || data[0] == nil {
+		ctx.Status(http.StatusNoContent)
+		return
+	}
+	accept := ctx.Request.Header.Get("Accept")
+	if strings.Contains(accept, "text/csv") && len(data) >= 2 {
+		columnName, ok := data[1].(string)
+		if !ok {
+			columnName = "分布式服务"
+		}
+		file := mem.NewFileHandle(mem.CreateFile(columnName))
+		err := json.NewEncoder(file).Encode(data[0])
+		if err != nil {
+			Errors(ctx, err)
+			return
+		}
+		ctx.Render(http.StatusOK, NewCsvRender(file, ctx.Request))
+		return
+	}
+	ctx.JSON(http.StatusOK, data[0])
 }
