@@ -14,10 +14,15 @@ import (
 type Option struct {
 	TagName    string
 	FieldNames []string
+	Writer     io.Writer
 }
 
 func NewMarshal(opts ...func(*Option)) *marshal {
-	option := Option{TagName: "csv", FieldNames: []string{"Result", "List"}}
+	option := Option{
+		TagName:    "csv",
+		FieldNames: []string{"Result", "List"},
+		Writer:     os.Stdout,
+	}
 	for _, opt := range opts {
 		opt(&option)
 	}
@@ -25,7 +30,7 @@ func NewMarshal(opts ...func(*Option)) *marshal {
 		fieldNames: option.FieldNames,
 		expose:     expose{},
 		parser:     &parse{tagName: option.TagName},
-		w:          os.Stdout,
+		w:          option.Writer,
 	}
 }
 
@@ -36,41 +41,50 @@ type marshal struct {
 	w          io.Writer
 }
 
-func (m *marshal) NewEncoder(w io.Writer) {
-	m.w = w
-}
-
 func (m *marshal) Encode(obj interface{}) error {
 	value, err := m.expose.GetStruct(obj, m.fieldNames...)
 	if err != nil {
 		return err
 	}
-	var data []map[string]interface{}
-	if data, err = m.parser.Parse(value); err != nil {
+	var data []*mapIndexValue
+	if data, err = m.parser.parse(value); err != nil {
 		return err
 	}
 	if len(data) == 0 {
 		return nil
 	}
-	headerStrings := make([]string, 0, len(data[0]))
-	for key := range data[0] {
-		headerStrings = append(headerStrings, key)
+	headers := make([]*indexValue, 0, 4)
+	for _, v := range data {
+		for _, indexKey := range v.index {
+			var ignore bool
+			for _, header := range headers {
+				if indexKey.key == header.key {
+					ignore = true
+					break
+				}
+			}
+			if !ignore {
+				headers = append(headers, &indexValue{
+					key:   indexKey.key,
+					index: indexKey.index,
+				})
+			}
+		}
 	}
-	sort.Strings(headerStrings)
-	header := make(table.Row, 0, len(headerStrings))
-	for _, headerValue := range headerStrings {
-		header = append(header, headerValue)
+	sort.Sort(indexValueList(headers))
+	header := make(table.Row, 0, len(data[0].index))
+	for _, key := range headers {
+		header = append(header, key.key)
 	}
 
 	rows := make([]table.Row, len(data))
 	for i, d := range data {
-		row := make(table.Row, len(headerStrings))
-		for k, v := range d {
-			index := indexOf(headerStrings, k)
-			if index == -1 {
-				continue
+		row := make(table.Row, len(headers))
+		for index, key := range headers {
+			v, found := d.data[key.key]
+			if found {
+				row[index] = text.WrapHard(toString(v), DefaultTransverseStringLength)
 			}
-			row[index] = text.WrapHard(toString(v), DefaultTransverseStringLength)
 		}
 		rows[i] = row
 	}
@@ -86,15 +100,6 @@ func (m *marshal) Encode(obj interface{}) error {
 const (
 	DefaultTransverseStringLength = 64
 )
-
-func indexOf(list []string, target string) int {
-	for i, v := range list {
-		if v == target {
-			return i
-		}
-	}
-	return -1
-}
 
 func toString(d interface{}) string {
 	switch d.(type) {

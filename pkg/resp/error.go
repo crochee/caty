@@ -1,16 +1,14 @@
 package resp
 
 import (
-	"encoding/json"
+	"caty/pkg/csv"
 	"errors"
 	"fmt"
-	"github.com/spf13/afero/mem"
-	"net/http"
-	"strings"
-
 	"github.com/crochee/lirity/e"
 	"github.com/crochee/lirity/log"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/afero/mem"
+	"net/http"
 )
 
 type ResponseCode struct {
@@ -92,17 +90,20 @@ func Success(ctx *gin.Context, data ...interface{}) {
 		return
 	}
 	accept := ctx.Request.Header.Get("Accept")
-	if strings.Contains(accept, "text/csv") && len(data) >= 2 {
+	if accept == "text/csv" && len(data) >= 2 {
 		columnName, ok := data[1].(string)
 		if !ok {
 			columnName = "分布式服务"
 		}
 		file := mem.NewFileHandle(mem.CreateFile(columnName))
-		err := json.NewEncoder(file).Encode(data[0])
+		err := csv.NewMarshal(func(option *csv.Option) {
+			option.Writer = file
+		}).Encode(data[0])
 		if err != nil {
 			Errors(ctx, err)
 			return
 		}
+		_ = file.Sync()
 		ctx.Render(http.StatusOK, NewCsvRender(file, ctx.Request))
 		return
 	}
