@@ -1,13 +1,12 @@
 package csv
 
 import (
+	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
 	"sort"
 
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/json-iterator/go"
 )
 
@@ -72,41 +71,50 @@ func (m *marshal) Encode(obj interface{}) error {
 		}
 	}
 	sort.Sort(indexValueList(headers))
-	header := make(table.Row, 0, len(data[0].index))
+
+	if _, err = m.w.Write([]byte("\xEF\xBB\xBF")); err != nil { // 写入UTF-8 BOM，防止中文乱码
+		return err
+	}
+	w := csv.NewWriter(m.w)
+
+	header := make([]string, 0, len(headers))
 	for _, key := range headers {
 		header = append(header, key.key)
 	}
+	if err = w.Write(header); err != nil {
+		return err
+	}
 
-	rows := make([]table.Row, len(data))
+	rows := make([][]string, len(data))
 	for i, d := range data {
-		row := make(table.Row, len(headers))
-		for index, key := range headers {
-			v, found := d.data[key.key]
+		row := make([]string, len(header))
+		for index, key := range header {
+			v, found := d.data[key]
 			if found {
-				row[index] = text.WrapHard(toString(v), DefaultTransverseStringLength)
+				row[index] = toString(v)
 			}
 		}
 		rows[i] = row
 	}
-
-	t := table.NewWriter()
-	t.SetOutputMirror(m.w)
-	t.AppendHeader(header)
-	t.AppendRows(rows)
-	t.RenderCSV()
-	return nil
+	return w.WriteAll(rows)
 }
 
-const (
-	DefaultTransverseStringLength = 64
-)
-
 func toString(d interface{}) string {
-	switch d.(type) {
-	case bool, *bool:
-		return fmt.Sprintf("%t", d)
-	case string, *string:
-		return fmt.Sprintf("%s", d)
+	switch v := d.(type) {
+	case bool:
+		if v {
+			return "true"
+		}
+		return "false"
+	case *bool:
+		if *v {
+			return "true"
+		}
+		return "false"
+	case string:
+		return v
+	case *string:
+		return *v
 	case int, *int, int64, *int64:
 		return fmt.Sprintf("%d", d)
 	default:
