@@ -1,8 +1,12 @@
 package resp
 
 import (
+	"context"
+	"encoding/base64"
+	"github.com/minio/minio-go/v7"
 	"io"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -58,4 +62,24 @@ func testContent(ctx *gin.Context) {
 			},
 		},
 	}, "分布式网络")
+}
+
+func TestName(t *testing.T) {
+	data := []byte{
+		131, 164, 78, 97, 109, 101, 163, 108, 99, 102, 167, 67, 114, 101, 97, 116, 101, 100, 199, 12, 5, 0, 0, 0, 0, 97, 204, 82, 41, 30, 113, 93, 58, 176, 80, 111, 108, 105, 99, 121, 67, 111, 110, 102, 105, 103, 74, 83, 79, 78, 196, 0,
+	}
+	t.Logf("%s", data)
+	ur := "op/lio/p.log"
+	temp := url.QueryEscape(ur)
+	t.Log(temp)
+	t.Log(base64.URLEncoding.EncodeToString([]byte(temp)))
+	c, err := minio.New("", &minio.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := context.Background()
+	t.Log(c.MakeBucket(ctx, "", minio.MakeBucketOptions{
+		Region:        "",
+		ObjectLocking: false,
+	}))
 }
