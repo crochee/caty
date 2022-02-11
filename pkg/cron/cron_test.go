@@ -9,14 +9,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
+	"go.uber.org/zap"
 
 	"caty/config"
 )
 
 func TestCronSetup(t *testing.T) {
 	config.LoadConfig("../conf/caty.yml")
-	log.InitSystemLogger()
+	zap.ReplaceGlobals(logger.New())
 	Setup()
 	// 0 0/5 * * * ?
 	id, err := timeCron.AddFunc("*/20 */30 * * * *", func() {

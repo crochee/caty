@@ -13,10 +13,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/crochee/lirity/log"
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 
 	"caty/internal/host"
 	"caty/pkg/etcdx"
@@ -66,7 +66,7 @@ func NewServer(ctx context.Context) (*HTTPServer, error) {
 		Key:  "server-key.pem",
 	}); err != nil {
 		uri.Scheme = "http"
-		log.Warn(err.Error())
+		zap.L().Warn(err.Error())
 	}
 	srv.Server.TLSConfig = cfg
 	srv.Server.Addr = uri.Host

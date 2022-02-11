@@ -15,7 +15,7 @@ import (
 func TraceID(ctx *gin.Context) {
 	tracedID := ctx.Request.Header.Get(v.XTraceID)
 	if tracedID == "" {
-		tracedID = id.UUID()
+		tracedID = id.UV4()
 	}
 	ctx.Request.Header.Set(v.XTraceID, tracedID)  // 请求头
 	ctx.Writer.Header().Set(v.XTraceID, tracedID) // 响应头

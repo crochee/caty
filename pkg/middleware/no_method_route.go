@@ -7,16 +7,14 @@ package middleware
 import (
 	"github.com/crochee/lirity/e"
 	"github.com/gin-gonic/gin"
-
-	"caty/pkg/resp"
 )
 
 // NoRoute 404
 func NoRoute(ctx *gin.Context) {
-	resp.Error(ctx, e.ErrNotFound)
+	e.GinErrorCode(ctx, e.ErrNotFound)
 }
 
 // NoMethod 405
 func NoMethod(ctx *gin.Context) {
-	resp.Error(ctx, e.ErrMethodNotAllow)
+	e.GinErrorCode(ctx, e.ErrNotAllowMethod)
 }

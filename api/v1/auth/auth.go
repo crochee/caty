@@ -6,10 +6,10 @@ package auth
 import (
 	"net/http"
 
+	"github.com/crochee/lirity/e"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"caty/pkg/resp"
 	"caty/pkg/service/auth"
 )
 
@@ -32,12 +32,12 @@ import (
 func Sign(ctx *gin.Context) {
 	var request auth.TokenClaims
 	if err := ctx.ShouldBindBodyWith(&request, binding.JSON); err != nil {
-		resp.ErrorParam(ctx, err)
+		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	token, err := auth.Create(ctx.Request.Context(), &request)
 	if err != nil {
-		resp.Errors(ctx, err)
+		e.GinError(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, token)
@@ -62,12 +62,12 @@ func Sign(ctx *gin.Context) {
 func Parse(ctx *gin.Context) {
 	var apiToken auth.APIToken
 	if err := ctx.ShouldBindBodyWith(&apiToken, binding.JSON); err != nil {
-		resp.ErrorParam(ctx, err)
+		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	token, err := auth.Parse(ctx.Request.Context(), &apiToken)
 	if err != nil {
-		resp.Errors(ctx, err)
+		e.GinError(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, token)

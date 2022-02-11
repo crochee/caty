@@ -5,7 +5,7 @@ package show
 
 import (
 	"github.com/crochee/lirity"
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
 	"github.com/crochee/lirity/table"
 	"github.com/spf13/cobra"
 
@@ -31,9 +31,7 @@ func do(cmd *cobra.Command, args []string) error {
 	}
 	ctx := cmd.Context()
 	if debug {
-		ctx = log.WithContext(ctx, log.NewLogger(func(option *log.Option) {
-			option.Level = log.DEBUG
-		}))
+		ctx = logger.With(ctx, logger.New(logger.WithLevel(logger.DEBUG)))
 	}
 	var detail *account.RetrieveResponse
 	if detail, err = client.New(client.AccountService).Retrieve(ctx, &account.User{ID: args[0]}); err != nil {

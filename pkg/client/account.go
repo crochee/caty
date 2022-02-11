@@ -5,14 +5,13 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 
 	"github.com/crochee/lirity/client"
+	"github.com/crochee/lirity/e"
 	"github.com/json-iterator/go"
 
-	"caty/pkg/resp"
 	"caty/pkg/service/account"
 )
 
@@ -55,11 +54,7 @@ func (a *AccountClient) Register(ctx context.Context,
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		var result resp.ResponseCode
-		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
-		}
-		return nil, &result
+		return nil, e.From(response)
 	}
 	var result account.CreateResponseResult
 	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
@@ -95,11 +90,7 @@ func (a *AccountClient) List(ctx context.Context,
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		var result resp.ResponseCode
-		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
-		}
-		return nil, &result
+		return nil, e.From(response)
 	}
 	var result account.RetrieveResponses
 	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
@@ -126,11 +117,7 @@ func (a *AccountClient) Update(ctx context.Context, user *account.User, request 
 	if response.StatusCode == http.StatusNoContent {
 		return nil
 	}
-	var result resp.ResponseCode
-	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-		return err
-	}
-	return &result
+	return e.From(response)
 }
 
 func (a *AccountClient) Retrieve(ctx context.Context, user *account.User) (*account.RetrieveResponse, error) {
@@ -144,11 +131,7 @@ func (a *AccountClient) Retrieve(ctx context.Context, user *account.User) (*acco
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		var result resp.ResponseCode
-		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
-		}
-		return nil, &result
+		return nil, e.From(response)
 	}
 	var result account.RetrieveResponse
 	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
@@ -170,9 +153,5 @@ func (a *AccountClient) Delete(ctx context.Context, user *account.User) error {
 	if response.StatusCode == http.StatusNoContent {
 		return nil
 	}
-	var result resp.ResponseCode
-	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-		return err
-	}
-	return &result
+	return e.From(response)
 }
