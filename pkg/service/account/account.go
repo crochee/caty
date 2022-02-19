@@ -6,7 +6,6 @@ package account
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -15,13 +14,14 @@ import (
 	"github.com/crochee/lirity"
 	"github.com/crochee/lirity/db"
 	"github.com/crochee/lirity/e"
+	"github.com/crochee/lirity/variable"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"caty/pkg/code"
 	"caty/pkg/dbx"
 	"caty/pkg/model"
 	"caty/pkg/service/auth"
-	"github.com/crochee/lirity/variable"
 )
 
 type CreateRequest struct {
@@ -72,7 +72,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 	}
 	permission, err := json.Marshal(actionMap)
 	if err != nil {
-		return nil, fmt.Errorf("json marshal failed.Error:%v,%w", err, e.ErrInternalServerError)
+		return nil, errors.WithStack(e.ErrInternalServerError.WithResult(err))
 	}
 	userModel := &model.User{
 		Name:       request.Account,
@@ -87,29 +87,29 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 			if err = tx.Model(accountModel).Where("id =?", request.AccountID).
 				First(accountModel).Error; err != nil {
 				if errors.Is(err, db.NotFound) {
-					return code.ErrNoAccount
+					return errors.WithStack(code.ErrNoAccount.WithResult(err))
 				}
-				return fmt.Errorf("first account failed;%v;%w", err, code.ErrRegisterAccount)
+				return errors.WithStack(code.ErrRegisterAccount.WithResult(err))
 			}
 		} else {
 			accountModel.Name = request.Account
 			if err = tx.Model(accountModel).Create(accountModel).Error; err != nil {
 				if strings.Contains(err.Error(), db.ErrDuplicate) {
-					return code.ErrExistAccount
+					return errors.WithStack(code.ErrExistAccount.WithResult(err))
 				}
-				return fmt.Errorf("insert account failed;%v;%w", err, code.ErrRegisterAccount)
+				return errors.WithStack(code.ErrRegisterAccount.WithResult(err))
 			}
 			userModel.PrimaryAccount = true
 		}
 		userModel.AccountID = accountModel.ID
 		if err = tx.Model(userModel).Create(userModel).Error; err != nil {
 			if strings.Contains(err.Error(), db.ErrDuplicate) {
-				return code.ErrExistAccount
+				return errors.WithStack(code.ErrExistAccount.WithResult(err))
 			}
-			return fmt.Errorf("insert user failed;%v;%w", err, code.ErrRegisterAccount)
+			return errors.WithStack(code.ErrRegisterAccount.WithResult(err))
 		}
 		if err = tx.Model(userModel).First(userModel).Error; err != nil {
-			return fmt.Errorf("first user failed;%v;%w", err, code.ErrRegisterAccount)
+			return errors.WithStack(code.ErrRegisterAccount.WithResult(err))
 		}
 		return nil
 	})
@@ -172,15 +172,15 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 		updates["desc"] = request.Desc
 	}
 	if len(updates) == 0 {
-		return code.ErrNoUpdate
+		return errors.WithStack(code.ErrNoUpdate)
 	}
 	query := dbx.With(ctx).Model(&model.User{}).Where("id=? AND password=?",
 		user.ID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
-		return fmt.Errorf("update failed.Error:%v,%w", err, code.ErrUpdateAccount)
+		return errors.WithStack(code.ErrUpdateAccount.WithResult(err))
 	}
 	if query.RowsAffected == 0 {
-		return code.ErrNoUpdate
+		return errors.WithStack(code.ErrNoUpdate)
 	}
 	return nil
 }
@@ -247,7 +247,7 @@ func List(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, e
 	query = model.HandlePage(query, request.Page)
 	var userList []*model.User
 	if err := query.Find(&userList).Error; err != nil {
-		return nil, fmt.Errorf("find user failed.Error:%v,%w", err, code.ErrRetrieveAccount)
+		return nil, errors.WithStack(code.ErrRetrieveAccount.WithResult(err))
 	}
 	responses := &RetrieveResponses{
 		Page: model.Page{
@@ -278,9 +278,9 @@ func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 	user := &model.User{}
 	if err := dbx.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
-			return nil, code.ErrNoAccount
+			return nil, errors.WithStack(code.ErrNoAccount.WithResult(err))
 		}
-		return nil, fmt.Errorf("%v.%w", err, code.ErrRetrieveAccount)
+		return nil, errors.WithStack(code.ErrRetrieveAccount.WithResult(err))
 	}
 	return &RetrieveResponse{
 		AccountID:  FormatUint(user.AccountID),
@@ -302,26 +302,26 @@ func Delete(ctx context.Context, request *User) error {
 		query := tx.Model(user).Where("id =?", request.ID)
 		if err := query.First(user).Error; err != nil {
 			if errors.Is(err, db.NotFound) {
-				return code.ErrNoAccount
+				return errors.WithStack(code.ErrNoAccount.WithResult(err))
 			}
-			return fmt.Errorf("first user failed;%v;%w", err, code.ErrDeleteAccount)
+			return errors.WithStack(code.ErrDeleteAccount.WithResult(err))
 		}
 		if user.PrimaryAccount {
 			accountModel := &model.Account{}
 			queryAccountDel := tx.Model(accountModel).Where("id =?", user.AccountID).Delete(accountModel)
 			if err := queryAccountDel.Error; err != nil {
-				return fmt.Errorf("delete account failed;%v;%w", err, code.ErrDeleteAccount)
+				return errors.WithStack(code.ErrDeleteAccount.WithResult(err))
 			}
 			if queryAccountDel.RowsAffected == 0 {
-				return code.ErrNoAccount
+				return errors.WithStack(code.ErrNoAccount)
 			}
 		}
 		queryDel := query.Delete(user)
 		if err := queryDel.Error; err != nil {
-			return fmt.Errorf("%v.%w", err, code.ErrDeleteAccount)
+			return errors.WithStack(code.ErrDeleteAccount.WithResult(err))
 		}
 		if queryDel.RowsAffected == 0 {
-			return code.ErrNoAccount
+			return errors.WithStack(code.ErrNoAccount)
 		}
 		return nil
 	})

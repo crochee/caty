@@ -27,6 +27,8 @@ require (
 	gorm.io/gorm v1.21.15
 )
 
+replace github.com/crochee/lirity v1.2.1 => ../lirity
+
 require (
 	github.com/aws/aws-sdk-go v1.34.28 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect

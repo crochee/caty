@@ -32,12 +32,12 @@ import (
 func Sign(ctx *gin.Context) {
 	var request auth.TokenClaims
 	if err := ctx.ShouldBindBodyWith(&request, binding.JSON); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	token, err := auth.Create(ctx.Request.Context(), &request)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, token)
@@ -62,12 +62,12 @@ func Sign(ctx *gin.Context) {
 func Parse(ctx *gin.Context) {
 	var apiToken auth.APIToken
 	if err := ctx.ShouldBindBodyWith(&apiToken, binding.JSON); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	token, err := auth.Parse(ctx.Request.Context(), &apiToken)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, token)

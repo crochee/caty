@@ -32,16 +32,16 @@ import (
 func Login(ctx *gin.Context) {
 	var request account.LoginRequest
 	if err := ctx.ShouldBindBodyWith(&request, binding.JSON); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	if err := account.ValidPassword(request.Password); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	response, err := account.Login(ctx.Request.Context(), &request)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, response)

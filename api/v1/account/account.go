@@ -32,16 +32,16 @@ import (
 func Register(ctx *gin.Context) {
 	var registerRequest account.CreateRequest
 	if err := ctx.ShouldBindBodyWith(&registerRequest, binding.JSON); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	if err := account.ValidPassword(registerRequest.Password); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	response, err := account.Create(ctx.Request.Context(), &registerRequest)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -64,12 +64,12 @@ func Register(ctx *gin.Context) {
 func List(ctx *gin.Context) {
 	retrieveRequest := &account.RetrievesRequest{}
 	if err := ctx.BindQuery(retrieveRequest); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	response, err := account.List(ctx.Request.Context(), retrieveRequest)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -94,24 +94,24 @@ func List(ctx *gin.Context) {
 func Update(ctx *gin.Context) {
 	var user account.User
 	if err := ctx.BindUri(&user); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	var modifyRequest account.UpdateRequest
 	if err := ctx.ShouldBindBodyWith(&modifyRequest, binding.JSON); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	if err := account.ValidPassword(modifyRequest.Password); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	if err := account.ValidPermission(modifyRequest.Permission); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	if err := account.Update(ctx.Request.Context(), &user, &modifyRequest); err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusNoContent)
@@ -134,12 +134,12 @@ func Update(ctx *gin.Context) {
 func Retrieve(ctx *gin.Context) {
 	var user account.User
 	if err := ctx.BindUri(&user); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	response, err := account.Retrieve(ctx.Request.Context(), &user)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -162,12 +162,12 @@ func Retrieve(ctx *gin.Context) {
 func Delete(ctx *gin.Context) {
 	var user account.User
 	if err := ctx.BindUri(&user); err != nil {
-		e.GinErrorCode(ctx, e.ErrInvalidParam.WithResult(err))
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	err := account.Delete(ctx.Request.Context(), &user)
 	if err != nil {
-		e.GinError(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.Status(http.StatusNoContent)

@@ -11,10 +11,10 @@ import (
 
 // NoRoute 404
 func NoRoute(ctx *gin.Context) {
-	e.GinErrorCode(ctx, e.ErrNotFound)
+	e.Code(ctx, e.ErrNotFound)
 }
 
 // NoMethod 405
 func NoMethod(ctx *gin.Context) {
-	e.GinErrorCode(ctx, e.ErrNotAllowMethod)
+	e.Code(ctx, e.ErrNotAllowMethod)
 }

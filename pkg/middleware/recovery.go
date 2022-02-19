@@ -52,7 +52,7 @@ func Recovery(ctx *gin.Context) {
 			if brokenPipe {
 				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", r)
 			}
-			e.GinErrorCode(ctx, e.ErrInternalServerError.WithResult(extra))
+			e.Code(ctx, e.ErrInternalServerError.WithResult(extra))
 		}
 	}()
 	ctx.Next()
