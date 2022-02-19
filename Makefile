@@ -7,10 +7,10 @@ all: ci
 
 .PHONY: run
 run:
-	CGO_ENABLED=0 GOARCH=amd64 go run ./cmd/$(PROJECT)
+	CGO_ENABLED=0 GOARCH=amd64 go run -trimpath -ldflags="-s -w" -buildmode=pie -tags=jsoniter ./cmd/$(PROJECT)
 .PHONY: build
 build:
-	CGO_ENABLED=0 GOARCH=amd64 go build -o $(PROJECT) ./cmd/$(PROJECT)
+	CGO_ENABLED=0 GOARCH=amd64 go build -trimpath -ldflags="-s -w" -buildmode=pie -tags=jsoniter -o $(PROJECT) ./cmd/$(PROJECT)
 .PHONY: start
 start:
 	./scripts/start.sh
