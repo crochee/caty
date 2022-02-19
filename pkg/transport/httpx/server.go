@@ -13,21 +13,21 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/registry"
+	"github.com/crochee/lirity/registry/etcd"
 	"github.com/crochee/uid"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 
 	"caty/internal/host"
-	"caty/pkg/etcdx"
-	"caty/pkg/registry"
 	"caty/pkg/router"
 	"caty/pkg/tlsx"
 	"caty/pkg/v"
 )
 
 func NewServer(ctx context.Context) (*HTTPServer, error) {
-	r, err := etcdx.NewEtcdRegistry(func(option *etcdx.Option) {
+	r, err := etcd.NewRegistry(func(option *etcd.Option) {
 		option.AddrList = viper.GetStringSlice("etcd.url")
 	})
 	if err != nil {
@@ -66,7 +66,7 @@ func NewServer(ctx context.Context) (*HTTPServer, error) {
 		Key:  "server-key.pem",
 	}); err != nil {
 		uri.Scheme = "http"
-		log.Warn(err.Error())
+		zap.L().Warn(err.Error())
 	}
 	srv.Server.TLSConfig = cfg
 	srv.Server.Addr = uri.Host

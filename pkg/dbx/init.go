@@ -34,7 +34,7 @@ func Close() {
 }
 
 func With(ctx context.Context) *db.DB {
-	return dbClient.WithContext(ctx)
+	return dbClient.With(ctx)
 }
 
 func New() *db.DB {

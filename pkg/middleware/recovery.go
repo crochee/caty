@@ -14,12 +14,11 @@ import (
 	"strings"
 
 	"github.com/crochee/lirity/e"
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
 	"caty/internal"
-	"caty/pkg/resp"
 )
 
 // Recovery panic logx
@@ -37,7 +36,7 @@ func Recovery(ctx *gin.Context) {
 			c := ctx.Request.Context()
 			httpRequest, err := httputil.DumpRequest(ctx.Request, true)
 			if err != nil {
-				log.FromContext(c).Error(err.Error())
+				logger.From(c).Error(err.Error())
 			}
 			headers := strings.Split(string(httpRequest), "\r\n")
 			for idx, header := range headers {
@@ -47,13 +46,13 @@ func Recovery(ctx *gin.Context) {
 				}
 			}
 			headersToStr := strings.Join(headers, "\r\n")
-			log.FromContext(c).Errorf("[Recovery] %s\n%v\n%s",
+			logger.From(c).Sugar().Errorf("[Recovery] %s\n%v\n%s",
 				headersToStr, r, internal.Stack(3))
 			extra := fmt.Sprint(r)
 			if brokenPipe {
 				extra = fmt.Sprintf("broken pipe or connection reset by peer;%v", r)
 			}
-			resp.Abort(ctx, e.ErrInternalServerError, extra)
+			e.Code(ctx, e.ErrInternalServerError.WithResult(extra))
 		}
 	}()
 	ctx.Next()

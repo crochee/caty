@@ -5,7 +5,7 @@ package list
 
 import (
 	"github.com/crochee/lirity"
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
 	"github.com/crochee/lirity/table"
 	"github.com/spf13/cobra"
 
@@ -57,9 +57,7 @@ func do(cmd *cobra.Command, _ []string) error {
 	}
 	ctx := cmd.Context()
 	if debug {
-		ctx = log.WithContext(ctx, log.NewLogger(func(option *log.Option) {
-			option.Level = log.DEBUG
-		}))
+		ctx = logger.With(ctx, logger.New(logger.WithLevel(logger.DEBUG)))
 	}
 	var response *account.RetrieveResponses
 	if response, err = client.New(client.AccountService).List(ctx, opt); err != nil {
@@ -67,7 +65,7 @@ func do(cmd *cobra.Command, _ []string) error {
 	}
 	listMap := make([]map[string]interface{}, len(response.Result))
 	for index, value := range response.Result {
-		listMap[index] = lirity.Struct2MapTag(value, "")
+		listMap[index] = lirity.Struct2MapWithTag(value, "")
 	}
 	fields := []string{
 		"UserID",

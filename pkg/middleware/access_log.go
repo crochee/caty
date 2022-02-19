@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
 	"github.com/gin-gonic/gin"
 
 	"caty/pkg/v"
@@ -44,7 +44,7 @@ func Log(ctx *gin.Context) {
 		path = buf.String()
 	}
 	param.Path = path
-	log.FromContext(ctx.Request.Context()).Info(defaultLogFormatter(param))
+	logger.From(ctx.Request.Context()).Info(defaultLogFormatter(param))
 }
 
 // defaultLogFormatter is the default log format function Logger middleware uses.

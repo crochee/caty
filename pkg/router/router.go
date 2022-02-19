@@ -20,7 +20,7 @@
 package router
 
 import (
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 
@@ -37,10 +37,10 @@ func New() *gin.Engine {
 	router.NoMethod(middleware.NoMethod)
 
 	router.Use(middleware.TraceID,
-		middleware.RequestLogger(log.NewLogger(func(option *log.Option) {
-			option.Path = viper.GetString("path")
-			option.Level = log.JudgeLevel(viper.GetString("level"), gin.Mode())
-		})),
+		middleware.RequestLogger(
+			logger.New(
+				logger.WithLevel(viper.GetString("level")),
+				logger.WithWriter(logger.SetWriter(viper.GetString("path"))))),
 		middleware.Log,
 		middleware.Recovery,
 	)

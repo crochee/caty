@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crochee/lirity/log"
 	"github.com/robfig/cron/v3"
+	"go.uber.org/zap"
 )
 
 var timeCron *cron.Cron
@@ -34,12 +34,12 @@ type cronLogger struct{}
 
 func (c cronLogger) Info(msg string, keysAndValues ...interface{}) {
 	keysAndValues = formatTimes(keysAndValues)
-	log.Infof(formatString(len(keysAndValues)), append([]interface{}{msg}, keysAndValues...)...)
+	zap.S().Infof(formatString(len(keysAndValues)), append([]interface{}{msg}, keysAndValues...)...)
 }
 
 func (c cronLogger) Error(err error, msg string, keysAndValues ...interface{}) {
 	keysAndValues = formatTimes(keysAndValues)
-	log.Errorf(formatString(len(keysAndValues)+2),
+	zap.S().Errorf(formatString(len(keysAndValues)+2),
 		append([]interface{}{msg, "error", err}, keysAndValues...)...)
 }
 

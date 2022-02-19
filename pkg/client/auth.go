@@ -5,13 +5,12 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/crochee/lirity/client"
+	"github.com/crochee/lirity/e"
 	"github.com/json-iterator/go"
 
-	"caty/pkg/resp"
 	"caty/pkg/service/auth"
 )
 
@@ -50,11 +49,7 @@ func (a *AuthClient) Sign(ctx context.Context, request *auth.TokenClaims) (*auth
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		var result resp.ResponseCode
-		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
-		}
-		return nil, &result
+		return nil, e.From(response)
 	}
 	var result auth.APIToken
 	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
@@ -79,11 +74,7 @@ func (a *AuthClient) Parse(ctx context.Context, request *auth.APIToken) (*auth.T
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		var result resp.ResponseCode
-		if err = a.NewDecoder(response.Body).Decode(&result); err != nil {
-			return nil, fmt.Errorf("http code %d,but not 200,%w", response.StatusCode, err)
-		}
-		return nil, &result
+		return nil, e.From(response)
 	}
 	var result auth.TokenClaims
 	if err = a.NewDecoder(response.Body).Decode(&result); err != nil {

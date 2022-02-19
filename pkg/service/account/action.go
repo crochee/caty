@@ -6,12 +6,11 @@ package account
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/crochee/lirity/db"
 	"github.com/crochee/lirity/e"
+	"github.com/pkg/errors"
 
 	"caty/pkg/code"
 	"caty/pkg/dbx"
@@ -34,12 +33,12 @@ func Login(ctx context.Context, request *LoginRequest) (*auth.APIToken, error) {
 	if err := dbx.With(ctx).Model(user).Where("id =?",
 		request.UserID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
-			return nil, code.ErrNoAccount
+			return nil, errors.WithStack(code.ErrNoAccount.WithResult(err))
 		}
-		return nil, fmt.Errorf("first user failed;%v;%w", err, code.ErrLoginAccount)
+		return nil, errors.WithStack(code.ErrLoginAccount.WithResult(err))
 	}
 	if user.Password != request.Password {
-		return nil, code.ErrWrongPasswordAccount
+		return nil, errors.WithStack(code.ErrWrongPasswordAccount)
 	}
 	token := &auth.TokenClaims{
 		Now: time.Now().Unix(),
@@ -50,7 +49,7 @@ func Login(ctx context.Context, request *LoginRequest) (*auth.APIToken, error) {
 		},
 	}
 	if err := json.Unmarshal([]byte(user.Permission), &token.Token.Permission); err != nil {
-		return nil, fmt.Errorf("unmarshal failed;%v;%w", err, e.ErrInternalServerError)
+		return nil, errors.WithStack(e.ErrInternalServerError.WithResult(err))
 	}
 	return auth.Create(ctx, token)
 }

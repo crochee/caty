@@ -24,56 +24,12 @@
         "operationId": "SNullRequest",
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "result"
-              ],
-              "properties": {
-                "result": {
-                  "description": "结果集",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": [
-                      "version",
-                      "status",
-                      "release"
-                    ],
-                    "properties": {
-                      "offline": {
-                        "description": "下线时间",
-                        "type": "string",
-                        "x-go-name": "Offline"
-                      },
-                      "release": {
-                        "description": "发布时间",
-                        "type": "string",
-                        "x-go-name": "Release"
-                      },
-                      "status": {
-                        "description": "状态 pre-release,online,offline",
-                        "type": "string",
-                        "x-go-name": "Status"
-                      },
-                      "version": {
-                        "description": "版本",
-                        "type": "string",
-                        "x-go-name": "Version"
-                      }
-                    },
-                    "x-go-package": "caty/api"
-                  },
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SAPIVersionResponse"
           }
         }
       }
     },
-    "/v1/account": {
+    "/v1/accounts": {
       "get": {
         "description": "根据条件查询账户列表",
         "produces": [
@@ -87,7 +43,7 @@
         "parameters": [
           {
             "type": "integer",
-            "format": "int64",
+            "format": "uint64",
             "x-go-name": "Index",
             "description": "分页索引",
             "name": "num",
@@ -140,119 +96,10 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "num": {
-                  "description": "分页索引",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Index"
-                },
-                "result": {
-                  "description": "结果集",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "account": {
-                        "description": "账户",
-                        "type": "string",
-                        "x-go-name": "Account"
-                      },
-                      "account_id": {
-                        "description": "账户ID",
-                        "type": "string",
-                        "x-go-name": "AccountID"
-                      },
-                      "created_at": {
-                        "description": "创建时间",
-                        "type": "string",
-                        "format": "date-time",
-                        "x-go-name": "CreatedAt"
-                      },
-                      "desc": {
-                        "description": "描述",
-                        "type": "string",
-                        "x-go-name": "Desc"
-                      },
-                      "email": {
-                        "description": "邮箱",
-                        "type": "string",
-                        "x-go-name": "Email"
-                      },
-                      "permission": {
-                        "description": "权限",
-                        "type": "string",
-                        "x-go-name": "Permission"
-                      },
-                      "updated_at": {
-                        "description": "更新时间",
-                        "type": "string",
-                        "format": "date-time",
-                        "x-go-name": "UpdatedAt"
-                      },
-                      "user_id": {
-                        "description": "用户",
-                        "type": "string",
-                        "x-go-name": "UserID"
-                      },
-                      "verify": {
-                        "description": "是否认证",
-                        "type": "integer",
-                        "format": "uint8",
-                        "x-go-name": "Verify"
-                      }
-                    },
-                    "x-go-package": "caty/pkg/service/account"
-                  },
-                  "x-go-name": "Result"
-                },
-                "size": {
-                  "description": "分页大小",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Size"
-                },
-                "total": {
-                  "description": "总数",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Total"
-                }
-              }
-            }
+            "$ref": "#/responses/SAccountRetrieveResponses"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       },
@@ -311,100 +158,15 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "account": {
-                  "description": "账户",
-                  "type": "string",
-                  "x-go-name": "Account"
-                },
-                "account_id": {
-                  "description": "账户ID",
-                  "type": "string",
-                  "x-go-name": "AccountID"
-                },
-                "created_at": {
-                  "description": "创建时间",
-                  "type": "string",
-                  "format": "date-time",
-                  "x-go-name": "CreatedAt"
-                },
-                "desc": {
-                  "description": "描述",
-                  "type": "string",
-                  "x-go-name": "Desc"
-                },
-                "email": {
-                  "description": "邮箱",
-                  "type": "string",
-                  "x-go-name": "Email"
-                },
-                "permission": {
-                  "description": "权限",
-                  "type": "string",
-                  "x-go-name": "Permission"
-                },
-                "primary_account": {
-                  "description": "是否主账号",
-                  "type": "boolean",
-                  "x-go-name": "PrimaryAccount"
-                },
-                "updated_at": {
-                  "description": "更新时间",
-                  "type": "string",
-                  "format": "date-time",
-                  "x-go-name": "UpdatedAt"
-                },
-                "user_id": {
-                  "description": "用户",
-                  "type": "string",
-                  "x-go-name": "UserID"
-                },
-                "verify": {
-                  "description": "是否认证",
-                  "type": "integer",
-                  "format": "uint8",
-                  "x-go-name": "Verify"
-                }
-              }
-            }
+            "$ref": "#/responses/SAccountRegisterResponseResult"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       }
     },
-    "/v1/account/login": {
+    "/v1/accounts/login": {
       "post": {
         "description": "用户登录获取token信息",
         "consumes": [
@@ -445,55 +207,15 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "token"
-              ],
-              "properties": {
-                "token": {
-                  "description": "加密token信息",
-                  "type": "string",
-                  "x-go-name": "Token"
-                }
-              }
-            }
+            "$ref": "#/responses/SAuthSignResponse"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       }
     },
-    "/v1/account/{id}": {
+    "/v1/accounts/{id}": {
       "get": {
         "description": "查询指定账户的信息",
         "produces": [
@@ -516,90 +238,10 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "account": {
-                  "description": "账户",
-                  "type": "string",
-                  "x-go-name": "Account"
-                },
-                "account_id": {
-                  "description": "账户ID",
-                  "type": "string",
-                  "x-go-name": "AccountID"
-                },
-                "created_at": {
-                  "description": "创建时间",
-                  "type": "string",
-                  "format": "date-time",
-                  "x-go-name": "CreatedAt"
-                },
-                "desc": {
-                  "description": "描述",
-                  "type": "string",
-                  "x-go-name": "Desc"
-                },
-                "email": {
-                  "description": "邮箱",
-                  "type": "string",
-                  "x-go-name": "Email"
-                },
-                "permission": {
-                  "description": "权限",
-                  "type": "string",
-                  "x-go-name": "Permission"
-                },
-                "updated_at": {
-                  "description": "更新时间",
-                  "type": "string",
-                  "format": "date-time",
-                  "x-go-name": "UpdatedAt"
-                },
-                "user_id": {
-                  "description": "用户",
-                  "type": "string",
-                  "x-go-name": "UserID"
-                },
-                "verify": {
-                  "description": "是否认证",
-                  "type": "integer",
-                  "format": "uint8",
-                  "x-go-name": "Verify"
-                }
-              }
-            }
+            "$ref": "#/responses/SAccountRetrieveResponse"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       },
@@ -625,37 +267,10 @@
         ],
         "responses": {
           "204": {
-            "description": ""
+            "$ref": "#/responses/SNullResponse"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       },
@@ -726,42 +341,15 @@
         ],
         "responses": {
           "204": {
-            "description": ""
+            "$ref": "#/responses/SNullResponse"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       }
     },
-    "/v1/auth/parse": {
+    "/v1/auths/parse": {
       "post": {
         "description": "解析token信息",
         "consumes": [
@@ -796,83 +384,15 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "now": {
-                  "description": "生成token的时间戳",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Now"
-                },
-                "token": {
-                  "type": "object",
-                  "required": [
-                    "account_id",
-                    "user_id",
-                    "permission"
-                  ],
-                  "properties": {
-                    "account_id": {
-                      "description": "主账号id",
-                      "type": "string",
-                      "x-go-name": "AccountID"
-                    },
-                    "permission": {
-                      "description": "权限列表",
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "integer",
-                        "format": "uint8"
-                      },
-                      "x-go-name": "Permission"
-                    },
-                    "user_id": {
-                      "description": "账户id",
-                      "type": "string",
-                      "x-go-name": "UserID"
-                    }
-                  },
-                  "x-go-package": "caty/pkg/service/auth"
-                }
-              }
-            }
+            "$ref": "#/responses/SAuthParseResponse"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       }
     },
-    "/v1/auth/sign": {
+    "/v1/auths/sign": {
       "post": {
         "description": "生成token信息",
         "consumes": [
@@ -900,34 +420,7 @@
                   "x-go-name": "Now"
                 },
                 "token": {
-                  "type": "object",
-                  "required": [
-                    "account_id",
-                    "user_id",
-                    "permission"
-                  ],
-                  "properties": {
-                    "account_id": {
-                      "description": "主账号id",
-                      "type": "string",
-                      "x-go-name": "AccountID"
-                    },
-                    "permission": {
-                      "description": "权限列表",
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "integer",
-                        "format": "uint8"
-                      },
-                      "x-go-name": "Permission"
-                    },
-                    "user_id": {
-                      "description": "账户id",
-                      "type": "string",
-                      "x-go-name": "UserID"
-                    }
-                  },
-                  "x-go-package": "caty/pkg/service/auth"
+                  "$ref": "#/definitions/Token"
                 }
               }
             }
@@ -935,50 +428,10 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "token"
-              ],
-              "properties": {
-                "token": {
-                  "description": "加密token信息",
-                  "type": "string",
-                  "x-go-name": "Token"
-                }
-              }
-            }
+            "$ref": "#/responses/SAuthSignResponse"
           },
           "default": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "description": "返回码",
-                  "type": "integer",
-                  "format": "int64",
-                  "x-go-name": "Code",
-                  "example": 20000000
-                },
-                "message": {
-                  "description": "返回信息描述",
-                  "type": "string",
-                  "x-go-name": "Msg",
-                  "example": "success"
-                },
-                "result": {
-                  "description": "具体描述信息",
-                  "type": "string",
-                  "x-go-name": "Result"
-                }
-              }
-            }
+            "$ref": "#/responses/SResponseCode"
           }
         }
       }
@@ -1114,35 +567,7 @@
             "description": "结果集",
             "type": "array",
             "items": {
-              "type": "object",
-              "required": [
-                "version",
-                "status",
-                "release"
-              ],
-              "properties": {
-                "offline": {
-                  "description": "下线时间",
-                  "type": "string",
-                  "x-go-name": "Offline"
-                },
-                "release": {
-                  "description": "发布时间",
-                  "type": "string",
-                  "x-go-name": "Release"
-                },
-                "status": {
-                  "description": "状态 pre-release,online,offline",
-                  "type": "string",
-                  "x-go-name": "Status"
-                },
-                "version": {
-                  "description": "版本",
-                  "type": "string",
-                  "x-go-name": "Version"
-                }
-              },
-              "x-go-package": "caty/api"
+              "$ref": "#/definitions/VersionResult"
             },
             "x-go-name": "Result"
           }
@@ -1274,65 +699,14 @@
           "num": {
             "description": "分页索引",
             "type": "integer",
-            "format": "int64",
+            "format": "uint64",
             "x-go-name": "Index"
           },
           "result": {
             "description": "结果集",
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "account": {
-                  "description": "账户",
-                  "type": "string",
-                  "x-go-name": "Account"
-                },
-                "account_id": {
-                  "description": "账户ID",
-                  "type": "string",
-                  "x-go-name": "AccountID"
-                },
-                "created_at": {
-                  "description": "创建时间",
-                  "type": "string",
-                  "format": "date-time",
-                  "x-go-name": "CreatedAt"
-                },
-                "desc": {
-                  "description": "描述",
-                  "type": "string",
-                  "x-go-name": "Desc"
-                },
-                "email": {
-                  "description": "邮箱",
-                  "type": "string",
-                  "x-go-name": "Email"
-                },
-                "permission": {
-                  "description": "权限",
-                  "type": "string",
-                  "x-go-name": "Permission"
-                },
-                "updated_at": {
-                  "description": "更新时间",
-                  "type": "string",
-                  "format": "date-time",
-                  "x-go-name": "UpdatedAt"
-                },
-                "user_id": {
-                  "description": "用户",
-                  "type": "string",
-                  "x-go-name": "UserID"
-                },
-                "verify": {
-                  "description": "是否认证",
-                  "type": "integer",
-                  "format": "uint8",
-                  "x-go-name": "Verify"
-                }
-              },
-              "x-go-package": "caty/pkg/service/account"
+              "$ref": "#/definitions/RetrieveResponse"
             },
             "x-go-name": "Result"
           },
@@ -1363,34 +737,7 @@
             "x-go-name": "Now"
           },
           "token": {
-            "type": "object",
-            "required": [
-              "account_id",
-              "user_id",
-              "permission"
-            ],
-            "properties": {
-              "account_id": {
-                "description": "主账号id",
-                "type": "string",
-                "x-go-name": "AccountID"
-              },
-              "permission": {
-                "description": "权限列表",
-                "type": "object",
-                "additionalProperties": {
-                  "type": "integer",
-                  "format": "uint8"
-                },
-                "x-go-name": "Permission"
-              },
-              "user_id": {
-                "description": "账户id",
-                "type": "string",
-                "x-go-name": "UserID"
-              }
-            },
-            "x-go-package": "caty/pkg/service/auth"
+            "$ref": "#/definitions/Token"
           }
         }
       }
@@ -1417,31 +764,7 @@
     "SResponseCode": {
       "description": "",
       "schema": {
-        "type": "object",
-        "required": [
-          "code",
-          "message"
-        ],
-        "properties": {
-          "code": {
-            "description": "返回码",
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "Code",
-            "example": 20000000
-          },
-          "message": {
-            "description": "返回信息描述",
-            "type": "string",
-            "x-go-name": "Msg",
-            "example": "success"
-          },
-          "result": {
-            "description": "具体描述信息",
-            "type": "string",
-            "x-go-name": "Result"
-          }
-        }
+        "type": "object"
       }
     }
   },

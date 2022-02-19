@@ -10,10 +10,9 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/crochee/lirity"
+	"github.com/crochee/lirity/mq"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-
-	"caty/pkg/message/mq"
 )
 
 var router *message.Router
@@ -29,9 +28,7 @@ func Setup(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	conn, err := mq.NewMq(func(option *mq.Option) {
-		option.URI = viper.GetString("rabbitmq.consumer.resource.URI")
-	})
+	conn, err := mq.New(mq.WithURI(viper.GetString("rabbitmq.consumer.resource.URI")))
 	if err != nil {
 		return err
 	}

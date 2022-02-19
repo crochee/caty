@@ -6,15 +6,15 @@ package account
 import (
 	"net/http"
 
+	"github.com/crochee/lirity/e"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"caty/pkg/resp"
 	"caty/pkg/service/account"
 )
 
 // Login godoc
-// swagger:operation POST /v1/account/login 账户 SAccountLoginRequest
+// swagger:operation POST /v1/accounts/login 账户 SAccountLoginRequest
 // ---
 // summary: 用户登录
 // description: 用户登录获取token信息
@@ -32,16 +32,16 @@ import (
 func Login(ctx *gin.Context) {
 	var request account.LoginRequest
 	if err := ctx.ShouldBindBodyWith(&request, binding.JSON); err != nil {
-		resp.ErrorParam(ctx, err)
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	if err := account.ValidPassword(request.Password); err != nil {
-		resp.ErrorParam(ctx, err)
+		e.Code(ctx, e.ErrInvalidParam.WithResult(err))
 		return
 	}
 	response, err := account.Login(ctx.Request.Context(), &request)
 	if err != nil {
-		resp.Errors(ctx, err)
+		e.Error(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, response)

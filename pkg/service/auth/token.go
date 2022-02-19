@@ -2,10 +2,10 @@ package auth
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 
 	"caty/pkg/code"
 )
@@ -53,11 +53,11 @@ func (t *TokenClaims) Create() (string, error) {
 	tokenImpl := jwt.NewWithClaims(jwt.SigningMethodHS256, t)
 	secretKey, err := t.Secret(nil)
 	if err != nil {
-		return "", fmt.Errorf("create secret failed;%v;%w", err, code.ErrCreateAuth)
+		return "", errors.WithStack(code.ErrCreateAuth.WithResult(err))
 	}
 	var token string
 	if token, err = tokenImpl.SignedString(secretKey); err != nil {
-		return "", fmt.Errorf("signedString failed;%v;%w", err, code.ErrCreateAuth)
+		return "", errors.WithStack(code.ErrCreateAuth.WithResult(err))
 	}
 	return token, nil
 }
@@ -65,11 +65,11 @@ func (t *TokenClaims) Create() (string, error) {
 func (t *TokenClaims) Parse(data string) error {
 	tokenImpl, err := jwt.ParseWithClaims(data, t, t.Secret)
 	if err != nil {
-		return fmt.Errorf("parse token failed;%v;%w", err, code.ErrParseAuth)
+		return errors.WithStack(code.ErrParseAuth.WithResult(err))
 	}
 	claims, ok := tokenImpl.Claims.(*TokenClaims)
 	if !ok {
-		return fmt.Errorf("cannot convert token claim;%w", code.ErrInvalidAuth)
+		return errors.WithStack(code.ErrInvalidAuth)
 	}
 	// 验证token，如果token被修改过则为false
 	if !tokenImpl.Valid {

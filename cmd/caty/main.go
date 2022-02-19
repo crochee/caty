@@ -10,11 +10,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/crochee/lirity/log"
+	"github.com/crochee/lirity/logger"
 	"github.com/crochee/lirity/routine"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	_ "go.uber.org/automaxprocs"
+	"go.uber.org/zap"
 
 	"caty/config"
 	"caty/pkg/code"
@@ -40,18 +41,15 @@ func main() {
 		gin.SetMode(mode)
 	}
 	// 初始化系统日志
-	log.InitSystemLogger(func(option *log.Option) {
-		option.Path = viper.GetString("path")
-		option.Level = log.JudgeLevel(viper.GetString("level"), gin.Mode())
-	})
+	zap.ReplaceGlobals(logger.New(
+		logger.WithLevel(viper.GetString("level")),
+		logger.WithWriter(logger.SetWriter(viper.GetString("path")))))
 
 	if err := run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Error(err.Error())
-		log.Sync()
+		zap.L().Fatal(err.Error())
 		_, _ = os.Stderr.WriteString(err.Error())
 		os.Exit(1)
 	}
-	log.Sync()
 }
 
 func run() error {
@@ -61,7 +59,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	log.Debugf("listen on %s", srv.Server.Addr)
+	zap.S().Debugf("listen on %s", srv.Server.Addr)
 	// 服务启动流程
 	g.Go(func(ctx context.Context) error {
 		return startAction(ctx, srv)
@@ -87,7 +85,7 @@ func startAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	if err := validator.Init(); err != nil {
 		return err
 	}
-	log.Infof("%s run on %s", v.ServiceName, gin.Mode())
+	zap.S().Infof("%s run on %s", v.ServiceName, gin.Mode())
 	return srv.Start(ctx)
 }
 
@@ -99,6 +97,6 @@ func shutdownAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	case <-quit:
 	}
 	message.Close()
-	log.Info("shutting down server...")
+	zap.L().Info("shutting down server...")
 	return srv.Stop(ctx)
 }
