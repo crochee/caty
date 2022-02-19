@@ -14,7 +14,7 @@ import (
 )
 
 // Login godoc
-// swagger:operation POST /v1/account/login 账户 SAccountLoginRequest
+// swagger:operation POST /v1/accounts/login 账户 SAccountLoginRequest
 // ---
 // summary: 用户登录
 // description: 用户登录获取token信息

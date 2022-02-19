@@ -14,7 +14,7 @@ import (
 )
 
 // Sign godoc
-// swagger:operation POST /v1/auth/sign 鉴权 SAuthSignRequest
+// swagger:operation POST /v1/auths/sign 鉴权 SAuthSignRequest
 // ---
 // summary: 生成token
 // description: 生成token信息
@@ -44,7 +44,7 @@ func Sign(ctx *gin.Context) {
 }
 
 // Parse godoc
-// swagger:operation POST /v1/auth/parse 鉴权 SAuthParseRequest
+// swagger:operation POST /v1/auths/parse 鉴权 SAuthParseRequest
 // ---
 // summary: 解析token
 // description: 解析token信息

@@ -14,7 +14,7 @@ import (
 )
 
 // Register godoc
-// swagger:operation POST /v1/account 账户 SAccountRegisterRequest
+// swagger:operation POST /v1/accounts 账户 SAccountRegisterRequest
 // ---
 // summary: 注册账户
 // description: 注册账户信息
@@ -48,7 +48,7 @@ func Register(ctx *gin.Context) {
 }
 
 // List godoc
-// swagger:operation GET /v1/account 账户 SAccountRetrievesRequest
+// swagger:operation GET /v1/accounts 账户 SAccountRetrievesRequest
 // ---
 // summary: 查询账户
 // description: 根据条件查询账户列表
@@ -76,7 +76,7 @@ func List(ctx *gin.Context) {
 }
 
 // Update godoc
-// swagger:operation PATCH /v1/account/{id} 账户 SAccountUpdateRequest
+// swagger:operation PATCH /v1/accounts/{id} 账户 SAccountUpdateRequest
 // ---
 // summary: 编辑账户
 // description: 编辑指定账户的信息
@@ -118,7 +118,7 @@ func Update(ctx *gin.Context) {
 }
 
 // Retrieve godoc
-// swagger:operation GET /v1/account/{id} 账户 SAccountRetrieveRequest
+// swagger:operation GET /v1/accounts/{id} 账户 SAccountRetrieveRequest
 // ---
 // summary: 查询指定账户
 // description: 查询指定账户的信息
@@ -146,7 +146,7 @@ func Retrieve(ctx *gin.Context) {
 }
 
 // Delete godoc
-// swagger:operation DELETE /v1/account/{id} 账户 SAccountDeleteRequest
+// swagger:operation DELETE /v1/accounts/{id} 账户 SAccountDeleteRequest
 // ---
 // summary: 删除指定账户
 // description: 删除指定账户信息

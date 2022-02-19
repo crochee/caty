@@ -10,6 +10,6 @@ import (
 )
 
 func registerAuth(v1Router *gin.RouterGroup) {
-	v1Router.POST("/auth/sign", auth.Sign)
-	v1Router.POST("/auth/parse", auth.Parse)
+	v1Router.POST("/auths/sign", auth.Sign)
+	v1Router.POST("/auths/parse", auth.Parse)
 }

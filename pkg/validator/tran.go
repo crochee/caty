@@ -12,5 +12,5 @@ func Init() error {
 		return err
 	}
 	binding.Validator = v
-	return validator.RegisterValidation(binding.Validator, "sort", validator.OrderWithDBSort)
+	return validator.RegisterValidation(binding.Validator, "sort", validator.Sort)
 }

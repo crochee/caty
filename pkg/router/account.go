@@ -10,10 +10,10 @@ import (
 )
 
 func registerAccount(v1Router *gin.RouterGroup) {
-	v1Router.POST("/account", account.Register)
-	v1Router.GET("/account", account.List)
-	v1Router.PATCH("/account/:id", account.Update)
-	v1Router.GET("/account/:id", account.Retrieve)
-	v1Router.DELETE("/account/:id", account.Delete)
-	v1Router.POST("/account/login", account.Login)
+	v1Router.POST("/accounts", account.Register)
+	v1Router.GET("/accounts", account.List)
+	v1Router.PATCH("/accounts/:id", account.Update)
+	v1Router.GET("/accounts/:id", account.Retrieve)
+	v1Router.DELETE("/accounts/:id", account.Delete)
+	v1Router.POST("/accounts/login", account.Login)
 }
