@@ -4,7 +4,7 @@ level: debug
 mysql:
   user: root
   password: 123456
-  ip: localhost
+  ip: 192.168.31.63
   port: 3306
   database: caty
   charset: utf8
@@ -13,4 +13,4 @@ mysql:
   conn_max_lifetime: 500
 etcd:
   url:
-    - "localhost:2379"
+    - "192.168.31.63:2379"

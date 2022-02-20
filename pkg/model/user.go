@@ -6,7 +6,7 @@ package model
 import "github.com/crochee/lirity/db"
 
 type User struct {
-	ID             uint64 `json:"id" gorm:"primary_key:id"`
+	ID             uint64 `json:"id,string" gorm:"primary_key:id"`
 	AccountID      uint64 `json:"account_id" gorm:"column:account_id;not null;index:idx_account_id_name_primary_deleted,unique;comment:账号ID"`
 	Name           string `json:"name" gorm:"column:name;type:varchar(255);not null;index:idx_account_id_name_primary_deleted,unique;comment:用户名"`
 	Password       string `json:"password" gorm:"column:password;type:varchar(50);not null;comment:密码"`

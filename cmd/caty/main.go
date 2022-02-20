@@ -81,7 +81,6 @@ func startAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	if err := dbx.Init(ctx); err != nil {
 		return err
 	}
-	defer dbx.Close()
 	if err := validator.Init(); err != nil {
 		return err
 	}
