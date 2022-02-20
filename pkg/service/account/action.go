@@ -13,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 
 	"caty/pkg/code"
-	"caty/pkg/dbx"
 	"caty/pkg/model"
 	"caty/pkg/service/auth"
 )
@@ -30,7 +29,7 @@ type LoginRequest struct {
 // Login 用户登录
 func Login(ctx context.Context, request *LoginRequest) (*auth.APIToken, error) {
 	user := &model.User{}
-	if err := dbx.With(ctx).Model(user).Where("id =?",
+	if err := db.With(ctx).Model(user).Where("id =?",
 		request.UserID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
 			return nil, errors.WithStack(code.ErrNoAccount.WithResult(err))

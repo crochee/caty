@@ -19,7 +19,6 @@ import (
 	"gorm.io/gorm"
 
 	"caty/pkg/code"
-	"caty/pkg/dbx"
 	"caty/pkg/model"
 	"caty/pkg/service/auth"
 )
@@ -81,7 +80,7 @@ func Create(ctx context.Context, request *CreateRequest) (*CreateResponseResult,
 		Permission: lirity.String(permission),
 		Desc:       request.Desc,
 	}
-	err = dbx.With(ctx).Transaction(func(tx *gorm.DB) error {
+	err = db.With(ctx).Transaction(func(tx *gorm.DB) error {
 		accountModel := &model.Account{}
 		if request.AccountID != "" {
 			if err = tx.Model(accountModel).Where("id =?", request.AccountID).
@@ -174,7 +173,7 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 	if len(updates) == 0 {
 		return errors.WithStack(code.ErrNoUpdate)
 	}
-	query := dbx.With(ctx).Model(&model.User{}).Where("id=? AND password=?",
+	query := db.With(ctx).Model(&model.User{}).Where("id=? AND password=?",
 		user.ID, request.OldPassword).Updates(updates)
 	if err := query.Error; err != nil {
 		return errors.WithStack(code.ErrUpdateAccount.WithResult(err))
@@ -230,7 +229,7 @@ type RetrieveResponse struct {
 
 // List 查询、获取账户信息
 func List(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, error) {
-	query := dbx.With(ctx).Model(&model.User{})
+	query := db.With(ctx).Model(&model.User{})
 	if request.ID != "" {
 		query = query.Where("id = ?", request.ID)
 	} else {
@@ -276,7 +275,7 @@ func List(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, e
 // Retrieve 查询、获取指定账户信息
 func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 	user := &model.User{}
-	if err := dbx.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
+	if err := db.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
 			return nil, errors.WithStack(code.ErrNoAccount.WithResult(err))
 		}
@@ -297,7 +296,7 @@ func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 
 // Delete 删除账户
 func Delete(ctx context.Context, request *User) error {
-	return dbx.With(ctx).Transaction(func(tx *gorm.DB) error {
+	return db.With(ctx).Transaction(func(tx *gorm.DB) error {
 		user := &model.User{}
 		query := tx.Model(user).Where("id =?", request.ID)
 		if err := query.First(user).Error; err != nil {
