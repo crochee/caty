@@ -16,7 +16,6 @@ func RequestLogger(log *zap.Logger) gin.HandlerFunc {
 		if traceID := v.GetTraceID(ctx); traceID != "" {
 			fieldList = append(fieldList, zap.String("trace_id", traceID))
 		}
-		fieldList = append(fieldList, zap.String("client_ip", c.ClientIP()))
 		c.Request = c.Request.WithContext(logger.With(ctx, log.With(fieldList...)))
 		c.Next()
 	}

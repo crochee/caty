@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
-	github.com/crochee/lirity v1.2.7
+	github.com/crochee/lirity v1.2.8
 	github.com/crochee/uid v1.0.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7

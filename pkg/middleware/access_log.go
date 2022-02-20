@@ -7,8 +7,7 @@ import (
 
 	"github.com/crochee/lirity/logger"
 	"github.com/gin-gonic/gin"
-
-	"caty/pkg/v"
+	"go.uber.org/zap"
 )
 
 // Log request logx
@@ -26,7 +25,6 @@ func Log(ctx *gin.Context) {
 		Keys:    ctx.Keys,
 	}
 	// Stop timer
-	param.TimeStamp = time.Now()
 	param.Latency = param.TimeStamp.Sub(start)
 
 	param.ClientIP = ctx.ClientIP()
@@ -35,7 +33,7 @@ func Log(ctx *gin.Context) {
 	param.ErrorMessage = ctx.Errors.ByType(gin.ErrorTypePrivate).String()
 
 	param.BodySize = ctx.Writer.Size()
-
+	param.Keys = ctx.Keys
 	if raw != "" {
 		var buf strings.Builder
 		buf.WriteString(path)
@@ -44,11 +42,11 @@ func Log(ctx *gin.Context) {
 		path = buf.String()
 	}
 	param.Path = path
-	logger.From(ctx.Request.Context()).Info(defaultLogFormatter(param))
+	logger.From(ctx.Request.Context()).Info(defaultLogFormatter(&param), zap.Any("keys", param.Keys))
 }
 
 // defaultLogFormatter is the default log format function Logger middleware uses.
-var defaultLogFormatter = func(param gin.LogFormatterParams) string {
+func defaultLogFormatter(param *gin.LogFormatterParams) string {
 	var statusColor, methodColor, resetColor string
 	if param.IsOutputColor() {
 		statusColor = param.StatusCodeColor()
@@ -60,11 +58,6 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 		param.Latency = param.Latency - param.Latency%time.Second
 	}
 	var buf strings.Builder
-	buf.WriteByte('[')
-	buf.WriteString(v.ServiceName)
-	buf.WriteString("] ")
-	buf.WriteString(param.TimeStamp.Format("2006/01/02 - 15:04:05"))
-	buf.WriteString(" |")
 	buf.WriteString(statusColor)
 	buf.WriteByte(' ')
 	buf.WriteString(strconv.Itoa(param.StatusCode))

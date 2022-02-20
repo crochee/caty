@@ -43,6 +43,7 @@ func main() {
 	}
 	// 初始化系统日志
 	zap.ReplaceGlobals(logger.New(
+		logger.WithFields(zap.String("service", v.ServiceName)),
 		logger.WithLevel(viper.GetString("level")),
 		logger.WithWriter(logger.SetWriter(viper.GetString("path")))))
 
@@ -83,7 +84,7 @@ func startAction(ctx context.Context, srv *httpx.HTTPServer) error {
 	if err := validator.Init(); err != nil {
 		return err
 	}
-	zap.S().Infof("%s run on %s", v.ServiceName, gin.Mode())
+	zap.S().Infof("run on %s", gin.Mode())
 	return srv.Start(ctx)
 }
 

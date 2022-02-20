@@ -23,6 +23,7 @@ import (
 	"github.com/crochee/lirity/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 
 	"caty/api"
 	"caty/pkg/middleware"
@@ -36,9 +37,11 @@ func New() *gin.Engine {
 	router.NoRoute(middleware.NoRoute)
 	router.NoMethod(middleware.NoMethod)
 
-	router.Use(middleware.TraceID,
+	router.Use(
+		middleware.TraceID,
 		middleware.RequestLogger(
 			logger.New(
+				logger.WithFields(zap.String("service", v.ServiceName)),
 				logger.WithLevel(viper.GetString("level")),
 				logger.WithWriter(logger.SetWriter(viper.GetString("path"))))),
 		middleware.Log,

@@ -2,7 +2,7 @@ FROM golang:1.17.3-alpine as builder
 ARG Project=caty
 ARG URL=https://gitee.com/crochee/${Project}.git
 ARG GOSU_VERSION=1.14
-WORKDIR /opt/cloud
+WORKDIR /opt/cloud.0
 # 下载git 修改配置
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories &&\
     apk add --no-cache git tzdata dos2unix
