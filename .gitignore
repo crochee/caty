@@ -1,5 +1,6 @@
 .idea/
 ./log
 golangci-lint.json
-caty*
+./caty*
 go.sum
+./conf/caty.yml
