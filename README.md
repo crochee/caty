@@ -6,6 +6,15 @@
 
 8120
 
+## 本地数据库的创建
+
+数据库为pokerface,创建sql
+
+```sql
+create
+    database caty character set utf8mb4 collate utf8mb4_bin;
+```
+
 ## go-swagger本地简单运用
 
 下载：go get -u github.com/go-swagger/go-swagger/cmd/swagger  
