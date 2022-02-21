@@ -3,4 +3,4 @@
 golangci-lint.json
 ./caty*
 go.sum
-./conf/caty.yml
+./conf/*.yaml

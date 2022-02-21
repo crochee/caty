@@ -27,7 +27,7 @@ import (
 	"caty/pkg/validator"
 )
 
-var configFile = flag.String("f", "./conf/caty.yml", "the config file")
+var configFile = flag.String("f", "./conf/caty.yaml", "the config file")
 
 func main() {
 	flag.Parse()
