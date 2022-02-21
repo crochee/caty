@@ -65,3 +65,25 @@ ${image} \
 #--initial-cluster：集群中所有节点的信息，格式为node1=http://ip1:2380,node2=http://ip2:2380,…，注意：这里的 node1 是节点的 --name 指定的名字；后面的 ip1:2380 是 --initial-advertise-peer-urls 指定的值。
 #--initial-cluster-state：新建集群的时候，这个值为 new；假如已经存在的集群，这个值为 existing。
 #--initial-cluster-token：创建集群的 token，这个值每个集群保持唯一。这样的话，如果你要重新创建集群，即使配置和之前一样，也会再次生成新的集群和节点 uuid；否则会导致多个集群之间的冲突，造成未知的错误
+
+rm -rf /data/mysql/etcd-data.tmp && mkdir -p /data/mysql/etcd-data.tmp && \
+docker rmi quay.io/coreos/etcd:v3.5.2 || true && \
+docker run -itd \
+  -p 2379:2379 \
+  -p 2380:2380 \
+  --mount type=bind,source=/data/mysql/etcd-data.tmp,destination=/etcd-data \
+  --name etcd \
+  quay.io/coreos/etcd:v3.5.2 \
+  /usr/local/bin/etcd \
+  --name s1 \
+  --data-dir /etcd-data \
+  --listen-client-urls http://0.0.0.0:2379 \
+  --advertise-client-urls http://0.0.0.0:2379 \
+  --listen-peer-urls http://0.0.0.0:2380 \
+  --initial-advertise-peer-urls http://0.0.0.0:2380 \
+  --initial-cluster s1=http://0.0.0.0:2380 \
+  --initial-cluster-token token \
+  --initial-cluster-state new \
+  --log-level info \
+  --logger zap \
+  --log-outputs stderr
