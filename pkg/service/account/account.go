@@ -185,7 +185,7 @@ func Update(ctx context.Context, user *User, request *UpdateRequest) error {
 }
 
 type RetrievesRequest struct {
-	model.Page
+	db.Pagination
 	// 账户ID
 	// in: query
 	AccountID string `json:"account-id" form:"account-id" binding:"omitempty,numeric"`
@@ -201,30 +201,9 @@ type RetrievesRequest struct {
 }
 
 type RetrieveResponses struct {
-	model.Page
+	db.Pagination
 	// 结果集
-	Result []*RetrieveResponse `json:"result"`
-}
-
-type RetrieveResponse struct {
-	// 是否认证
-	Verify uint8 `json:"verify"`
-	// 账户ID
-	AccountID string `json:"account_id"`
-	// 账户
-	Account string `json:"account"`
-	// 用户
-	UserID string `json:"user_id"`
-	// 邮箱
-	Email string `json:"email"`
-	// 权限
-	Permission string `json:"permission"`
-	// 描述
-	Desc string `json:"desc"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
-	// 更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	List []*model.User `json:"list"`
 }
 
 // List 查询、获取账户信息
@@ -243,37 +222,19 @@ func List(ctx context.Context, request *RetrievesRequest) (*RetrieveResponses, e
 			query = query.Where("email = ?", request.Email)
 		}
 	}
-	query = model.HandlePage(query, request.Page)
+	query = request.Pagination.Build(ctx, query)
 	var userList []*model.User
 	if err := query.Find(&userList).Error; err != nil {
 		return nil, errors.WithStack(code.ErrRetrieveAccount.WithResult(err))
 	}
-	responses := &RetrieveResponses{
-		Page: model.Page{
-			Index: request.Index,
-			Size:  request.Size,
-			Total: len(userList),
-		},
-		Result: make([]*RetrieveResponse, 0, len(userList)),
-	}
-	for _, user := range userList {
-		responses.Result = append(responses.Result, &RetrieveResponse{
-			AccountID:  FormatUint(user.AccountID),
-			Account:    user.Name,
-			UserID:     FormatUint(user.ID),
-			Email:      user.Email,
-			Permission: user.Permission,
-			Verify:     user.Verify,
-			Desc:       user.Desc,
-			CreatedAt:  user.CreatedAt,
-			UpdatedAt:  user.UpdatedAt,
-		})
-	}
-	return responses, nil
+	return &RetrieveResponses{
+		Pagination: request.Pagination,
+		List:       userList,
+	}, nil
 }
 
 // Retrieve 查询、获取指定账户信息
-func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
+func Retrieve(ctx context.Context, request *User) (*model.User, error) {
 	user := &model.User{}
 	if err := db.With(ctx).Model(user).Where("id =?", request.ID).First(user).Error; err != nil {
 		if errors.Is(err, db.NotFound) {
@@ -281,17 +242,7 @@ func Retrieve(ctx context.Context, request *User) (*RetrieveResponse, error) {
 		}
 		return nil, errors.WithStack(code.ErrRetrieveAccount.WithResult(err))
 	}
-	return &RetrieveResponse{
-		AccountID:  FormatUint(user.AccountID),
-		Account:    user.Name,
-		UserID:     FormatUint(user.ID),
-		Email:      user.Email,
-		Permission: user.Permission,
-		Verify:     user.Verify,
-		Desc:       user.Desc,
-		CreatedAt:  user.CreatedAt,
-		UpdatedAt:  user.UpdatedAt,
-	}, nil
+	return user, nil
 }
 
 // Delete 删除账户
