@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,10 +33,10 @@ func main() {
 	flag.Parse()
 	// 初始化配置
 	if err := config.LoadConfig(*configFile); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	if err := code.Loading(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	if mode := strings.ToLower(viper.GetString("GIN_MODE")); mode != "" {
 		gin.SetMode(mode)
@@ -46,9 +47,7 @@ func main() {
 		logger.WithWriter(logger.SetWriter(viper.GetString("path")))))
 
 	if err := run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		zap.L().Fatal(err.Error())
-		_, _ = os.Stderr.WriteString(err.Error())
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
