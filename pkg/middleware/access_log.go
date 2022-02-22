@@ -25,6 +25,7 @@ func Log(ctx *gin.Context) {
 		Keys:    ctx.Keys,
 	}
 	// Stop timer
+	param.TimeStamp = time.Now()
 	param.Latency = param.TimeStamp.Sub(start)
 
 	param.ClientIP = ctx.ClientIP()
